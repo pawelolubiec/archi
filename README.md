@@ -48,7 +48,7 @@ src/
   data/        the data model = the single source of truth
     chapters.ts      10 chapters: camera, visible points, flows, scene, modal
     locations.ts     factory + offices + customers (lat/lng)
-    systems.ts       ERP/PTS/PID/MIFO/WMS/QMS/CRM/APS/Data/AI
+    systems.ts       ERP/PTS/PID/MiFo/WMS/QMS/APS/Data/AI
     dataFlows.ts     customer → office → factory flows
     kpis.ts          10 KPIs with drivers (system → KPI)
     scenarios.ts     investment scenarios + KPI deltas + roadmap
@@ -86,8 +86,8 @@ Swap them 1:1 for real screenshots (same file name, ~1366×830 recommended):
 
 ```
 public/screens/
-  salesforce_crm.png   workday_erp.png   pts.png    pid.png    mifo.png
-  wms.png              qms_lims.png      aps.png    data_platform.png    gone_ai.png
+  mifo.png             workday_erp.png   pts.png    pid.png    wms.png
+  qms_lims.png         aps.png           data_platform.png    gone_ai.png
 ```
 
 Regenerating continent dots: `npm run gen:land`.

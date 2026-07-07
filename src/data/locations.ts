@@ -9,7 +9,7 @@ export const locations: Location[] = [
     lat: 54.46,
     lng: 17.03, // Słupsk
     description:
-      "The group's production center and operational core. This is where the ERP, PTS, PID, MIFO, WMS, and QMS systems meet.",
+      "The group's production center and operational core. This is where the ERP, PTS, PID, MiFo, WMS, and QMS systems meet.",
     connectedSystems: ['workday_erp', 'pts', 'pid', 'mifo', 'wms', 'qms_lims'],
     labelOffsetY: 0.2,
   },
@@ -22,7 +22,7 @@ export const locations: Location[] = [
     lng: 8.007, // Wallenhorst
     description:
       'Milarex Arctic Seafood GmbH — D-49134 Wallenhorst, Germany. Sales and key-account management for the DACH market.',
-    connectedSystems: ['salesforce_crm'],
+    connectedSystems: ['mifo'],
     pinLabel: 'Sales offices',
     labelOffsetY: 0.14,
     labelDistanceFactor: 4,
@@ -35,7 +35,7 @@ export const locations: Location[] = [
     lat: 45.821,
     lng: 8.825, // Varese
     description: 'Varese, Italy. Southern European market, retail and HoReCa.',
-    connectedSystems: ['salesforce_crm'],
+    connectedSystems: ['mifo'],
     pinLabel: 'Italy',
     labelOffsetY: 0.02,
   },
@@ -48,7 +48,7 @@ export const locations: Location[] = [
     lng: 3.098, // Marcq-en-Barœul
     description:
       'Milarex France — 165 avenue de la Marne, 59700 Marcq-en-Barœul, France. Sales and customer-concentration analytics (HHI).',
-    connectedSystems: ['salesforce_crm'],
+    connectedSystems: ['mifo'],
     pinLabel: 'France',
     labelOffsetY: 0.08,
   },
@@ -61,7 +61,7 @@ export const locations: Location[] = [
     lng: -118.09, // Seal Beach, CA
     description:
       'ULTCO LLC — California Headquarters, 3030 Old Ranch Parkway, Suite 240, Seal Beach, CA 90740, US. Expansion into the North American market.',
-    connectedSystems: ['salesforce_crm'],
+    connectedSystems: ['mifo'],
     pinLabel: 'USA',
   },
   {
@@ -72,7 +72,7 @@ export const locations: Location[] = [
     lat: 35.68,
     lng: 139.69, // Tokyo
     description: 'Sales and key-account management for the Japanese market.',
-    connectedSystems: ['salesforce_crm'],
+    connectedSystems: ['mifo'],
     pinLabel: 'Japan',
   },
   {
@@ -83,7 +83,7 @@ export const locations: Location[] = [
     lat: -33.87,
     lng: 151.21, // Sydney
     description: 'Sales and key-account management for the Australian market.',
-    connectedSystems: ['salesforce_crm'],
+    connectedSystems: ['mifo'],
     pinLabel: 'Australia',
   },
   {
@@ -94,7 +94,7 @@ export const locations: Location[] = [
     lat: 35.68,
     lng: 139.69, // Tokyo
     description: 'Retail and distributor demand in the Japanese market.',
-    connectedSystems: ['salesforce_crm'],
+    connectedSystems: ['mifo'],
     pinLabel: 'Japan',
   },
   {
@@ -105,7 +105,7 @@ export const locations: Location[] = [
     lat: -33.87,
     lng: 151.21, // Sydney
     description: 'Retail and distributor demand in the Australian market.',
-    connectedSystems: ['salesforce_crm'],
+    connectedSystems: ['mifo'],
     pinLabel: 'Australia',
   },
 ];

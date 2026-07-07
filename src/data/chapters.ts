@@ -60,9 +60,9 @@ export const chapters: Chapter[] = [
     index: 2,
     scene: 'globe',
     eyebrow: 'Sales',
-    title: 'Sales offices · CRM',
+    title: 'Sales offices · MiFo',
     description:
-      'Zooming into the sales offices. Salesforce manages customers, pipeline, forecast, quotes, and complaints.',
+      'Zooming into the sales offices. MiFo — Milarex Forecasting, Ordering & Profitability — manages customers, demand forecast, orders, quotes, and margin visibility.',
     businessMessage:
       'Sales starts the data chain — from the very first customer contact.',
     cameraPosition: [3.03, 3.96, -0.43],
@@ -85,8 +85,8 @@ export const chapters: Chapter[] = [
       'au_to_factory',
     ],
     labeledLocations: [],
-    activeSystems: ['salesforce_crm'],
-    modal: 'salesforce_crm',
+    activeSystems: ['mifo'],
+    modal: 'mifo',
     kpiPanel: false,
   },
   {
@@ -96,15 +96,15 @@ export const chapters: Chapter[] = [
     eyebrow: 'Integration',
     title: 'Sales feeds production',
     description:
-      'Orders, forecast, prices, complaints, and customer requirements flow from CRM into the operational core in Poland.',
+      'Orders, forecast, prices, complaints, and customer requirements flow from MiFo into the operational core in Poland.',
     businessMessage:
       "Sales isn't a silo — its data drives planning and operational decisions.",
     cameraPosition: [2.72, 3.99, -0.84],
     cameraTarget: [1.11, 1.63, -0.34],
     visibleLocations: ['office_germany', 'factory_poland'],
     activeFlows: ['de_to_factory'],
-    activeSystems: ['salesforce_crm', 'aps', 'workday_erp'],
-    modal: 'salesforce_crm',
+    activeSystems: ['mifo', 'aps', 'workday_erp'],
+    modal: 'mifo',
     kpiPanel: false,
   },
   {
@@ -131,7 +131,7 @@ export const chapters: Chapter[] = [
     eyebrow: 'Systems',
     title: "The factory's internal systems",
     description:
-      'ERP, PTS, PID, MIFO, WMS, and QMS/LIMS as the digital blueprint of operations. Click a system to see details.',
+      'ERP, PTS, PID, MiFo, WMS, and QMS/LIMS as the digital blueprint of operations. Click a system to see details.',
     businessMessage:
       'Every area has a specialized system — not one monolith for everything.',
     cameraPosition: [4.5, 8.5, 6.5],
@@ -156,7 +156,7 @@ export const chapters: Chapter[] = [
     visibleLocations: [],
     activeFlows: [],
     activeSystems: [
-      'salesforce_crm',
+      'mifo',
       'workday_erp',
       'pts',
       'pid',
@@ -178,7 +178,7 @@ export const chapters: Chapter[] = [
     description:
       'Every KPI has an owner and is driven by specific systems. Technology meets the financial result.',
     businessMessage:
-      'Yield = PTS + MIFO + PID + Data. Forecast = CRM + APS + Data + AI. Working capital = WMS + ERP + APS.',
+      'Yield = PTS + MiFo + PID + Data. Forecast = MiFo + APS + Data + AI. Working capital = WMS + ERP + APS.',
     cameraPosition: [0, 1, 9.5],
     cameraTarget: [0, 0, 0],
     visibleLocations: [],

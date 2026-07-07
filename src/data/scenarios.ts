@@ -45,7 +45,7 @@ export const scenarios: Scenario[] = [
     paybackMonths: 8,
     risks: ['Line coverage', 'Operator data quality'],
     dependencies: ['pid'],
-    sequence: ['PTS scope+', 'PID sync', 'MIFO feed'],
+    sequence: ['PTS scope+', 'PID sync', 'MiFo feed'],
     kpiDeltas: { yield: 2, oee: 5, cost_per_kg: -3 },
     activatesSystems: ['pts'],
   },
@@ -67,9 +67,9 @@ export const scenarios: Scenario[] = [
   },
   {
     id: 'mifo_ai',
-    name: 'MIFO + AI',
+    name: 'MiFo + AI',
     summary:
-      'Manufacturing Intelligence with AI analytics: loss prediction, throughput optimization, and cost/kg reduction.',
+      'MiFo with AI analytics: demand and margin prediction, throughput optimization, and cost/kg reduction.',
     horizon: '2028–2029',
     capexK: 900,
     opexAnnualK: 150,
@@ -77,7 +77,7 @@ export const scenarios: Scenario[] = [
     paybackMonths: 18,
     risks: ['Data maturity', 'Trust in models', 'Team capabilities'],
     dependencies: ['pts', 'data_platform'],
-    sequence: ['Data Platform', 'MIFO', 'AI Agents'],
+    sequence: ['Data Platform', 'MiFo', 'AI Agents'],
     kpiDeltas: { yield: 2, cost_per_kg: -4, co2_per_kg: -6, oee: 3 },
     activatesSystems: ['mifo', 'data_platform', 'gone_ai'],
   },
@@ -95,8 +95,8 @@ export const scenarios: Scenario[] = [
     dependencies: [],
     sequence: [
       'Data foundations',
-      'CRM/WMS/PTS/PID',
-      'MIFO/APS/QMS',
+      'MiFo/WMS/PTS/PID',
+      'MiFo/APS/QMS',
       'AI Agents',
       'Digital Twin',
     ],
@@ -140,13 +140,13 @@ export const roadmap: RoadmapPhase[] = [
   {
     year: '2027',
     theme: 'Operational core',
-    items: ['CRM', 'WMS', 'PTS', 'PID'],
+    items: ['MiFo', 'WMS', 'PTS', 'PID'],
     valueIndex: 0.38,
   },
   {
     year: '2028',
     theme: 'Intelligence',
-    items: ['MIFO', 'APS', 'QMS / LIMS'],
+    items: ['MiFo', 'APS', 'QMS / LIMS'],
     valueIndex: 0.6,
   },
   {

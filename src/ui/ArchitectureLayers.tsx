@@ -18,7 +18,7 @@ const LAYERS: Layer[] = [
   { label: 'Users · Customers · Partners', items: ['Customers', 'Sales offices', 'Partners'], tone: 'mist' },
   {
     label: 'Specialized systems',
-    items: ['CRM', 'APS', 'PTS', 'PID', 'MIFO', 'WMS', 'QMS'],
+    items: ['MiFo', 'APS', 'PTS', 'PID', 'WMS', 'QMS'],
     tone: 'sea',
   },
   { label: 'Integration Layer · API · Event Bus', items: ['Integrations', 'Events', 'API'], tone: 'green' },

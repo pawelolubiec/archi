@@ -68,7 +68,7 @@ export const kpis: KPI[] = [
     target: 82,
     unit: '%',
     higherBetter: true,
-    affectedBy: ['salesforce_crm', 'aps', 'data_platform', 'gone_ai'],
+    affectedBy: ['mifo', 'aps', 'data_platform', 'gone_ai'],
     businessMeaning: 'Accuracy of demand forecasting — drives planning and inventory.',
   },
   {
@@ -78,7 +78,7 @@ export const kpis: KPI[] = [
     target: 98,
     unit: '%',
     higherBetter: true,
-    affectedBy: ['salesforce_crm', 'aps', 'wms'],
+    affectedBy: ['mifo', 'aps', 'wms'],
     businessMeaning: 'On-time, in-full order fulfillment (OTIF).',
   },
   {
