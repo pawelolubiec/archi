@@ -46,6 +46,28 @@ export const dataFlows: DataFlow[] = [
     kpisAffected: ['forecast_accuracy'],
     lift: 0.5,
   },
+  {
+    id: 'jp_to_factory',
+    from: 'office_japan',
+    to: 'factory_poland',
+    type: 'orders',
+    description: 'Sales data from Japan into the operational core.',
+    frequency: 'daily',
+    systems: ['salesforce_crm', 'aps'],
+    kpisAffected: ['forecast_accuracy'],
+    lift: 0.5,
+  },
+  {
+    id: 'au_to_factory',
+    from: 'office_australia',
+    to: 'factory_poland',
+    type: 'orders',
+    description: 'Sales data from Australia into the operational core.',
+    frequency: 'daily',
+    systems: ['salesforce_crm', 'aps'],
+    kpisAffected: ['forecast_accuracy'],
+    lift: 0.5,
+  },
 ];
 
 export const dataFlowById = Object.fromEntries(

@@ -23,8 +23,9 @@ export const locations: Location[] = [
     description:
       'Milarex Arctic Seafood GmbH — D-49134 Wallenhorst, Germany. Sales and key-account management for the DACH market.',
     connectedSystems: ['salesforce_crm'],
-    pinLabel: 'Germany',
+    pinLabel: 'Sales offices',
     labelOffsetY: 0.14,
+    labelDistanceFactor: 4,
   },
   {
     id: 'office_italy',
@@ -62,6 +63,28 @@ export const locations: Location[] = [
       'ULTCO LLC — California Headquarters, 3030 Old Ranch Parkway, Suite 240, Seal Beach, CA 90740, US. Expansion into the North American market.',
     connectedSystems: ['salesforce_crm'],
     pinLabel: 'USA',
+  },
+  {
+    id: 'office_japan',
+    name: 'Milarex Japan',
+    country: 'Japan',
+    type: 'office',
+    lat: 35.68,
+    lng: 139.69, // Tokyo
+    description: 'Sales and key-account management for the Japanese market.',
+    connectedSystems: ['salesforce_crm'],
+    pinLabel: 'Japan',
+  },
+  {
+    id: 'office_australia',
+    name: 'Milarex Australia',
+    country: 'Australia',
+    type: 'office',
+    lat: -33.87,
+    lng: 151.21, // Sydney
+    description: 'Sales and key-account management for the Australian market.',
+    connectedSystems: ['salesforce_crm'],
+    pinLabel: 'Australia',
   },
   {
     id: 'market_japan',

@@ -16,9 +16,15 @@ interface Props {
   location: Location;
   active: boolean;
   showLabel?: boolean;
+  opacity?: number;
 }
 
-export function LocationMarker({ location, active, showLabel = true }: Props) {
+export function LocationMarker({
+  location,
+  active,
+  showLabel = true,
+  opacity = 1,
+}: Props) {
   const ringRef = useRef<Mesh>(null);
   const groupRef = useRef<Group>(null);
   const pos = latLngToVector3(location.lat, location.lng, GLOBE_RADIUS * 1.01);
@@ -40,22 +46,27 @@ export function LocationMarker({ location, active, showLabel = true }: Props) {
   });
 
   return (
-    <group ref={groupRef} position={pos}>
+    <group ref={groupRef} position={pos} visible={opacity > 0.01}>
       {/* core */}
       <mesh>
         <sphereGeometry args={[0.028, 16, 16]} />
-        <meshBasicMaterial color={color} toneMapped={false} />
+        <meshBasicMaterial color={color} toneMapped={false} transparent opacity={opacity} />
       </mesh>
 
       {/* pulsing ring */}
       <mesh ref={ringRef} rotation={[Math.PI / 2, 0, 0]}>
         <ringGeometry args={[0.045, 0.06, 32]} />
-        <meshBasicMaterial color={color} transparent opacity={0.4} toneMapped={false} />
+        <meshBasicMaterial
+          color={color}
+          transparent
+          opacity={0.4 * opacity}
+          toneMapped={false}
+        />
       </mesh>
 
       {active && showLabel && (
         <Html
-          distanceFactor={8}
+          distanceFactor={location.labelDistanceFactor ?? 8}
           position={[0, location.labelOffsetY ?? 0.12, 0]}
           center
           occlude

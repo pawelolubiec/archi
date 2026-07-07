@@ -4,13 +4,13 @@ import { systemById } from '../data/systems';
 import { scenarioById } from '../data/scenarios';
 import { useStore } from '../store/useStore';
 import type { KPI } from '../data/types';
+import { AnimatedBar, AnimatedDelta, AnimatedNumber } from './AnimatedNumber';
 
 function projectedValue(kpi: KPI, deltas?: Record<string, number>): number {
   if (!deltas || deltas[kpi.id] === undefined) return kpi.baseline;
   return kpi.baseline + deltas[kpi.id];
 }
 
-/** 0..1 how close the value is to the target (direction depends on higherBetter) */
 function progress(kpi: KPI, value: number): number {
   const span = kpi.target - kpi.baseline;
   if (span === 0) return 1;
@@ -23,14 +23,13 @@ export function KPIBoard({ compact = false }: { compact?: boolean }) {
 
   return (
     <div className="pointer-events-auto w-full max-w-5xl">
-      <div
-        className={`grid gap-3 ${compact ? 'grid-cols-5' : 'grid-cols-5'}`}
-      >
+      <div className={`grid gap-3 ${compact ? 'grid-cols-5' : 'grid-cols-5'}`}>
         {kpis.map((kpi, i) => {
           const value = projectedValue(kpi, scenario?.kpiDeltas);
           const delta = value - kpi.baseline;
           const improved = kpi.higherBetter ? delta > 0 : delta < 0;
           const pct = progress(kpi, value);
+          const decimals = value % 1 === 0 ? 0 : 1;
 
           return (
             <motion.div
@@ -45,28 +44,23 @@ export function KPIBoard({ compact = false }: { compact?: boolean }) {
               </div>
               <div className="mt-1 flex items-baseline gap-1.5">
                 <span className="font-display text-2xl text-paper">
-                  {value % 1 === 0 ? value : value.toFixed(1)}
+                  <AnimatedNumber
+                    value={value}
+                    decimals={decimals}
+                    delay={i * 0.05}
+                  />
                 </span>
                 <span className="text-[10px] text-mist">{kpi.unit}</span>
                 {scenario && delta !== 0 && (
-                  <span
-                    className="ml-auto text-xs font-medium"
-                    style={{ color: improved ? '#34D399' : '#ff8a8a' }}
-                  >
-                    {delta > 0 ? '+' : ''}
-                    {delta % 1 === 0 ? delta : delta.toFixed(1)}
-                  </span>
+                  <AnimatedDelta delta={delta} improved={improved} decimals={decimals} />
                 )}
               </div>
 
-              {/* baseline → target bar */}
               <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/10">
-                <div
-                  className="h-full rounded-full transition-all duration-700"
-                  style={{
-                    width: `${pct * 100}%`,
-                    background: scenario ? '#34D399' : '#2EC5C5',
-                  }}
+                <AnimatedBar
+                  widthPct={pct * 100}
+                  color={scenario ? '#34D399' : '#2EC5C5'}
+                  delay={i * 0.05 + 0.15}
                 />
               </div>
               <div className="mt-1 flex justify-between text-[9px] text-mist">

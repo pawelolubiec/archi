@@ -1,8 +1,18 @@
 import { create } from 'zustand';
+import type { Vector3Tuple } from 'three';
 import { chapters, TOTAL_CHAPTERS } from '../data/chapters';
 import type { Chapter } from '../data/types';
 
 export type Mode = 'strategic' | 'technical';
+export type SceneTransition = 'none' | 'toFactory' | 'toGlobe';
+
+function detectTransition(fromIndex: number, toIndex: number): SceneTransition {
+  const from = chapters[fromIndex]?.scene;
+  const to = chapters[toIndex]?.scene;
+  if (from === 'globe' && to === 'factory') return 'toFactory';
+  if (from === 'factory' && to === 'globe') return 'toGlobe';
+  return 'none';
+}
 
 interface AppState {
   index: number;
@@ -13,6 +23,14 @@ interface AppState {
   appModal: string | null;
   /** selected scenario in the decision simulation */
   scenarioId: string | null;
+  /** globe ↔ factory cinematic cross-fade */
+  sceneTransition: SceneTransition;
+  transitionProgress: number;
+  /** camera at the moment a scene transition started */
+  transitionFromCamera: {
+    position: Vector3Tuple;
+    target: Vector3Tuple;
+  } | null;
 
   current: () => Chapter;
   next: () => void;
@@ -25,6 +43,12 @@ interface AppState {
   openApp: (systemId: string) => void;
   closeApp: () => void;
   setScenario: (id: string | null) => void;
+  setTransitionProgress: (progress: number) => void;
+  finishTransition: () => void;
+  setTransitionFromCamera: (cam: {
+    position: Vector3Tuple;
+    target: Vector3Tuple;
+  }) => void;
 }
 
 export const useStore = create<AppState>((set, get) => ({
@@ -33,29 +57,65 @@ export const useStore = create<AppState>((set, get) => ({
   manualModal: null,
   appModal: null,
   scenarioId: null,
+  sceneTransition: 'none',
+  transitionProgress: 0,
+  transitionFromCamera: null,
 
   current: () => chapters[get().index],
 
   next: () =>
-    set((s) => ({
-      index: Math.min(s.index + 1, TOTAL_CHAPTERS - 1),
-      manualModal: null,
-      appModal: null,
-    })),
+    set((s) => {
+      const nextIndex = Math.min(s.index + 1, TOTAL_CHAPTERS - 1);
+      const transition = detectTransition(s.index, nextIndex);
+      return {
+        index: nextIndex,
+        manualModal: null,
+        appModal: null,
+        sceneTransition: transition,
+        transitionProgress: transition === 'none' ? 0 : 0,
+        transitionFromCamera:
+          transition === 'none' ? null : s.transitionFromCamera,
+      };
+    }),
 
   prev: () =>
-    set((s) => ({
-      index: Math.max(s.index - 1, 0),
-      manualModal: null,
-      appModal: null,
-    })),
+    set((s) => {
+      const nextIndex = Math.max(s.index - 1, 0);
+      const transition = detectTransition(s.index, nextIndex);
+      return {
+        index: nextIndex,
+        manualModal: null,
+        appModal: null,
+        sceneTransition: transition,
+        transitionProgress: transition === 'none' ? 0 : 0,
+        transitionFromCamera:
+          transition === 'none' ? null : s.transitionFromCamera,
+      };
+    }),
 
   goTo: (index) =>
-    set({
-      index: Math.max(0, Math.min(index, TOTAL_CHAPTERS - 1)),
-      manualModal: null,
-      appModal: null,
+    set((s) => {
+      const nextIndex = Math.max(0, Math.min(index, TOTAL_CHAPTERS - 1));
+      const transition = detectTransition(s.index, nextIndex);
+      return {
+        index: nextIndex,
+        manualModal: null,
+        appModal: null,
+        sceneTransition: transition,
+        transitionProgress: transition === 'none' ? 0 : 0,
+        transitionFromCamera:
+          transition === 'none' ? null : s.transitionFromCamera,
+      };
     }),
+
+  setTransitionProgress: (progress) => set({ transitionProgress: progress }),
+  finishTransition: () =>
+    set({
+      sceneTransition: 'none',
+      transitionProgress: 0,
+      transitionFromCamera: null,
+    }),
+  setTransitionFromCamera: (cam) => set({ transitionFromCamera: cam }),
 
   setMode: (mode) => set({ mode }),
   toggleMode: () =>

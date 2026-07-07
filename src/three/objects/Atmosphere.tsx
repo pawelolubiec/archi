@@ -3,13 +3,13 @@ import { BackSide, Color, ShaderMaterial } from 'three';
 import { BRAND, GLOBE_RADIUS } from '../../data/brand';
 
 /** Subtle atmospheric glow (fresnel) around the globe — a premium effect, not sci-fi. */
-export function Atmosphere() {
+export function Atmosphere({ opacity = 1 }: { opacity?: number }) {
   const material = useMemo(() => {
     return new ShaderMaterial({
       uniforms: {
         uColor: { value: new Color(BRAND.sea) },
         uPower: { value: 3.2 },
-        uIntensity: { value: 1.1 },
+        uIntensity: { value: 1.1 * opacity },
       },
       vertexShader: /* glsl */ `
         varying vec3 vNormal;
@@ -36,7 +36,7 @@ export function Atmosphere() {
       side: BackSide,
       depthWrite: false,
     });
-  }, []);
+  }, [opacity]);
 
   return (
     <mesh scale={1.18}>

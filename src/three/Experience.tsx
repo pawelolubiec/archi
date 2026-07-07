@@ -7,6 +7,7 @@ import { GlobeScene } from './scenes/GlobeScene';
 import { FactoryScene } from './scenes/FactoryScene';
 import { BRAND } from '../data/brand';
 import { useStore } from '../store/useStore';
+import { sceneOpacities } from '../lib/cameraKeyframes';
 
 function detectWebGL(): boolean {
   try {
@@ -20,12 +21,87 @@ function detectWebGL(): boolean {
   }
 }
 
+/** Brief atmospheric cloud during globe ↔ factory cross-fade. */
+function TransitionCloud() {
+  const sceneTransition = useStore((s) => s.sceneTransition);
+  const progress = useStore((s) => s.transitionProgress);
+
+  if (sceneTransition === 'none') return null;
+
+  const peak =
+    sceneTransition === 'toFactory'
+      ? progress > 0.32 && progress < 0.58
+        ? Math.sin(((progress - 0.32) / 0.26) * Math.PI)
+        : 0
+      : progress > 0.42 && progress < 0.68
+        ? Math.sin(((progress - 0.42) / 0.26) * Math.PI)
+        : 0;
+
+  if (peak < 0.01) return null;
+
+  return (
+    <mesh scale={1.2 + peak * 0.8}>
+      <sphereGeometry args={[2.8, 32, 32]} />
+      <meshBasicMaterial
+        color={BRAND.paper}
+        transparent
+        opacity={peak * 0.18}
+        depthWrite={false}
+      />
+    </mesh>
+  );
+}
+
 function SceneSwitch() {
-  const scene = useStore((s) => s.current().scene);
-  // The factory has its own scene; the other chapters use the globe
-  // (for 2D scenes the globe remains as a calm, dimmed background).
-  if (scene === 'factory') return <FactoryScene />;
-  return <GlobeScene />;
+  const chapter = useStore((s) => s.current());
+  const sceneTransition = useStore((s) => s.sceneTransition);
+  const progress = useStore((s) => s.transitionProgress);
+
+  const is2D =
+    chapter.scene !== 'globe' && chapter.scene !== 'factory';
+
+  const { globe: globeOpacity, factory: factoryOpacity } = sceneOpacities(
+    sceneTransition,
+    progress,
+  );
+
+  const showGlobe =
+    chapter.scene === 'globe' ||
+    is2D ||
+    sceneTransition === 'toFactory' ||
+    sceneTransition === 'toGlobe';
+
+  const showFactory =
+    chapter.scene === 'factory' ||
+    sceneTransition === 'toFactory' ||
+    sceneTransition === 'toGlobe';
+
+  const globeScale =
+    sceneTransition === 'toFactory'
+      ? 1 - progress * 0.15
+      : sceneTransition === 'toGlobe'
+        ? 0.85 + progress * 0.15
+        : 1;
+
+  return (
+    <>
+      {showGlobe && (
+        <group scale={globeScale}>
+          <GlobeScene
+            opacity={is2D ? 0.55 : globeOpacity}
+            ambientMode={is2D}
+          />
+        </group>
+      )}
+      {showFactory && (
+        <FactoryScene
+          opacity={factoryOpacity}
+          reveal={factoryOpacity > 0.01}
+        />
+      )}
+      <TransitionCloud />
+    </>
+  );
 }
 
 export function Experience() {
@@ -51,7 +127,7 @@ export function Experience() {
   return (
     <Canvas
       dpr={[1, 2]}
-      gl={{ antialias: false, alpha: false, preserveDrawingBuffer: true }}
+      gl={{ antialias: false, alpha: false }}
       camera={{ position: [0.6, 2.6, 8.6], fov: 38, near: 0.1, far: 100 }}
       onCreated={({ gl }) => gl.setClearColor(BRAND.ink)}
     >
@@ -74,18 +150,16 @@ export function Experience() {
         <CameraRig />
       </Suspense>
 
-      {false && (
-        <EffectComposer multisampling={4}>
-          <Bloom
-            intensity={0.7}
-            luminanceThreshold={0.35}
-            luminanceSmoothing={0.4}
-            mipmapBlur
-            radius={0.5}
-          />
-          <Vignette eskil={false} offset={0.25} darkness={0.7} />
-        </EffectComposer>
-      )}
+      <EffectComposer multisampling={0}>
+        <Bloom
+          intensity={0.7}
+          luminanceThreshold={0.35}
+          luminanceSmoothing={0.4}
+          mipmapBlur
+          radius={0.5}
+        />
+        <Vignette eskil={false} offset={0.25} darkness={0.7} />
+      </EffectComposer>
     </Canvas>
   );
 }

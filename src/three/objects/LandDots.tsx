@@ -10,7 +10,7 @@ import landDots from '../../data/landDots.json';
  * Dots closer to the "front" are not artificially brightened — depth comes
  * from per-vertex color with slight variation + additive blending.
  */
-export function LandDots() {
+export function LandDots({ opacity = 1 }: { opacity?: number }) {
   const geometry = useMemo(() => {
     const geo = new BufferGeometry();
     const positions: number[] = [];
@@ -41,7 +41,7 @@ export function LandDots() {
         size={0.022}
         vertexColors
         transparent
-        opacity={0.85}
+        opacity={0.85 * opacity}
         depthWrite={false}
         blending={AdditiveBlending}
         sizeAttenuation

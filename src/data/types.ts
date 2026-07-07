@@ -15,6 +15,8 @@ export interface Location {
   pinLabel?: string;
   /** vertical offset for the pin label, to de-clutter tightly clustered markers */
   labelOffsetY?: number;
+  /** drei <Html> distanceFactor for the pin label — lower = smaller on screen (default 8) */
+  labelDistanceFactor?: number;
 }
 
 export type SystemCategory =
@@ -116,6 +118,8 @@ export interface Chapter {
   kpiPanel: boolean;
   /** hide the floating name pill on location markers (dots stay visible) */
   hideLocationLabels?: boolean;
+  /** if set, only these location ids show their label pill (others show dot only) */
+  labeledLocations?: string[];
 }
 
 export interface RoadmapPhase {

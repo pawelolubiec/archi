@@ -40,7 +40,7 @@ function useGraticule(radius: number) {
   }, [radius]);
 }
 
-export function Earth() {
+export function Earth({ opacity = 1 }: { opacity?: number }) {
   // slightly larger than the core sphere to avoid z-fighting flicker
   const graticule = useGraticule(GLOBE_RADIUS * 1.004);
 
@@ -52,14 +52,16 @@ export function Earth() {
         <meshStandardMaterial
           color={BRAND.navyDeep}
           emissive={BRAND.navy}
-          emissiveIntensity={0.35}
+          emissiveIntensity={0.35 * opacity}
           roughness={0.85}
           metalness={0.1}
+          transparent={opacity < 1}
+          opacity={opacity}
         />
       </mesh>
 
       {/* continents as dots */}
-      <LandDots />
+      <LandDots opacity={opacity} />
 
       {/* geographic grid */}
       {graticule.map((pts, i) => (
@@ -69,11 +71,11 @@ export function Earth() {
           color={BRAND.sea}
           lineWidth={0.6}
           transparent
-          opacity={0.09}
+          opacity={0.09 * opacity}
         />
       ))}
 
-      <Atmosphere />
+      <Atmosphere opacity={opacity} />
     </group>
   );
 }

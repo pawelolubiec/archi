@@ -3,6 +3,7 @@ import { scenarios, scenarioById } from '../data/scenarios';
 import { systemById } from '../data/systems';
 import { useStore } from '../store/useStore';
 import { KPIBoard } from './KPIBoard';
+import { AnimatedNumber } from './AnimatedNumber';
 
 export function ScenarioPanel() {
   const scenarioId = useStore((s) => s.scenarioId);
@@ -65,10 +66,10 @@ export function ScenarioPanel() {
                 </div>
 
                 <div className="mt-4 grid grid-cols-4 gap-3 text-sm">
-                  <Stat label="CAPEX" value={`€ ${(scenario.capexK / 1000).toFixed(1)}M`} tone="#D6BF91" />
-                  <Stat label="OPEX / year" value={`€ ${scenario.opexAnnualK}k`} tone="#9DB4CC" />
-                  <Stat label="EBITDA / year" value={`+€ ${scenario.ebitdaAnnualK}k`} tone="#34D399" />
-                  <Stat label="Payback" value={`${scenario.paybackMonths} mo.`} tone="#2EC5C5" />
+                  <Stat label="CAPEX" tone="#D6BF91" prefix="€ " suffix="M" numeric={scenario.capexK / 1000} decimals={1} />
+                  <Stat label="OPEX / year" tone="#9DB4CC" prefix="€ " suffix="k" numeric={scenario.opexAnnualK} />
+                  <Stat label="EBITDA / year" tone="#34D399" prefix="+€ " suffix="k" numeric={scenario.ebitdaAnnualK} />
+                  <Stat label="Payback" tone="#2EC5C5" suffix=" mo." numeric={scenario.paybackMonths} />
                 </div>
 
                 <div className="mt-3">
@@ -120,12 +121,28 @@ export function ScenarioPanel() {
   );
 }
 
-function Stat({ label, value, tone }: { label: string; value: string; tone: string }) {
+function Stat({
+  label,
+  tone,
+  numeric,
+  suffix = '',
+  prefix = '',
+  decimals = 0,
+}: {
+  label: string;
+  tone: string;
+  numeric: number;
+  suffix?: string;
+  prefix?: string;
+  decimals?: number;
+}) {
   return (
     <div>
       <div className="text-[10px] uppercase tracking-[0.2em] text-mist">{label}</div>
       <div className="text-base font-semibold" style={{ color: tone }}>
-        {value}
+        {prefix}
+        <AnimatedNumber value={numeric} decimals={decimals} />
+        {suffix}
       </div>
     </div>
   );
