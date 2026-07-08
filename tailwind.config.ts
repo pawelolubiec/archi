@@ -20,7 +20,7 @@ export default {
         paper: '#F2F7FC', // off-white
       },
       fontFamily: {
-        display: ['Georgia', 'Cambria', 'Times New Roman', 'serif'],
+        display: ['Fraunces', 'Georgia', 'Cambria', 'Times New Roman', 'serif'],
         sans: ['Inter', 'system-ui', 'sans-serif'],
       },
       letterSpacing: {

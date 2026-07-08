@@ -1,4 +1,4 @@
-import { Suspense, useMemo } from 'react';
+import { Suspense, useEffect, useMemo } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { Stars } from '@react-three/drei';
 import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing';
@@ -106,6 +106,13 @@ function SceneSwitch() {
 
 export function Experience() {
   const hasWebGL = useMemo(detectWebGL, []);
+  const setSceneReady = useStore((s) => s.setSceneReady);
+
+  // Without WebGL the canvas never mounts — lift the intro gate anyway so the
+  // fallback message is visible.
+  useEffect(() => {
+    if (!hasWebGL) setSceneReady();
+  }, [hasWebGL, setSceneReady]);
 
   if (!hasWebGL) {
     return (
@@ -129,7 +136,10 @@ export function Experience() {
       dpr={[1, 2]}
       gl={{ antialias: false, alpha: false }}
       camera={{ position: [0.6, 2.6, 8.6], fov: 38, near: 0.1, far: 100 }}
-      onCreated={({ gl }) => gl.setClearColor(BRAND.ink)}
+      onCreated={({ gl }) => {
+        gl.setClearColor(BRAND.ink);
+        setSceneReady();
+      }}
     >
       <fog attach="fog" args={[BRAND.ink, 14, 30]} />
       <ambientLight intensity={0.45} />

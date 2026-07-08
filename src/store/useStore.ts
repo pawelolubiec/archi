@@ -17,6 +17,8 @@ function detectTransition(fromIndex: number, toIndex: number): SceneTransition {
 interface AppState {
   index: number;
   mode: Mode;
+  /** WebGL canvas has been created — the intro gate can reveal the scene */
+  sceneReady: boolean;
   /** system modal opened manually (click), overrides the chapter modal */
   manualModal: string | null;
   /** fullscreen app preview (screenshot + description) */
@@ -33,6 +35,7 @@ interface AppState {
   } | null;
 
   current: () => Chapter;
+  setSceneReady: () => void;
   next: () => void;
   prev: () => void;
   goTo: (index: number) => void;
@@ -54,6 +57,7 @@ interface AppState {
 export const useStore = create<AppState>((set, get) => ({
   index: 0,
   mode: 'strategic',
+  sceneReady: false,
   manualModal: null,
   appModal: null,
   scenarioId: null,
@@ -62,6 +66,8 @@ export const useStore = create<AppState>((set, get) => ({
   transitionFromCamera: null,
 
   current: () => chapters[get().index],
+
+  setSceneReady: () => set({ sceneReady: true }),
 
   next: () =>
     set((s) => {

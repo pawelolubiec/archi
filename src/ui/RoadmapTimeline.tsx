@@ -11,7 +11,7 @@ export function RoadmapTimeline() {
           preserveAspectRatio="none"
           viewBox="0 0 100 30"
         >
-          <polyline
+          <motion.polyline
             points={roadmap
               .map((p, i) => `${(i / (roadmap.length - 1)) * 100},${30 - p.valueIndex * 28}`)
               .join(' ')}
@@ -19,6 +19,9 @@ export function RoadmapTimeline() {
             stroke="#D6BF91"
             strokeWidth="0.6"
             opacity="0.5"
+            initial={{ pathLength: 0 }}
+            animate={{ pathLength: 1 }}
+            transition={{ delay: 0.3, duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
           />
         </svg>
 
@@ -37,9 +40,11 @@ export function RoadmapTimeline() {
               </span>
             </div>
             <div className="mt-3 h-1 overflow-hidden rounded-full bg-white/10">
-              <div
+              <motion.div
                 className="h-full rounded-full bg-gradient-to-r from-sea to-green"
-                style={{ width: `${phase.valueIndex * 100}%` }}
+                initial={{ width: 0 }}
+                animate={{ width: `${phase.valueIndex * 100}%` }}
+                transition={{ delay: i * 0.1 + 0.35, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
               />
             </div>
             <ul className="mt-3 space-y-1.5">

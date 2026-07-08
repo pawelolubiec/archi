@@ -15,6 +15,7 @@ import { useStore } from '../store/useStore';
 import { AppModal } from './AppModal';
 import { PainPoints } from './PainPoints';
 import { DecisionsPanel } from './DecisionsPanel';
+import { IntroGate } from './IntroGate';
 
 function CentralPanel() {
   const chapter = useStore((s) => s.current());
@@ -135,6 +136,9 @@ export function AppShell() {
 
       {/* fullscreen app preview */}
       <AppModal />
+
+      {/* branded opening cover */}
+      <IntroGate />
     </div>
   );
 }
