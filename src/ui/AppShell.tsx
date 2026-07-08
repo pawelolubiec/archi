@@ -92,7 +92,7 @@ export function AppShell() {
       )}
 
       {/* top bar */}
-      <header className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-8">
+      <header className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-6 2xl:p-8">
         <div className="pointer-events-auto">
           <Logo />
         </div>
@@ -105,26 +105,26 @@ export function AppShell() {
       {/* center content */}
       {is3D ? (
         <>
-          <div className="absolute left-10 top-1/2 -translate-y-1/2">
+          <div className="absolute left-8 top-1/2 -translate-y-1/2 2xl:left-10">
             <Overlay />
           </div>
-          <div className="absolute right-10 top-28">
+          <div className="absolute right-8 top-24 2xl:right-10 2xl:top-28">
             <SystemModal />
           </div>
         </>
       ) : (
         <>
           {/* compact chapter header */}
-          <div className="pointer-events-none absolute left-10 top-24 max-w-md">
+          <div className="pointer-events-none absolute left-8 top-20 max-w-sm 2xl:left-10 2xl:top-24 2xl:max-w-md">
             <div className="mb-1 flex items-baseline gap-2">
-              <span className="font-display text-3xl text-gold/80">
+              <span className="font-display text-2xl text-gold/80 2xl:text-3xl">
                 {String(chapter.index + 1).padStart(2, '0')}
               </span>
               <span className="text-xs uppercase tracking-eyebrow text-sea">
                 {chapter.eyebrow}
               </span>
             </div>
-            <h1 className="font-display text-3xl text-paper">{chapter.title}</h1>
+            <h1 className="font-display text-2xl text-paper 2xl:text-3xl">{chapter.title}</h1>
             <p className="mt-2 text-sm text-mist">{chapter.description}</p>
           </div>
 
@@ -147,7 +147,7 @@ export function AppShell() {
       {chapter.index === 0 && <StartHint />}
 
       {/* bottom bar */}
-      <footer className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-6 p-8">
+      <footer className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-6 p-6 2xl:p-8">
         <ChapterProgress />
         <div className="flex items-center gap-5">
           <AutoplayController />

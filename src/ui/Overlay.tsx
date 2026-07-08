@@ -7,7 +7,7 @@ export function Overlay() {
   const chapter = useStore((s) => s.current());
 
   return (
-    <div className="pointer-events-none max-w-xl">
+    <div className="pointer-events-none max-w-md 2xl:max-w-xl">
       <AnimatePresence mode="wait">
         <motion.div
           key={chapter.id}
@@ -17,7 +17,7 @@ export function Overlay() {
           transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
         >
           <div className="mb-3 flex items-baseline gap-3">
-            <span className="font-display text-5xl leading-none text-gold/80">
+            <span className="font-display text-4xl leading-none text-gold/80 2xl:text-5xl">
               {String(index + 1).padStart(2, '0')}
             </span>
             <span className="text-xs uppercase tracking-eyebrow text-sea">
@@ -28,11 +28,11 @@ export function Overlay() {
             </span>
           </div>
 
-          <h1 className="font-display text-4xl leading-tight text-paper">
+          <h1 className="font-display text-3xl leading-tight text-paper 2xl:text-4xl">
             {chapter.title}
           </h1>
 
-          <p className="mt-4 text-base leading-relaxed text-mist">
+          <p className="mt-4 text-sm leading-relaxed text-mist 2xl:text-base">
             {chapter.description}
           </p>
 
