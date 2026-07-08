@@ -120,6 +120,8 @@ export interface Chapter {
   hideLocationLabels?: boolean;
   /** if set, only these location ids show their label pill (others show dot only) */
   labeledLocations?: string[];
+  /** autoplay dwell time for this chapter (defaults to 20 s) */
+  autoAdvanceSeconds?: number;
 }
 
 export interface RoadmapPhase {

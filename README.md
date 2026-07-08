@@ -30,6 +30,7 @@ npm run preview
 ## Controls
 
 - **→ / Space** — next chapter · **←** — previous
+- **F** — fullscreen · **P** — autoplay/kiosk mode (any click or arrow stops it)
 - **Esc** — close the system modal
 - Click the progress dots (bottom) or a system in the factory scene / in the list
 - The **strategic / technical** toggle (top right) reveals integrations and details

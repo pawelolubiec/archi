@@ -16,6 +16,9 @@ import { AppModal } from './AppModal';
 import { PainPoints } from './PainPoints';
 import { DecisionsPanel } from './DecisionsPanel';
 import { IntroGate } from './IntroGate';
+import { StartHint } from './StartHint';
+import { FullscreenButton, toggleFullscreen } from './FullscreenButton';
+import { AutoplayController } from './AutoplayController';
 
 function CentralPanel() {
   const chapter = useStore((s) => s.current());
@@ -47,17 +50,28 @@ export function AppShell() {
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      const { appModal, closeApp } = useStore.getState();
+      const { appModal, closeApp, toggleAutoplay, stopAutoplay } =
+        useStore.getState();
       if (e.key === 'Escape') {
         if (appModal) closeApp();
         else closeModal();
         return;
       }
+      if (e.key === 'f' || e.key === 'F') {
+        toggleFullscreen();
+        return;
+      }
       if (appModal) return; // fullscreen open — don't change chapters
+      if (e.key === 'p' || e.key === 'P') {
+        toggleAutoplay();
+        return;
+      }
       if (e.key === 'ArrowRight' || e.key === ' ') {
         e.preventDefault();
+        stopAutoplay();
         next();
       } else if (e.key === 'ArrowLeft') {
+        stopAutoplay();
         prev();
       }
     };
@@ -82,7 +96,8 @@ export function AppShell() {
         <div className="pointer-events-auto">
           <Logo />
         </div>
-        <div className="pointer-events-auto">
+        <div className="pointer-events-auto flex items-center gap-3">
+          <FullscreenButton />
           <ModeToggle />
         </div>
       </header>
@@ -128,10 +143,16 @@ export function AppShell() {
         </>
       )}
 
+      {/* start hint on the opening chapter */}
+      {chapter.index === 0 && <StartHint />}
+
       {/* bottom bar */}
       <footer className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-6 p-8">
         <ChapterProgress />
-        <NavigationControls />
+        <div className="flex items-center gap-5">
+          <AutoplayController />
+          <NavigationControls />
+        </div>
       </footer>
 
       {/* fullscreen app preview */}

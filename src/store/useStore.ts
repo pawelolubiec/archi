@@ -19,6 +19,10 @@ interface AppState {
   mode: Mode;
   /** WebGL canvas has been created — the intro gate can reveal the scene */
   sceneReady: boolean;
+  /** the presenter has navigated at least once — hides the start hint */
+  hasNavigated: boolean;
+  /** kiosk mode: auto-advance chapters (toggled with the P key) */
+  autoplay: boolean;
   /** system modal opened manually (click), overrides the chapter modal */
   manualModal: string | null;
   /** fullscreen app preview (screenshot + description) */
@@ -36,6 +40,8 @@ interface AppState {
 
   current: () => Chapter;
   setSceneReady: () => void;
+  toggleAutoplay: () => void;
+  stopAutoplay: () => void;
   next: () => void;
   prev: () => void;
   goTo: (index: number) => void;
@@ -58,6 +64,8 @@ export const useStore = create<AppState>((set, get) => ({
   index: 0,
   mode: 'strategic',
   sceneReady: false,
+  hasNavigated: false,
+  autoplay: false,
   manualModal: null,
   appModal: null,
   scenarioId: null,
@@ -69,12 +77,16 @@ export const useStore = create<AppState>((set, get) => ({
 
   setSceneReady: () => set({ sceneReady: true }),
 
+  toggleAutoplay: () => set((s) => ({ autoplay: !s.autoplay })),
+  stopAutoplay: () => set({ autoplay: false }),
+
   next: () =>
     set((s) => {
       const nextIndex = Math.min(s.index + 1, TOTAL_CHAPTERS - 1);
       const transition = detectTransition(s.index, nextIndex);
       return {
         index: nextIndex,
+        hasNavigated: true,
         manualModal: null,
         appModal: null,
         sceneTransition: transition,
@@ -90,6 +102,7 @@ export const useStore = create<AppState>((set, get) => ({
       const transition = detectTransition(s.index, nextIndex);
       return {
         index: nextIndex,
+        hasNavigated: true,
         manualModal: null,
         appModal: null,
         sceneTransition: transition,
@@ -105,6 +118,7 @@ export const useStore = create<AppState>((set, get) => ({
       const transition = detectTransition(s.index, nextIndex);
       return {
         index: nextIndex,
+        hasNavigated: true,
         manualModal: null,
         appModal: null,
         sceneTransition: transition,
