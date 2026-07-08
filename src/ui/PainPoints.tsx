@@ -6,30 +6,32 @@ interface Pain {
   cost: string;
 }
 
+// Cost figures are ILLUSTRATIVE placeholders — replace with validated numbers
+// (Controlling / Data Platform) before presenting.
 const PAINS: Pain[] = [
   {
     title: 'Data silos',
     detail:
       'Sales, production, warehouse, and finance report from separate systems. Numbers require manual reconciliation.',
-    cost: 'Hours of analyst work every week · conflicting versions of the truth',
+    cost: '≈120 h of analyst work every month · conflicting versions of the truth',
   },
   {
     title: 'Manual reporting',
     detail:
       'Key group reports are assembled in spreadsheets and manually maintained pipelines, outside version control.',
-    cost: 'Delayed decisions · risk of errors in management data',
+    cost: 'Group numbers 5–10 days after month-end · risk of errors in management data',
   },
   {
     title: 'Decisions without real-time data',
     detail:
       'We see yield, OEE, and losses after the fact. Production corrections arrive one or two shifts too late.',
-    cost: 'Lost margin on every production shift',
+    cost: '≈1 pp of yield left invisible · margin lost on every production shift',
   },
   {
     title: 'Point-to-point integrations',
     detail:
       'Systems are connected ad hoc; every change in one forces work in the others. Technical debt keeps growing.',
-    cost: 'Rising cost of every subsequent change · fragile operations',
+    cost: 'Every change costs 2–3× more than in a hub model · fragile operations',
   },
   {
     title: 'Compliance and cyber risk',
@@ -74,6 +76,14 @@ export function PainPoints() {
       >
         <span className="mr-2 text-gold">▸</span>
         This isn't an IT problem — it's a brake on margin, working capital, and decision speed.
+      </motion.p>
+      <motion.p
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.7 }}
+        className="mt-2 text-center text-[11px] text-mist/70"
+      >
+        Cost figures are illustrative estimates — to be validated with Controlling before the meeting.
       </motion.p>
     </div>
   );

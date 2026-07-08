@@ -160,7 +160,6 @@ export const chapters: Chapter[] = [
       'workday_erp',
       'pts',
       'pid',
-      'mifo',
       'wms',
       'qms_lims',
       'aps',

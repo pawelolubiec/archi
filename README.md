@@ -1,11 +1,12 @@
 # Milarex · Digital Architecture
 
 Interactive 3D presentation showing the Milarex digital architecture as a journey:
-cosmos → sales offices and customers → the factory in Poland → internal systems →
-hybrid architecture → KPIs → governance → decision simulation → 2026–2030 roadmap.
+cosmos → why now → sales offices and customers → the factory in Poland →
+internal systems → hybrid architecture → KPIs → governance → decision simulation →
+2026–2030 roadmap → board decisions.
 
 Board-level, dark mode, Milarex branding (navy / sea / gold / green).
-One continuous 3D scene + a 2D layer, driven by 10 chapters.
+One continuous 3D scene + a 2D layer, driven by 12 chapters.
 
 ## Stack
 
@@ -46,7 +47,7 @@ the whole scene is tied together with a subtle **bloom**.
 ```
 src/
   data/        the data model = the single source of truth
-    chapters.ts      10 chapters: camera, visible points, flows, scene, modal
+    chapters.ts      12 chapters: camera, visible points, flows, scene, modal
     locations.ts     factory + offices + customers (lat/lng)
     systems.ts       ERP/PTS/PID/MiFo/WMS/QMS/APS/Data/AI
     dataFlows.ts     customer → office → factory flows
@@ -81,7 +82,8 @@ Clicking a system card (factory scene, architecture layers, or a button in the s
 panel) opens a **fullscreen modal**: a large screenshot + "what it does",
 responsibilities, KPIs, and integrations (navigation between apps inside the modal).
 
-Screenshots live in `public/screens/{system_id}.png` — currently **branded mockups**.
+Screenshots live in `public/screens/{system_id}.png` — currently **branded mockups**
+generated from HTML templates (`npm run gen:screens`, sources in `scripts/mockups/`).
 Swap them 1:1 for real screenshots (same file name, ~1366×830 recommended):
 
 ```
