@@ -23,7 +23,7 @@ export function KPIBoard({ compact = false }: { compact?: boolean }) {
 
   return (
     <div className="pointer-events-auto w-full max-w-5xl">
-      <div className={`grid gap-3 ${compact ? 'grid-cols-5' : 'grid-cols-5'}`}>
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-5">
         {kpis.map((kpi, i) => {
           const value = projectedValue(kpi, scenario?.kpiDeltas);
           const delta = value - kpi.baseline;

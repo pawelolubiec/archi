@@ -37,7 +37,7 @@ export function AppModal() {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.25 }}
-          className="pointer-events-auto fixed inset-0 z-50 flex items-center justify-center bg-ink/80 p-6 backdrop-blur-sm"
+          className="pointer-events-auto fixed inset-0 z-50 flex items-center justify-center bg-ink/80 p-3 backdrop-blur-sm md:p-6"
           onClick={closeApp}
         >
           <motion.div
@@ -45,11 +45,11 @@ export function AppModal() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.97, y: 10 }}
             transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-            className="flex h-full max-h-[92vh] w-full max-w-[1500px] overflow-hidden rounded-2xl border border-white/10 bg-navy-900/95 shadow-panel"
+            className="thin-scroll flex h-full max-h-[94dvh] w-full max-w-[1500px] flex-col overflow-y-auto rounded-2xl border border-white/10 bg-navy-900/95 shadow-panel md:max-h-[92vh] md:flex-row md:overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             {/* screenshot */}
-            <div className="relative flex min-w-0 flex-1 items-center justify-center bg-ink p-6">
+            <div className="relative flex min-w-0 shrink-0 items-center justify-center bg-ink p-4 md:flex-1 md:shrink md:p-6">
               <img
                 src={`/screens/${sys.id}.png`}
                 alt={`Screenshot — ${sys.name}`}
@@ -61,7 +61,7 @@ export function AppModal() {
             </div>
 
             {/* description */}
-            <div className="thin-scroll flex w-[400px] shrink-0 flex-col overflow-y-auto border-l border-white/10 p-7">
+            <div className="thin-scroll flex w-full shrink-0 flex-col border-t border-white/10 p-5 md:w-[400px] md:overflow-y-auto md:border-l md:border-t-0 md:p-7">
               <div className="flex items-start justify-between">
                 <div>
                   <div

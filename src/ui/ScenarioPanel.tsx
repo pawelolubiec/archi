@@ -11,9 +11,9 @@ export function ScenarioPanel() {
   const scenario = scenarioId ? scenarioById[scenarioId] : null;
 
   return (
-    <div className="pointer-events-auto flex w-full max-w-6xl gap-6">
+    <div className="pointer-events-auto flex w-full max-w-6xl flex-col gap-4 md:flex-row md:gap-6">
       {/* scenario selection */}
-      <div className="w-64 shrink-0 space-y-2">
+      <div className="w-full shrink-0 space-y-2 md:w-64">
         <div className="mb-2 text-[10px] uppercase tracking-[0.22em] text-mist">
           Investment scenario
         </div>
@@ -65,7 +65,7 @@ export function ScenarioPanel() {
                   </div>
                 </div>
 
-                <div className="mt-4 grid grid-cols-4 gap-3 text-sm">
+                <div className="mt-4 grid grid-cols-2 gap-3 text-sm md:grid-cols-4">
                   <Stat label="CAPEX" tone="#D6BF91" prefix="€ " suffix="M" numeric={scenario.capexK / 1000} decimals={1} />
                   <Stat label="OPEX / year" tone="#9DB4CC" prefix="€ " suffix="k" numeric={scenario.opexAnnualK} />
                   <Stat label="EBITDA / year" tone="#34D399" prefix="+€ " suffix="k" numeric={scenario.ebitdaAnnualK} />
@@ -88,7 +88,7 @@ export function ScenarioPanel() {
                   </div>
                 </div>
 
-                <div className="mt-4 grid grid-cols-2 gap-4">
+                <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
                   <Block title="Risks" items={scenario.risks} dot="#ff8a8a" />
                   <Block title="Implementation sequence" items={scenario.sequence} dot="#2EC5C5" numbered />
                 </div>

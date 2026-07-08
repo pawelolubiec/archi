@@ -34,7 +34,7 @@ export function SystemModal() {
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: 40 }}
           transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-          className="pointer-events-auto w-[320px] rounded-2xl border border-white/10 bg-navy-900/80 p-5 shadow-panel backdrop-blur-md 2xl:w-[360px] 2xl:p-6"
+          className="thin-scroll pointer-events-auto max-h-[42dvh] w-full overflow-y-auto rounded-2xl border border-white/10 bg-navy-900/80 p-5 shadow-panel backdrop-blur-md md:max-h-none md:w-[320px] md:overflow-visible 2xl:w-[360px] 2xl:p-6"
         >
           <div className="flex items-start justify-between">
             <div>

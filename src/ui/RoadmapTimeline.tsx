@@ -4,10 +4,10 @@ import { roadmap } from '../data/scenarios';
 export function RoadmapTimeline() {
   return (
     <div className="pointer-events-auto w-full max-w-6xl">
-      <div className="relative grid grid-cols-5 gap-4">
+      <div className="relative grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-5 md:gap-4">
         {/* background value line */}
         <svg
-          className="pointer-events-none absolute inset-x-0 -top-2 h-24 w-full"
+          className="pointer-events-none absolute inset-x-0 -top-2 hidden h-24 w-full md:block"
           preserveAspectRatio="none"
           viewBox="0 0 100 30"
         >

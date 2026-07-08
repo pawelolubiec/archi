@@ -53,13 +53,13 @@ export function ArchitectureLayers() {
               initial={{ opacity: 0, x: -24 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: i * 0.08, duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-              className="flex items-center gap-4 rounded-xl border bg-navy-900/60 px-5 py-3 backdrop-blur-sm"
+              className="flex flex-col items-start gap-2 rounded-xl border bg-navy-900/60 px-4 py-3 backdrop-blur-sm md:flex-row md:items-center md:gap-4 md:px-5"
               style={{
                 borderColor: isCore ? `${TONE.gold}99` : 'rgba(255,255,255,0.08)',
                 boxShadow: isCore ? `0 0 40px -12px ${TONE.gold}66` : 'none',
               }}
             >
-              <div className="w-56 shrink-0">
+              <div className="w-full shrink-0 md:w-56">
                 <div
                   className="text-sm font-semibold"
                   style={{ color: TONE[layer.tone] }}

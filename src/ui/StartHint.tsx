@@ -5,6 +5,9 @@ import { useStore } from '../store/useStore';
 export function StartHint() {
   const hasNavigated = useStore((s) => s.hasNavigated);
   const sceneReady = useStore((s) => s.sceneReady);
+  const touch =
+    typeof window !== 'undefined' &&
+    window.matchMedia('(pointer: coarse)').matches;
 
   return (
     <AnimatePresence>
@@ -21,7 +24,11 @@ export function StartHint() {
             animate={{ opacity: [0.45, 1, 0.45] }}
             transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
           >
-            Press <span className="text-gold">→</span> to begin
+            {touch ? (
+              <>Swipe <span className="text-gold">←</span> to begin</>
+            ) : (
+              <>Press <span className="text-gold">→</span> to begin</>
+            )}
           </motion.span>
         </motion.div>
       )}

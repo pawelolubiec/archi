@@ -47,7 +47,7 @@ export function DecisionsPanel() {
           initial={{ opacity: 0, x: -24 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: i * 0.12, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          className="flex gap-5 rounded-2xl border border-gold/25 bg-navy-900/70 p-5 backdrop-blur-sm"
+          className="flex flex-col gap-3 rounded-2xl border border-gold/25 bg-navy-900/70 p-5 backdrop-blur-sm md:flex-row md:gap-5"
         >
           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-gold/50 bg-gold/10 font-display text-lg text-gold">
             {d.no}
@@ -59,7 +59,7 @@ export function DecisionsPanel() {
               <span className="text-sea">Consequence:</span> {d.consequence}
             </p>
           </div>
-          <div className="shrink-0 self-center rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-gold">
+          <div className="shrink-0 self-start rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-gold md:self-center">
             {d.deadline}
           </div>
         </motion.div>

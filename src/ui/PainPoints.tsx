@@ -44,7 +44,7 @@ const PAINS: Pain[] = [
 export function PainPoints() {
   return (
     <div className="pointer-events-auto w-full max-w-5xl">
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
         {PAINS.map((p, i) => (
           <motion.div
             key={p.title}
@@ -52,7 +52,7 @@ export function PainPoints() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.08, duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
             className={`rounded-xl border border-white/10 bg-navy-900/60 p-5 backdrop-blur-sm ${
-              i === PAINS.length - 1 ? 'col-span-2' : ''
+              i === PAINS.length - 1 ? 'md:col-span-2' : ''
             }`}
           >
             <div className="flex items-start gap-3">

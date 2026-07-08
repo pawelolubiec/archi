@@ -17,7 +17,7 @@ export function Overlay() {
           transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
         >
           <div className="mb-3 flex items-baseline gap-3">
-            <span className="font-display text-4xl leading-none text-gold/80 2xl:text-5xl">
+            <span className="font-display text-3xl leading-none text-gold/80 md:text-4xl 2xl:text-5xl">
               {String(index + 1).padStart(2, '0')}
             </span>
             <span className="text-xs uppercase tracking-eyebrow text-sea">
@@ -28,15 +28,15 @@ export function Overlay() {
             </span>
           </div>
 
-          <h1 className="font-display text-3xl leading-tight text-paper 2xl:text-4xl">
+          <h1 className="font-display text-2xl leading-tight text-paper md:text-3xl 2xl:text-4xl">
             {chapter.title}
           </h1>
 
-          <p className="mt-4 text-sm leading-relaxed text-mist 2xl:text-base">
+          <p className="mt-2 text-sm leading-relaxed text-mist md:mt-4 2xl:text-base">
             {chapter.description}
           </p>
 
-          <div className="mt-6 border-l-2 border-gold/60 pl-4">
+          <div className="mt-3 border-l-2 border-gold/60 pl-4 md:mt-6">
             <p className="text-sm font-medium leading-relaxed text-paper/90">
               {chapter.businessMessage}
             </p>

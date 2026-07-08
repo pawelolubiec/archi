@@ -23,7 +23,7 @@ const PRINCIPLES = [
 export function GovernanceCard() {
   return (
     <div className="pointer-events-auto w-full max-w-4xl">
-      <div className="flex gap-6">
+      <div className="flex flex-col gap-4 md:flex-row md:gap-6">
         <div className="flex-1 rounded-2xl border border-white/10 bg-navy-900/60 p-6 backdrop-blur-sm">
           <div className="text-xs uppercase tracking-eyebrow text-gold">
             Accountability model
@@ -31,7 +31,7 @@ export function GovernanceCard() {
           <h3 className="mt-2 font-display text-2xl text-paper">
             One methodology for the entire portfolio
           </h3>
-          <ul className="mt-4 grid grid-cols-2 gap-2.5">
+          <ul className="mt-4 grid grid-cols-1 gap-2.5 sm:grid-cols-2">
             {PRINCIPLES.map((p) => (
               <li key={p} className="flex items-center gap-2 text-sm text-paper/85">
                 <span className="h-1.5 w-1.5 rounded-full bg-sea" />
@@ -41,7 +41,7 @@ export function GovernanceCard() {
           </ul>
         </div>
 
-        <div className="w-72 shrink-0 rounded-2xl border border-gold/30 bg-navy-900/70 p-5 backdrop-blur-sm">
+        <div className="w-full shrink-0 rounded-2xl border border-gold/30 bg-navy-900/70 p-5 backdrop-blur-sm md:w-72">
           <div className="text-[10px] uppercase tracking-[0.22em] text-gold">
             Initiative card
           </div>
@@ -63,7 +63,7 @@ export function GovernanceCard() {
       </div>
 
       {/* compliance and cyber risk pillar */}
-      <div className="mt-4 flex items-center gap-6 rounded-2xl border border-sea/25 bg-navy-900/60 px-6 py-4 backdrop-blur-sm">
+      <div className="mt-4 flex flex-col items-start gap-3 rounded-2xl border border-sea/25 bg-navy-900/60 px-5 py-4 backdrop-blur-sm md:flex-row md:items-center md:gap-6 md:px-6">
         <div className="shrink-0">
           <div className="text-[10px] uppercase tracking-[0.22em] text-sea">
             Compliance and cyber resilience

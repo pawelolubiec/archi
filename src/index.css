@@ -56,6 +56,8 @@ body {
   font-family: 'Inter', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   overflow: hidden;
+  /* keep swipe navigation from triggering pull-to-refresh / rubber-banding */
+  overscroll-behavior: none;
 }
 
 /* cienki, dyskretny scrollbar w panelach */
