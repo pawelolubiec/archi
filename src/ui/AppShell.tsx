@@ -133,7 +133,7 @@ export function AppShell() {
             <h1 className="font-display text-xl text-paper">{chapter.title}</h1>
           </div>
 
-          <div className="absolute inset-x-4 top-[5.5rem] bottom-[5.5rem] z-10 flex flex-col sm:inset-x-6 lg:inset-x-8">
+          <div className="absolute inset-x-4 top-36 bottom-[5.5rem] z-10 flex flex-col sm:inset-x-6 lg:inset-x-8">
             <CentralPanel />
           </div>
 
