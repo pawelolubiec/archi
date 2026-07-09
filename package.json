@@ -3,6 +3,9 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "description": "Milarex – interactive 3D presentation of the digital architecture (board-level strategic storytelling).",
   "scripts": {
     "dev": "vite",
