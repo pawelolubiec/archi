@@ -49,6 +49,7 @@ export function AppShell() {
   const closeArchitectureConfig = useStore((s) => s.closeArchitectureConfig);
 
   const is3D = chapter.scene === 'globe' || chapter.scene === 'factory';
+  const isArchitecture = chapter.scene === 'architecture';
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -82,7 +83,13 @@ export function AppShell() {
 
       {/* scrim for 2D panel readability */}
       {!is3D && (
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-ink/70 via-ink/40 to-ink/80" />
+        <div
+          className={`pointer-events-none absolute inset-0 ${
+            isArchitecture
+              ? 'bg-gradient-to-b from-ink/85 via-ink/75 to-ink/90'
+              : 'bg-gradient-to-b from-ink/70 via-ink/40 to-ink/80'
+          }`}
+        />
       )}
 
       {/* top bar */}
@@ -105,6 +112,31 @@ export function AppShell() {
           </div>
           <div className="absolute right-10 top-28">
             <SystemModal />
+          </div>
+        </>
+      ) : isArchitecture ? (
+        <>
+          <div className="pointer-events-none absolute left-8 top-20 z-10">
+            <div className="mb-0.5 flex items-baseline gap-2">
+              <span className="font-display text-2xl text-gold/80">
+                {String(chapter.index + 1).padStart(2, '0')}
+              </span>
+              <span className="text-[10px] uppercase tracking-eyebrow text-sea">
+                {chapter.eyebrow}
+              </span>
+            </div>
+            <h1 className="font-display text-xl text-paper">{chapter.title}</h1>
+          </div>
+
+          <div className="absolute inset-x-4 top-[5.5rem] bottom-[5.5rem] z-10 flex flex-col sm:inset-x-6 lg:inset-x-8">
+            <CentralPanel />
+          </div>
+
+          <div className="pointer-events-none absolute inset-x-0 bottom-24 z-10 flex justify-center px-8">
+            <p className="max-w-4xl text-center text-xs font-medium text-paper/75">
+              <span className="mr-2 text-gold">▸</span>
+              {chapter.businessMessage}
+            </p>
           </div>
         </>
       ) : (
