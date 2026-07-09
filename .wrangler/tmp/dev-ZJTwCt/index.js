@@ -11,6 +11,7 @@ var CORS_HEADERS = {
   "Access-Control-Allow-Methods": "GET, PUT, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type"
 };
+var schemaReady = null;
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
     status,
@@ -18,6 +19,22 @@ function json(data, status = 200) {
   });
 }
 __name(json, "json");
+async function ensureSchema(env) {
+  if (!env.DB) {
+    throw new Error('D1 binding "DB" is not configured');
+  }
+  if (!schemaReady) {
+    schemaReady = env.DB.prepare(
+      `CREATE TABLE IF NOT EXISTS app_config (
+        key TEXT PRIMARY KEY,
+        value TEXT NOT NULL,
+        updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+      )`
+    ).run().then(() => void 0);
+  }
+  await schemaReady;
+}
+__name(ensureSchema, "ensureSchema");
 async function getConfigValue(env, key) {
   const row = await env.DB.prepare(
     "SELECT value FROM app_config WHERE key = ?"
@@ -31,16 +48,20 @@ async function getConfigValue(env, key) {
 }
 __name(getConfigValue, "getConfigValue");
 async function setConfigValue(env, key, value) {
-  await env.DB.prepare(
+  const result = await env.DB.prepare(
     `INSERT INTO app_config (key, value, updated_at)
      VALUES (?, ?, datetime('now'))
      ON CONFLICT(key) DO UPDATE SET
        value = excluded.value,
        updated_at = excluded.updated_at`
   ).bind(key, JSON.stringify(value)).run();
+  if (!result.success) {
+    throw new Error(`D1 write failed for key "${key}"`);
+  }
 }
 __name(setConfigValue, "setConfigValue");
 async function handleApi(request, env) {
+  await ensureSchema(env);
   if (request.method === "OPTIONS") {
     return new Response(null, { status: 204, headers: CORS_HEADERS });
   }
@@ -73,8 +94,9 @@ var worker_default = {
       try {
         return await handleApi(request, env);
       } catch (err) {
-        console.error(err);
-        return json({ error: "Internal server error" }, 500);
+        console.error("API error:", err);
+        const message = err instanceof Error ? err.message : "Internal server error";
+        return json({ error: message }, 500);
       }
     }
     return env.ASSETS.fetch(request);

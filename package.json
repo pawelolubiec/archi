@@ -12,7 +12,7 @@
     "dev:worker": "wrangler dev",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "deploy": "npm run build && wrangler deploy",
+    "deploy": "npm run build && npm run db:migrate:remote && wrangler deploy",
     "db:migrate:local": "wrangler d1 migrations apply archi --local",
     "db:migrate:remote": "wrangler d1 migrations apply archi --remote",
     "gen:land": "node scripts/generate-land-dots.mjs"

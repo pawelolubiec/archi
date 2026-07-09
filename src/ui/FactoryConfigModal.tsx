@@ -7,10 +7,13 @@ import {
   type FactoryZoneId,
 } from '../data/factoryLayout';
 import { ACCENT_HEX } from '../data/brand';
+import { SaveStatus } from './ConfigSaveStatus';
 
 export function FactoryConfigModal() {
   const open = useStore((s) => s.factoryConfigOpen);
   const factoryMapping = useStore((s) => s.factoryMapping);
+  const factorySaveStatus = useStore((s) => s.factorySaveStatus);
+  const factorySaveError = useStore((s) => s.factorySaveError);
   const closeFactoryConfig = useStore((s) => s.closeFactoryConfig);
   const setSystemZones = useStore((s) => s.setSystemZones);
   const resetFactoryMapping = useStore((s) => s.resetFactoryMapping);
@@ -49,9 +52,10 @@ export function FactoryConfigModal() {
                   Factory system mapping
                 </h2>
                 <p className="mt-1 text-sm text-mist">
-                  Connect each system to one or more factory zones. Changes apply
-                  immediately on the factory scene.
+                  Connect each system to one or more factory zones. Changes save
+                  to the shared database automatically.
                 </p>
+                <SaveStatus status={factorySaveStatus} error={factorySaveError} />
               </div>
               <div className="flex shrink-0 gap-2">
                 <button

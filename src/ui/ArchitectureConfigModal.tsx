@@ -7,6 +7,7 @@ import {
   type ArchLayerId,
   type ArchitectureElement,
 } from '../data/architectureLayout';
+import { SaveStatus } from './ConfigSaveStatus';
 
 const LAYER_ORDER: ArchLayerId[] = ['ai', 'data', 'apps'];
 
@@ -137,6 +138,8 @@ export function ArchitectureConfigModal() {
   const removeArchitectureElement = useStore((s) => s.removeArchitectureElement);
   const setElementProcessLinks = useStore((s) => s.setElementProcessLinks);
   const resetArchitectureConfig = useStore((s) => s.resetArchitectureConfig);
+  const architectureSaveStatus = useStore((s) => s.architectureSaveStatus);
+  const architectureSaveError = useStore((s) => s.architectureSaveError);
 
   const toggleProcess = (elementId: string, processId: string) => {
     const el = config.elements.find((e) => e.id === elementId);
@@ -174,8 +177,12 @@ export function ArchitectureConfigModal() {
                 </h2>
                 <p className="mt-1 text-sm text-mist">
                   Add elements to each layer and link them to business processes.
-                  Changes apply immediately on the architecture slide.
+                  Changes save to the shared database automatically.
                 </p>
+                <SaveStatus
+                  status={architectureSaveStatus}
+                  error={architectureSaveError}
+                />
               </div>
               <div className="flex shrink-0 gap-2">
                 <button

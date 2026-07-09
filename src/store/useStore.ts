@@ -21,6 +21,63 @@ import type { Chapter } from '../data/types';
 
 export type Mode = 'strategic' | 'technical';
 export type SceneTransition = 'none' | 'toFactory' | 'toGlobe';
+export type ConfigSaveStatus = 'idle' | 'saving' | 'saved' | 'error';
+
+const SAVE_DEBOUNCE_MS = 400;
+let factorySaveTimer: ReturnType<typeof setTimeout> | null = null;
+let factorySavePending: FactoryMapping | null = null;
+let architectureSaveTimer: ReturnType<typeof setTimeout> | null = null;
+let architectureSavePending: ArchitectureConfig | null = null;
+
+function scheduleFactorySave(
+  mapping: FactoryMapping,
+  set: (partial: Partial<AppState>) => void,
+) {
+  factorySavePending = mapping;
+  set({ factorySaveStatus: 'saving', factorySaveError: null });
+
+  if (factorySaveTimer) clearTimeout(factorySaveTimer);
+
+  factorySaveTimer = setTimeout(async () => {
+    const payload = factorySavePending;
+    if (!payload) return;
+
+    try {
+      await saveFactoryMappingRemote(payload);
+      set({ factorySaveStatus: 'saved', factorySaveError: null });
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : 'Failed to save factory mapping';
+      console.error('Failed to save factory mapping to D1', err);
+      set({ factorySaveStatus: 'error', factorySaveError: message });
+    }
+  }, SAVE_DEBOUNCE_MS);
+}
+
+function scheduleArchitectureSave(
+  config: ArchitectureConfig,
+  set: (partial: Partial<AppState>) => void,
+) {
+  architectureSavePending = config;
+  set({ architectureSaveStatus: 'saving', architectureSaveError: null });
+
+  if (architectureSaveTimer) clearTimeout(architectureSaveTimer);
+
+  architectureSaveTimer = setTimeout(async () => {
+    const payload = architectureSavePending;
+    if (!payload) return;
+
+    try {
+      await saveArchitectureConfigRemote(payload);
+      set({ architectureSaveStatus: 'saved', architectureSaveError: null });
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : 'Failed to save architecture config';
+      console.error('Failed to save architecture config to D1', err);
+      set({ architectureSaveStatus: 'error', architectureSaveError: message });
+    }
+  }, SAVE_DEBOUNCE_MS);
+}
 
 function detectTransition(fromIndex: number, toIndex: number): SceneTransition {
   const from = chapters[fromIndex]?.scene;
@@ -28,18 +85,6 @@ function detectTransition(fromIndex: number, toIndex: number): SceneTransition {
   if (from === 'globe' && to === 'factory') return 'toFactory';
   if (from === 'factory' && to === 'globe') return 'toGlobe';
   return 'none';
-}
-
-function persistFactoryMapping(mapping: FactoryMapping) {
-  saveFactoryMappingRemote(mapping).catch((err) => {
-    console.error('Failed to save factory mapping to D1', err);
-  });
-}
-
-function persistArchitectureConfig(config: ArchitectureConfig) {
-  saveArchitectureConfigRemote(config).catch((err) => {
-    console.error('Failed to save architecture config to D1', err);
-  });
 }
 
 function chapterNavState(
@@ -83,6 +128,10 @@ interface AppState {
   architectureConfig: ArchitectureConfig;
   architectureConfigOpen: boolean;
   configHydrated: boolean;
+  factorySaveStatus: ConfigSaveStatus;
+  factorySaveError: string | null;
+  architectureSaveStatus: ConfigSaveStatus;
+  architectureSaveError: string | null;
 
   current: () => Chapter;
   next: () => void;
@@ -132,6 +181,10 @@ export const useStore = create<AppState>((set, get) => ({
   architectureConfig: cloneDefaultArchitectureConfig(),
   architectureConfigOpen: false,
   configHydrated: false,
+  factorySaveStatus: 'idle',
+  factorySaveError: null,
+  architectureSaveStatus: 'idle',
+  architectureSaveError: null,
 
   current: () => chapters[get().index],
 
@@ -183,14 +236,14 @@ export const useStore = create<AppState>((set, get) => ({
         ...s.factoryMapping,
         [systemId]: [...zoneIds],
       };
-      persistFactoryMapping(factoryMapping);
+      scheduleFactorySave(factoryMapping, set);
       return { factoryMapping };
     }),
 
   resetFactoryMapping: () => {
     const factoryMapping = cloneDefaultMapping();
-    persistFactoryMapping(factoryMapping);
     set({ factoryMapping });
+    scheduleFactorySave(factoryMapping, set);
   },
 
   openArchitectureConfig: () => set({ architectureConfigOpen: true }),
@@ -207,7 +260,7 @@ export const useStore = create<AppState>((set, get) => ({
       const architectureConfig = {
         elements: [...s.architectureConfig.elements, element],
       };
-      persistArchitectureConfig(architectureConfig);
+      scheduleArchitectureSave(architectureConfig, set);
       return { architectureConfig };
     }),
 
@@ -218,7 +271,7 @@ export const useStore = create<AppState>((set, get) => ({
           el.id === id ? { ...el, ...patch } : el,
         ),
       };
-      persistArchitectureConfig(architectureConfig);
+      scheduleArchitectureSave(architectureConfig, set);
       return { architectureConfig };
     }),
 
@@ -227,7 +280,7 @@ export const useStore = create<AppState>((set, get) => ({
       const architectureConfig = {
         elements: s.architectureConfig.elements.filter((el) => el.id !== id),
       };
-      persistArchitectureConfig(architectureConfig);
+      scheduleArchitectureSave(architectureConfig, set);
       return { architectureConfig };
     }),
 
@@ -238,20 +291,26 @@ export const useStore = create<AppState>((set, get) => ({
           el.id === id ? { ...el, linkedProcessIds: [...processIds] } : el,
         ),
       };
-      persistArchitectureConfig(architectureConfig);
+      scheduleArchitectureSave(architectureConfig, set);
       return { architectureConfig };
     }),
 
   resetArchitectureConfig: () => {
     const architectureConfig = cloneDefaultArchitectureConfig();
-    persistArchitectureConfig(architectureConfig);
     set({ architectureConfig });
+    scheduleArchitectureSave(architectureConfig, set);
   },
 
   hydrateConfig: async () => {
     try {
       const remote = await fetchRemoteConfig();
-      const updates: Partial<AppState> = { configHydrated: true };
+      const updates: Partial<AppState> = {
+        configHydrated: true,
+        factorySaveStatus: 'idle',
+        factorySaveError: null,
+        architectureSaveStatus: 'idle',
+        architectureSaveError: null,
+      };
 
       if (remote.factoryMapping && typeof remote.factoryMapping === 'object') {
         updates.factoryMapping = remote.factoryMapping;
@@ -265,8 +324,14 @@ export const useStore = create<AppState>((set, get) => ({
 
       set(updates);
     } catch (err) {
+      const message =
+        err instanceof Error ? err.message : 'Failed to load config from D1';
       console.error('Failed to hydrate config from D1', err);
-      set({ configHydrated: true });
+      set({
+        configHydrated: true,
+        factorySaveStatus: 'error',
+        factorySaveError: message,
+      });
     }
   },
 }));

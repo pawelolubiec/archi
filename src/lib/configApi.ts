@@ -7,15 +7,32 @@ export interface RemoteConfig {
 }
 
 async function parseJson<T>(res: Response): Promise<T> {
-  if (!res.ok) {
-    const text = await res.text().catch(() => '');
-    throw new Error(`Config API ${res.status}: ${text || res.statusText}`);
+  const contentType = res.headers.get('content-type') ?? '';
+  const text = await res.text();
+
+  if (!contentType.includes('application/json')) {
+    throw new Error(
+      `Config API returned non-JSON (${res.status}). Is the worker deployed with /api routes?`,
+    );
   }
-  return res.json() as Promise<T>;
+
+  let data: T;
+  try {
+    data = JSON.parse(text) as T;
+  } catch {
+    throw new Error(`Config API returned invalid JSON (${res.status})`);
+  }
+
+  if (!res.ok) {
+    const err = data as { error?: string };
+    throw new Error(err.error ?? `Config API ${res.status}`);
+  }
+
+  return data;
 }
 
 export async function fetchRemoteConfig(): Promise<RemoteConfig> {
-  const res = await fetch('/api/config');
+  const res = await fetch('/api/config', { cache: 'no-store' });
   return parseJson<RemoteConfig>(res);
 }
 

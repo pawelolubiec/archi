@@ -14,11 +14,31 @@ const CORS_HEADERS = {
   'Access-Control-Allow-Headers': 'Content-Type',
 };
 
+let schemaReady: Promise<void> | null = null;
+
 function json(data: unknown, status = 200): Response {
   return new Response(JSON.stringify(data), {
     status,
     headers: { 'Content-Type': 'application/json', ...CORS_HEADERS },
   });
+}
+
+async function ensureSchema(env: Env): Promise<void> {
+  if (!env.DB) {
+    throw new Error('D1 binding "DB" is not configured');
+  }
+  if (!schemaReady) {
+    schemaReady = env.DB.prepare(
+      `CREATE TABLE IF NOT EXISTS app_config (
+        key TEXT PRIMARY KEY,
+        value TEXT NOT NULL,
+        updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+      )`,
+    )
+      .run()
+      .then(() => undefined);
+  }
+  await schemaReady;
 }
 
 async function getConfigValue(env: Env, key: string): Promise<unknown | null> {
@@ -40,7 +60,7 @@ async function setConfigValue(
   key: string,
   value: unknown,
 ): Promise<void> {
-  await env.DB.prepare(
+  const result = await env.DB.prepare(
     `INSERT INTO app_config (key, value, updated_at)
      VALUES (?, ?, datetime('now'))
      ON CONFLICT(key) DO UPDATE SET
@@ -49,9 +69,15 @@ async function setConfigValue(
   )
     .bind(key, JSON.stringify(value))
     .run();
+
+  if (!result.success) {
+    throw new Error(`D1 write failed for key "${key}"`);
+  }
 }
 
 async function handleApi(request: Request, env: Env): Promise<Response> {
+  await ensureSchema(env);
+
   if (request.method === 'OPTIONS') {
     return new Response(null, { status: 204, headers: CORS_HEADERS });
   }
@@ -90,8 +116,10 @@ export default {
       try {
         return await handleApi(request, env);
       } catch (err) {
-        console.error(err);
-        return json({ error: 'Internal server error' }, 500);
+        console.error('API error:', err);
+        const message =
+          err instanceof Error ? err.message : 'Internal server error';
+        return json({ error: message }, 500);
       }
     }
 
