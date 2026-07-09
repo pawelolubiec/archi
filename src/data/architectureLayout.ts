@@ -37,8 +37,6 @@ export const processById = Object.fromEntries(
   BUSINESS_PROCESSES.map((p) => [p.id, p]),
 ) as Record<string, BusinessProcess>;
 
-export const ARCHITECTURE_STORAGE_KEY = 'milarex.architectureConfig';
-
 const DEFAULT_ELEMENTS: ArchitectureElement[] = [
   // AI / automation orchestration
   { id: 'ai_demand', label: 'Demand monitoring', layer: 'ai', linkedProcessIds: ['market_demand'] },

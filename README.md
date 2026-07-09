@@ -21,9 +21,12 @@ One continuous 3D scene + a 2D layer, driven by 11 chapters.
 
 ```bash
 npm install
-npm run dev      # http://localhost:5173
-npm run build    # production
-npm run preview
+npm run db:migrate:local   # first time / local D1 schema
+npm run dev                # Vite on :5173 (proxies /api → worker)
+npm run dev:worker         # in another terminal — Worker + D1 on :8787
+npm run build
+npm run deploy             # build + wrangler deploy
+npm run db:migrate:remote  # apply migrations to production D1
 ```
 
 ## Controls
@@ -32,6 +35,7 @@ npm run preview
 - **Esc** — close modals (factory/architecture config, app preview, system panel)
 - Click the progress dots (bottom) or a system in the factory scene / in the list
 - The **strategic / technical** toggle (top right) reveals integrations and details
+- **Configure** on factory / architecture slides — edits persist to **Cloudflare D1**
 
 ## What's "the wow"
 
@@ -100,10 +104,10 @@ Regenerating continent dots: `npm run gen:land`.
   Filleting, Slicing D, Slicing S, MAP, and Freezing, ending at Output — with
   a material flow line and clickable system cards. Use **Configure** (cogs, top
   right on the factory slide) to map each system to one or more zones; mappings
-  persist in `localStorage`.
+  persist in **D1** (`factory_mapping` key).
 - Architecture slide (chapter 06): **process-led 4-tier layout** — 11 fixed business
   processes, AI orchestration, data platform, unified applications — color-linked by
   process number. Use **Configure** on the architecture slide to add layer elements
-  and link them to processes; persists in `localStorage`.
+  and link them to processes; persists in **D1** (`architecture_config` key).
 - Globe camera positions were computed from the location normals; worth fine-tuning
   on the target presentation screen (16:9).

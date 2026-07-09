@@ -3,17 +3,20 @@ import type { Vector3Tuple } from 'three';
 import { chapters, TOTAL_CHAPTERS } from '../data/chapters';
 import {
   cloneDefaultMapping,
-  FACTORY_MAPPING_STORAGE_KEY,
   type FactoryMapping,
   type FactoryZoneId,
 } from '../data/factoryLayout';
 import {
   cloneDefaultArchitectureConfig,
-  ARCHITECTURE_STORAGE_KEY,
   type ArchitectureConfig,
   type ArchitectureElement,
   type ArchLayerId,
 } from '../data/architectureLayout';
+import {
+  fetchRemoteConfig,
+  saveArchitectureConfigRemote,
+  saveFactoryMappingRemote,
+} from '../lib/configApi';
 import type { Chapter } from '../data/types';
 
 export type Mode = 'strategic' | 'technical';
@@ -27,46 +30,16 @@ function detectTransition(fromIndex: number, toIndex: number): SceneTransition {
   return 'none';
 }
 
-function loadFactoryMapping(): FactoryMapping {
-  try {
-    const raw = localStorage.getItem(FACTORY_MAPPING_STORAGE_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw) as FactoryMapping;
-      if (parsed && typeof parsed === 'object') return parsed;
-    }
-  } catch {
-    /* ignore corrupt storage */
-  }
-  return cloneDefaultMapping();
-}
-
 function persistFactoryMapping(mapping: FactoryMapping) {
-  try {
-    localStorage.setItem(FACTORY_MAPPING_STORAGE_KEY, JSON.stringify(mapping));
-  } catch {
-    /* ignore quota errors */
-  }
-}
-
-function loadArchitectureConfig(): ArchitectureConfig {
-  try {
-    const raw = localStorage.getItem(ARCHITECTURE_STORAGE_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw) as ArchitectureConfig;
-      if (parsed?.elements && Array.isArray(parsed.elements)) return parsed;
-    }
-  } catch {
-    /* ignore corrupt storage */
-  }
-  return cloneDefaultArchitectureConfig();
+  saveFactoryMappingRemote(mapping).catch((err) => {
+    console.error('Failed to save factory mapping to D1', err);
+  });
 }
 
 function persistArchitectureConfig(config: ArchitectureConfig) {
-  try {
-    localStorage.setItem(ARCHITECTURE_STORAGE_KEY, JSON.stringify(config));
-  } catch {
-    /* ignore quota errors */
-  }
+  saveArchitectureConfigRemote(config).catch((err) => {
+    console.error('Failed to save architecture config to D1', err);
+  });
 }
 
 function chapterNavState(
@@ -109,6 +82,7 @@ interface AppState {
   factoryConfigOpen: boolean;
   architectureConfig: ArchitectureConfig;
   architectureConfigOpen: boolean;
+  configHydrated: boolean;
 
   current: () => Chapter;
   next: () => void;
@@ -141,6 +115,7 @@ interface AppState {
   removeArchitectureElement: (id: string) => void;
   setElementProcessLinks: (id: string, processIds: string[]) => void;
   resetArchitectureConfig: () => void;
+  hydrateConfig: () => Promise<void>;
 }
 
 export const useStore = create<AppState>((set, get) => ({
@@ -152,10 +127,11 @@ export const useStore = create<AppState>((set, get) => ({
   sceneTransition: 'none',
   transitionProgress: 0,
   transitionFromCamera: null,
-  factoryMapping: loadFactoryMapping(),
+  factoryMapping: cloneDefaultMapping(),
   factoryConfigOpen: false,
-  architectureConfig: loadArchitectureConfig(),
+  architectureConfig: cloneDefaultArchitectureConfig(),
   architectureConfigOpen: false,
+  configHydrated: false,
 
   current: () => chapters[get().index],
 
@@ -270,6 +246,28 @@ export const useStore = create<AppState>((set, get) => ({
     const architectureConfig = cloneDefaultArchitectureConfig();
     persistArchitectureConfig(architectureConfig);
     set({ architectureConfig });
+  },
+
+  hydrateConfig: async () => {
+    try {
+      const remote = await fetchRemoteConfig();
+      const updates: Partial<AppState> = { configHydrated: true };
+
+      if (remote.factoryMapping && typeof remote.factoryMapping === 'object') {
+        updates.factoryMapping = remote.factoryMapping;
+      }
+      if (
+        remote.architectureConfig?.elements &&
+        Array.isArray(remote.architectureConfig.elements)
+      ) {
+        updates.architectureConfig = remote.architectureConfig;
+      }
+
+      set(updates);
+    } catch (err) {
+      console.error('Failed to hydrate config from D1', err);
+      set({ configHydrated: true });
+    }
   },
 }));
 

@@ -28,7 +28,6 @@ export const FACTORY_MAPPABLE_SYSTEMS = Object.keys(
   DEFAULT_SYSTEM_ZONES,
 ) as (keyof typeof DEFAULT_SYSTEM_ZONES)[];
 
-export const FACTORY_MAPPING_STORAGE_KEY = 'milarex.factoryMapping';
 
 export function cloneDefaultMapping(): FactoryMapping {
   return Object.fromEntries(

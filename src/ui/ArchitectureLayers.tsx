@@ -25,7 +25,7 @@ function ProcessChevron({
       initial={{ opacity: 0, y: -6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.03, duration: 0.35 }}
-      className="flex min-h-[2.75rem] items-center justify-center px-2 py-2 text-center"
+      className="flex min-h-[2.5rem] items-center justify-center px-1 py-1.5 text-center"
       style={{
         background: proc.color,
         clipPath: isFirst
@@ -37,7 +37,7 @@ function ProcessChevron({
       title={`${proc.order}. ${proc.label}`}
     >
       <span
-        className="text-[11px] font-semibold leading-snug sm:text-xs"
+        className="text-[9px] font-semibold leading-tight sm:text-[10px]"
         style={{ color: proc.order >= 10 ? '#1a2332' : '#fff' }}
       >
         <span className="mr-1 opacity-75">{proc.order}</span>
@@ -48,33 +48,19 @@ function ProcessChevron({
 }
 
 function ProcessStrip() {
-  const rowA = BUSINESS_PROCESSES.slice(0, 6);
-  const rowB = BUSINESS_PROCESSES.slice(6);
-
   return (
     <div className="shrink-0">
       <div className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-mist">
         Business Process Layer
       </div>
-      <div className="grid grid-cols-6 gap-1">
-        {rowA.map((proc, i) => (
+      <div className="grid grid-cols-11 gap-0.5">
+        {BUSINESS_PROCESSES.map((proc, i) => (
           <ProcessChevron
             key={proc.id}
             proc={proc}
             index={i}
             isFirst={i === 0}
-            isLast={i === rowA.length - 1}
-          />
-        ))}
-      </div>
-      <div className="mt-1 grid grid-cols-5 gap-1 px-[4%]">
-        {rowB.map((proc, i) => (
-          <ProcessChevron
-            key={proc.id}
-            proc={proc}
-            index={i + 6}
-            isFirst={i === 0}
-            isLast={i === rowB.length - 1}
+            isLast={i === BUSINESS_PROCESSES.length - 1}
           />
         ))}
       </div>

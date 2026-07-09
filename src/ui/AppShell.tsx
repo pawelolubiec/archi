@@ -47,9 +47,14 @@ export function AppShell() {
   const closeModal = useStore((s) => s.closeModal);
   const closeFactoryConfig = useStore((s) => s.closeFactoryConfig);
   const closeArchitectureConfig = useStore((s) => s.closeArchitectureConfig);
+  const hydrateConfig = useStore((s) => s.hydrateConfig);
 
   const is3D = chapter.scene === 'globe' || chapter.scene === 'factory';
   const isArchitecture = chapter.scene === 'architecture';
+
+  useEffect(() => {
+    hydrateConfig();
+  }, [hydrateConfig]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
