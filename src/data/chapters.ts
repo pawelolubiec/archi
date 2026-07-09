@@ -104,7 +104,6 @@ export const chapters: Chapter[] = [
     visibleLocations: ['office_germany', 'factory_poland'],
     activeFlows: ['de_to_factory'],
     activeSystems: ['mifo', 'aps', 'workday_erp'],
-    modal: 'mifo',
     kpiPanel: false,
   },
   {

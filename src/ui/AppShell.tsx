@@ -12,6 +12,7 @@ import { GovernanceCard } from './GovernanceCard';
 import { ScenarioPanel } from './ScenarioPanel';
 import { RoadmapTimeline } from './RoadmapTimeline';
 import { useStore } from '../store/useStore';
+import { chapters } from '../data/chapters';
 import { AppModal } from './AppModal';
 import { PainPoints } from './PainPoints';
 import { DecisionsPanel } from './DecisionsPanel';
@@ -48,6 +49,8 @@ export function AppShell() {
   const closeFactoryConfig = useStore((s) => s.closeFactoryConfig);
   const closeArchitectureConfig = useStore((s) => s.closeArchitectureConfig);
   const hydrateConfig = useStore((s) => s.hydrateConfig);
+  const openModal = useStore((s) => s.openModal);
+  const index = useStore((s) => s.index);
 
   const is3D = chapter.scene === 'globe' || chapter.scene === 'factory';
   const isArchitecture = chapter.scene === 'architecture';
@@ -55,6 +58,15 @@ export function AppShell() {
   useEffect(() => {
     hydrateConfig();
   }, [hydrateConfig]);
+
+  // Close stale panels on slide change; open chapter modal only when landing on that slide.
+  useEffect(() => {
+    closeModal();
+    const chapterModal = chapters[index]?.modal;
+    if (chapterModal) {
+      openModal(chapterModal);
+    }
+  }, [index, closeModal, openModal]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {

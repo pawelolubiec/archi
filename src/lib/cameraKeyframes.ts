@@ -82,12 +82,12 @@ export function sceneOpacities(
   const p = easeInOutCubic(progress);
   if (transition === 'toFactory') {
     const globe =
-      p < 0.35 ? 1 : p < 0.55 ? 1 - (p - 0.35) / 0.2 : 0;
-    const factory = p < 0.55 ? 0 : p < 0.75 ? (p - 0.55) / 0.2 : 1;
+      p < 0.12 ? 1 : p < 0.32 ? 1 - (p - 0.12) / 0.2 : 0;
+    const factory = p < 0.28 ? 0 : p < 0.48 ? (p - 0.28) / 0.2 : 1;
     return { globe, factory };
   }
   // toGlobe
-  const factory = p < 0.45 ? 1 : p < 0.65 ? 1 - (p - 0.45) / 0.2 : 0;
-  const globe = p < 0.45 ? 0 : p < 0.65 ? (p - 0.45) / 0.2 : 1;
+  const factory = p < 0.4 ? 1 : p < 0.58 ? 1 - (p - 0.4) / 0.18 : 0;
+  const globe = p < 0.4 ? 0 : p < 0.58 ? (p - 0.4) / 0.18 : 1;
   return { globe, factory };
 }

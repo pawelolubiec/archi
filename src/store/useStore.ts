@@ -336,9 +336,7 @@ export const useStore = create<AppState>((set, get) => ({
   },
 }));
 
-/** Active modal: manual click > modal defined in the chapter. */
+/** Active modal: manual click only (chapter modals open once on enter via AppShell). */
 export function useActiveModal(): string | null {
-  const manual = useStore((s) => s.manualModal);
-  const chapterModal = useStore((s) => chapters[s.index].modal ?? null);
-  return manual ?? chapterModal;
+  return useStore((s) => s.manualModal);
 }

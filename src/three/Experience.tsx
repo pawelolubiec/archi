@@ -30,11 +30,11 @@ function TransitionCloud() {
 
   const peak =
     sceneTransition === 'toFactory'
-      ? progress > 0.32 && progress < 0.58
-        ? Math.sin(((progress - 0.32) / 0.26) * Math.PI)
+      ? progress > 0.18 && progress < 0.42
+        ? Math.sin(((progress - 0.18) / 0.24) * Math.PI)
         : 0
-      : progress > 0.42 && progress < 0.68
-        ? Math.sin(((progress - 0.42) / 0.26) * Math.PI)
+      : progress > 0.38 && progress < 0.62
+        ? Math.sin(((progress - 0.38) / 0.24) * Math.PI)
         : 0;
 
   if (peak < 0.01) return null;
@@ -66,21 +66,23 @@ function SceneSwitch() {
   );
 
   const showGlobe =
-    chapter.scene === 'globe' ||
-    is2D ||
-    sceneTransition === 'toFactory' ||
-    sceneTransition === 'toGlobe';
+    (chapter.scene === 'globe' ||
+      is2D ||
+      sceneTransition === 'toFactory' ||
+      sceneTransition === 'toGlobe') &&
+    globeOpacity > 0.02;
 
   const showFactory =
-    chapter.scene === 'factory' ||
-    sceneTransition === 'toFactory' ||
-    sceneTransition === 'toGlobe';
+    (chapter.scene === 'factory' ||
+      sceneTransition === 'toFactory' ||
+      sceneTransition === 'toGlobe') &&
+    factoryOpacity > 0.02;
 
   const globeScale =
     sceneTransition === 'toFactory'
-      ? 1 - progress * 0.15
+      ? Math.max(0.25, 1 - progress * 0.75)
       : sceneTransition === 'toGlobe'
-        ? 0.85 + progress * 0.15
+        ? 0.25 + progress * 0.75
         : 1;
 
   return (

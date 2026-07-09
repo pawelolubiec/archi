@@ -9,7 +9,7 @@ import {
   cameraForToGlobe,
 } from '../lib/cameraKeyframes';
 
-const TRANSITION_DURATION = 2.4;
+const TRANSITION_DURATION = 1.5;
 
 interface Props {
   controlsRef: React.RefObject<CameraControlsImpl | null>;
