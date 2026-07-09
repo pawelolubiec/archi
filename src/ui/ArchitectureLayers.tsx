@@ -1,3 +1,4 @@
+import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useStore } from '../store/useStore';
 import {
@@ -14,18 +15,29 @@ function ProcessChevron({
   index,
   isFirst,
   isLast,
+  highlighted,
+  dimmed,
+  onHover,
 }: {
   proc: (typeof BUSINESS_PROCESSES)[number];
   index: number;
   isFirst: boolean;
   isLast: boolean;
+  highlighted: boolean;
+  dimmed: boolean;
+  onHover: () => void;
 }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: -6 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.03, duration: 0.35 }}
-      className="flex min-h-[2.5rem] items-center justify-center px-1 py-1.5 text-center"
+      animate={{
+        opacity: dimmed ? 0.28 : 1,
+        y: 0,
+        scale: highlighted ? 1.06 : 1,
+      }}
+      transition={{ delay: index * 0.03, duration: 0.2 }}
+      onMouseEnter={onHover}
+      className="flex min-h-[2.5rem] cursor-pointer items-center justify-center px-1 py-1.5 text-center transition-shadow"
       style={{
         background: proc.color,
         clipPath: isFirst
@@ -33,6 +45,10 @@ function ProcessChevron({
           : isLast
             ? 'polygon(8px 0, 100% 0, 100% 100%, 8px 100%, 0 50%)'
             : 'polygon(8px 0, calc(100% - 8px) 0, 100% 50%, calc(100% - 8px) 100%, 8px 100%, 0 50%)',
+        boxShadow: highlighted
+          ? `0 0 0 2px #fff, 0 0 28px -4px ${proc.color}`
+          : undefined,
+        zIndex: highlighted ? 2 : 0,
       }}
       title={`${proc.order}. ${proc.label}`}
     >
@@ -47,22 +63,37 @@ function ProcessChevron({
   );
 }
 
-function ProcessStrip() {
+function ProcessStrip({
+  highlightedProcessIds,
+  onHoverProcess,
+}: {
+  highlightedProcessIds: Set<string>;
+  onHoverProcess: (id: string) => void;
+}) {
+  const isFiltering = highlightedProcessIds.size > 0;
+
   return (
     <div className="shrink-0">
       <div className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-mist">
         Business Process Layer
       </div>
       <div className="grid grid-cols-11 gap-0.5">
-        {BUSINESS_PROCESSES.map((proc, i) => (
-          <ProcessChevron
-            key={proc.id}
-            proc={proc}
-            index={i}
-            isFirst={i === 0}
-            isLast={i === BUSINESS_PROCESSES.length - 1}
-          />
-        ))}
+        {BUSINESS_PROCESSES.map((proc, i) => {
+          const highlighted = highlightedProcessIds.has(proc.id);
+          const dimmed = isFiltering && !highlighted;
+          return (
+            <ProcessChevron
+              key={proc.id}
+              proc={proc}
+              index={i}
+              isFirst={i === 0}
+              isLast={i === BUSINESS_PROCESSES.length - 1}
+              highlighted={highlighted}
+              dimmed={dimmed}
+              onHover={() => onHoverProcess(proc.id)}
+            />
+          );
+        })}
       </div>
     </div>
   );
@@ -72,10 +103,16 @@ function ElementChip({
   element,
   index,
   compact,
+  highlighted,
+  dimmed,
+  onHover,
 }: {
   element: ArchitectureElement;
   index: number;
   compact?: boolean;
+  highlighted: boolean;
+  dimmed: boolean;
+  onHover: () => void;
 }) {
   const color = primaryProcessColor(element.linkedProcessIds);
   const badges = formatProcessBadges(element.linkedProcessIds);
@@ -94,7 +131,11 @@ function ElementChip({
         </span>
       )}
       {element.systemId && (
-        <span className="text-[10px] text-sea opacity-0 transition-opacity group-hover:opacity-100">
+        <span
+          className={`text-[10px] text-sea transition-opacity ${
+            highlighted ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+          }`}
+        >
           ↗
         </span>
       )}
@@ -102,21 +143,28 @@ function ElementChip({
   );
 
   const style = {
-    borderColor: `${color}99`,
+    borderColor: highlighted ? color : `${color}99`,
     borderLeftWidth: '3px',
-    boxShadow: `0 0 24px -12px ${color}77`,
+    boxShadow: highlighted
+      ? `0 0 0 1px ${color}, 0 0 32px -6px ${color}`
+      : `0 0 24px -12px ${color}77`,
+    opacity: dimmed ? 0.28 : 1,
+    transform: highlighted ? 'scale(1.04)' : undefined,
   };
+
+  const hoverHandlers = { onMouseEnter: onHover };
 
   if (element.systemId) {
     return (
       <motion.button
         initial={{ opacity: 0, scale: 0.96 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.1 + index * 0.03, duration: 0.3 }}
+        animate={{ opacity: dimmed ? 0.28 : 1, scale: highlighted ? 1.04 : 1 }}
+        transition={{ delay: 0.1 + index * 0.03, duration: 0.2 }}
         onClick={() => openApp(element.systemId!)}
-        className={`group ${baseClass} transition hover:scale-[1.03] hover:border-sea/60`}
+        className={`group ${baseClass} cursor-pointer transition hover:border-sea/60`}
         style={style}
         title="Open app preview"
+        {...hoverHandlers}
       >
         {inner}
       </motion.button>
@@ -126,10 +174,11 @@ function ElementChip({
   return (
     <motion.span
       initial={{ opacity: 0, scale: 0.96 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ delay: 0.1 + index * 0.03, duration: 0.3 }}
-      className={baseClass}
+      animate={{ opacity: dimmed ? 0.28 : 1, scale: highlighted ? 1.04 : 1 }}
+      transition={{ delay: 0.1 + index * 0.03, duration: 0.2 }}
+      className={`${baseClass} cursor-pointer`}
       style={style}
+      {...hoverHandlers}
     >
       {inner}
     </motion.span>
@@ -141,13 +190,19 @@ function LayerSection({
   elements,
   delay,
   grow,
+  highlightedElementIds,
+  onHoverElement,
 }: {
   layerId: ArchLayerId;
   elements: ArchitectureElement[];
   delay: number;
   grow?: boolean;
+  highlightedElementIds: Set<string>;
+  onHoverElement: (id: string) => void;
 }) {
   if (!elements.length) return null;
+
+  const isFiltering = highlightedElementIds.size > 0;
 
   return (
     <motion.div
@@ -166,14 +221,21 @@ function LayerSection({
           grow ? 'min-h-0 flex-1 overflow-y-auto' : ''
         }`}
       >
-        {elements.map((el, i) => (
-          <ElementChip
-            key={el.id}
-            element={el}
-            index={i}
-            compact={layerId === 'data'}
-          />
-        ))}
+        {elements.map((el, i) => {
+          const highlighted = highlightedElementIds.has(el.id);
+          const dimmed = isFiltering && !highlighted;
+          return (
+            <ElementChip
+              key={el.id}
+              element={el}
+              index={i}
+              compact={layerId === 'data'}
+              highlighted={highlighted}
+              dimmed={dimmed}
+              onHover={() => onHoverElement(el.id)}
+            />
+          );
+        })}
       </div>
     </motion.div>
   );
@@ -182,23 +244,98 @@ function LayerSection({
 export function ArchitectureLayers() {
   const mode = useStore((s) => s.mode);
   const elements = useStore((s) => s.architectureConfig.elements);
+  const [hoveredProcessId, setHoveredProcessId] = useState<string | null>(null);
+  const [hoveredElementId, setHoveredElementId] = useState<string | null>(null);
+
+  const elementById = useMemo(
+    () => Object.fromEntries(elements.map((el) => [el.id, el])),
+    [elements],
+  );
+
+  const { highlightedProcessIds, highlightedElementIds } = useMemo(() => {
+    if (hoveredProcessId) {
+      const connected = elements
+        .filter((el) => el.linkedProcessIds.includes(hoveredProcessId))
+        .map((el) => el.id);
+      return {
+        highlightedProcessIds: new Set([hoveredProcessId]),
+        highlightedElementIds: new Set(connected),
+      };
+    }
+
+    if (hoveredElementId) {
+      const el = elementById[hoveredElementId];
+      return {
+        highlightedProcessIds: new Set(el?.linkedProcessIds ?? []),
+        highlightedElementIds: new Set([hoveredElementId]),
+      };
+    }
+
+    return {
+      highlightedProcessIds: new Set<string>(),
+      highlightedElementIds: new Set<string>(),
+    };
+  }, [hoveredProcessId, hoveredElementId, elements, elementById]);
+
+  const hoverProcess = (id: string) => {
+    setHoveredProcessId(id);
+    setHoveredElementId(null);
+  };
+
+  const hoverElement = (id: string) => {
+    setHoveredElementId(id);
+    setHoveredProcessId(null);
+  };
 
   const byLayer = (layer: ArchLayerId) =>
     elements.filter((el) => el.layer === layer);
 
+  const isHovering = hoveredProcessId !== null || hoveredElementId !== null;
+
   return (
-    <div className="pointer-events-auto flex h-full w-full flex-col gap-3">
-      <ProcessStrip />
+    <div
+      className="pointer-events-auto flex h-full w-full flex-col gap-3"
+      onMouseLeave={() => {
+        setHoveredProcessId(null);
+        setHoveredElementId(null);
+      }}
+    >
+      <ProcessStrip
+        highlightedProcessIds={highlightedProcessIds}
+        onHoverProcess={hoverProcess}
+      />
 
       <div className="flex min-h-0 flex-1 flex-col gap-3">
-        <LayerSection layerId="ai" elements={byLayer('ai')} delay={0.08} grow />
-        <LayerSection layerId="data" elements={byLayer('data')} delay={0.14} />
-        <LayerSection layerId="apps" elements={byLayer('apps')} delay={0.2} grow />
+        <LayerSection
+          layerId="ai"
+          elements={byLayer('ai')}
+          delay={0.08}
+          grow
+          highlightedElementIds={highlightedElementIds}
+          onHoverElement={hoverElement}
+        />
+        <LayerSection
+          layerId="data"
+          elements={byLayer('data')}
+          delay={0.14}
+          highlightedElementIds={highlightedElementIds}
+          onHoverElement={hoverElement}
+        />
+        <LayerSection
+          layerId="apps"
+          elements={byLayer('apps')}
+          delay={0.2}
+          grow
+          highlightedElementIds={highlightedElementIds}
+          onHoverElement={hoverElement}
+        />
       </div>
 
       {mode === 'technical' && (
         <p className="shrink-0 text-center text-[11px] text-mist">
-          Color-coded by process number — AI above data, all applications in one layer.
+          {isHovering
+            ? 'Hover links processes ↔ layer elements by color.'
+            : 'Hover a process or element to see connections.'}
         </p>
       )}
     </div>
