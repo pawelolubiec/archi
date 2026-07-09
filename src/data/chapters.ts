@@ -131,9 +131,9 @@ export const chapters: Chapter[] = [
     eyebrow: 'Architecture',
     title: 'Hybrid architecture',
     description:
-      'ERP remains a stable financial core. Operational advantage is built in specialized systems and the AI layer.',
+      'Process-led architecture: 11 business processes at the top, AI orchestration, data platform, and all applications in one layer — color-linked to the processes they support.',
     businessMessage:
-      "We're not buying a single ERP monolith. We're building a flexible ecosystem around a financial core.",
+      "We're not buying a single ERP monolith. We're building a flexible ecosystem aligned to how the business actually runs.",
     cameraPosition: [0, 1, 9],
     cameraTarget: [0, 0, 0],
     visibleLocations: [],

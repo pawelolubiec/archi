@@ -7,6 +7,13 @@ import {
   type FactoryMapping,
   type FactoryZoneId,
 } from '../data/factoryLayout';
+import {
+  cloneDefaultArchitectureConfig,
+  ARCHITECTURE_STORAGE_KEY,
+  type ArchitectureConfig,
+  type ArchitectureElement,
+  type ArchLayerId,
+} from '../data/architectureLayout';
 import type { Chapter } from '../data/types';
 
 export type Mode = 'strategic' | 'technical';
@@ -41,6 +48,27 @@ function persistFactoryMapping(mapping: FactoryMapping) {
   }
 }
 
+function loadArchitectureConfig(): ArchitectureConfig {
+  try {
+    const raw = localStorage.getItem(ARCHITECTURE_STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw) as ArchitectureConfig;
+      if (parsed?.elements && Array.isArray(parsed.elements)) return parsed;
+    }
+  } catch {
+    /* ignore corrupt storage */
+  }
+  return cloneDefaultArchitectureConfig();
+}
+
+function persistArchitectureConfig(config: ArchitectureConfig) {
+  try {
+    localStorage.setItem(ARCHITECTURE_STORAGE_KEY, JSON.stringify(config));
+  } catch {
+    /* ignore quota errors */
+  }
+}
+
 function chapterNavState(
   s: { index: number; transitionFromCamera: AppState['transitionFromCamera'] },
   nextIndex: number,
@@ -51,6 +79,7 @@ function chapterNavState(
     manualModal: null,
     appModal: null,
     factoryConfigOpen: false,
+    architectureConfigOpen: false,
     sceneTransition: transition,
     transitionProgress: transition === 'none' ? 0 : 0,
     transitionFromCamera:
@@ -78,6 +107,8 @@ interface AppState {
   /** system → factory zone mapping (one system, many zones) */
   factoryMapping: FactoryMapping;
   factoryConfigOpen: boolean;
+  architectureConfig: ArchitectureConfig;
+  architectureConfigOpen: boolean;
 
   current: () => Chapter;
   next: () => void;
@@ -100,6 +131,16 @@ interface AppState {
   closeFactoryConfig: () => void;
   setSystemZones: (systemId: string, zoneIds: FactoryZoneId[]) => void;
   resetFactoryMapping: () => void;
+  openArchitectureConfig: () => void;
+  closeArchitectureConfig: () => void;
+  addArchitectureElement: (layer: ArchLayerId, label: string) => void;
+  updateArchitectureElement: (
+    id: string,
+    patch: Partial<Pick<ArchitectureElement, 'label' | 'layer' | 'systemId' | 'linkedProcessIds'>>,
+  ) => void;
+  removeArchitectureElement: (id: string) => void;
+  setElementProcessLinks: (id: string, processIds: string[]) => void;
+  resetArchitectureConfig: () => void;
 }
 
 export const useStore = create<AppState>((set, get) => ({
@@ -113,6 +154,8 @@ export const useStore = create<AppState>((set, get) => ({
   transitionFromCamera: null,
   factoryMapping: loadFactoryMapping(),
   factoryConfigOpen: false,
+  architectureConfig: loadArchitectureConfig(),
+  architectureConfigOpen: false,
 
   current: () => chapters[get().index],
 
@@ -172,6 +215,61 @@ export const useStore = create<AppState>((set, get) => ({
     const factoryMapping = cloneDefaultMapping();
     persistFactoryMapping(factoryMapping);
     set({ factoryMapping });
+  },
+
+  openArchitectureConfig: () => set({ architectureConfigOpen: true }),
+  closeArchitectureConfig: () => set({ architectureConfigOpen: false }),
+
+  addArchitectureElement: (layer, label) =>
+    set((s) => {
+      const element: ArchitectureElement = {
+        id: `custom_${Date.now()}`,
+        label,
+        layer,
+        linkedProcessIds: [],
+      };
+      const architectureConfig = {
+        elements: [...s.architectureConfig.elements, element],
+      };
+      persistArchitectureConfig(architectureConfig);
+      return { architectureConfig };
+    }),
+
+  updateArchitectureElement: (id, patch) =>
+    set((s) => {
+      const architectureConfig = {
+        elements: s.architectureConfig.elements.map((el) =>
+          el.id === id ? { ...el, ...patch } : el,
+        ),
+      };
+      persistArchitectureConfig(architectureConfig);
+      return { architectureConfig };
+    }),
+
+  removeArchitectureElement: (id) =>
+    set((s) => {
+      const architectureConfig = {
+        elements: s.architectureConfig.elements.filter((el) => el.id !== id),
+      };
+      persistArchitectureConfig(architectureConfig);
+      return { architectureConfig };
+    }),
+
+  setElementProcessLinks: (id, processIds) =>
+    set((s) => {
+      const architectureConfig = {
+        elements: s.architectureConfig.elements.map((el) =>
+          el.id === id ? { ...el, linkedProcessIds: [...processIds] } : el,
+        ),
+      };
+      persistArchitectureConfig(architectureConfig);
+      return { architectureConfig };
+    }),
+
+  resetArchitectureConfig: () => {
+    const architectureConfig = cloneDefaultArchitectureConfig();
+    persistArchitectureConfig(architectureConfig);
+    set({ architectureConfig });
   },
 }));
 

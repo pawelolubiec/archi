@@ -17,6 +17,8 @@ import { PainPoints } from './PainPoints';
 import { DecisionsPanel } from './DecisionsPanel';
 import { FactoryConfigButton } from './FactoryConfigButton';
 import { FactoryConfigModal } from './FactoryConfigModal';
+import { ArchitectureConfigButton } from './ArchitectureConfigButton';
+import { ArchitectureConfigModal } from './ArchitectureConfigModal';
 
 function CentralPanel() {
   const chapter = useStore((s) => s.current());
@@ -44,19 +46,22 @@ export function AppShell() {
   const prev = useStore((s) => s.prev);
   const closeModal = useStore((s) => s.closeModal);
   const closeFactoryConfig = useStore((s) => s.closeFactoryConfig);
+  const closeArchitectureConfig = useStore((s) => s.closeArchitectureConfig);
 
   const is3D = chapter.scene === 'globe' || chapter.scene === 'factory';
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      const { appModal, closeApp, factoryConfigOpen } = useStore.getState();
+      const { appModal, closeApp, factoryConfigOpen, architectureConfigOpen } =
+        useStore.getState();
       if (e.key === 'Escape') {
         if (factoryConfigOpen) closeFactoryConfig();
+        else if (architectureConfigOpen) closeArchitectureConfig();
         else if (appModal) closeApp();
         else closeModal();
         return;
       }
-      if (appModal || factoryConfigOpen) return;
+      if (appModal || factoryConfigOpen || architectureConfigOpen) return;
       if (e.key === 'ArrowRight' || e.key === ' ') {
         e.preventDefault();
         next();
@@ -66,7 +71,7 @@ export function AppShell() {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [next, prev, closeModal, closeFactoryConfig]);
+  }, [next, prev, closeModal, closeFactoryConfig, closeArchitectureConfig]);
 
   return (
     <div className="relative h-screen w-screen overflow-hidden bg-ink">
@@ -87,6 +92,7 @@ export function AppShell() {
         </div>
         <div className="pointer-events-auto flex items-center gap-3">
           <FactoryConfigButton />
+          <ArchitectureConfigButton />
           <ModeToggle />
         </div>
       </header>
@@ -141,6 +147,7 @@ export function AppShell() {
       {/* fullscreen app preview */}
       <AppModal />
       <FactoryConfigModal />
+      <ArchitectureConfigModal />
     </div>
   );
 }

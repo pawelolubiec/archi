@@ -29,7 +29,7 @@ npm run preview
 ## Controls
 
 - **→ / Space** — next chapter · **←** — previous
-- **Esc** — close modals (factory config, app preview, system panel)
+- **Esc** — close modals (factory/architecture config, app preview, system panel)
 - Click the progress dots (bottom) or a system in the factory scene / in the list
 - The **strategic / technical** toggle (top right) reveals integrations and details
 
@@ -101,7 +101,9 @@ Regenerating continent dots: `npm run gen:land`.
   a material flow line and clickable system cards. Use **Configure** (cogs, top
   right on the factory slide) to map each system to one or more zones; mappings
   persist in `localStorage`.
-- Scenes 6–10 (architecture, KPI, governance, simulation, roadmap) are polished
-  2D panels over a dimmed globe — they can be moved into 3D if needed.
+- Architecture slide (chapter 06): **process-led 4-tier layout** — 11 fixed business
+  processes, AI orchestration, data platform, unified applications — color-linked by
+  process number. Use **Configure** on the architecture slide to add layer elements
+  and link them to processes; persists in `localStorage`.
 - Globe camera positions were computed from the location normals; worth fine-tuning
   on the target presentation screen (16:9).
