@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { CatmullRomCurve3, Group, Vector3 } from 'three';
+import { CatmullRomCurve3, CubicBezierCurve3, Group, Vector3 } from 'three';
 import { Html, Line, Edges } from '@react-three/drei';
 import { BRAND, ACCENT_HEX } from '../../data/brand';
 import { systemById } from '../../data/systems';
@@ -45,6 +45,107 @@ const buildingById = Object.fromEntries(BUILDINGS.map((b) => [b.id, b]));
 
 const STAGGER = 0.12;
 const RISE_LAMBDA = 6;
+const CHIP_MIN_DIST = 2.35;
+const CHIP_RING_RADIUS = 5.4;
+const CHIP_BASE_Y = 2.35;
+
+interface ChipLayout {
+  systemId: string;
+  x: number;
+  y: number;
+  z: number;
+}
+
+function zonesForSystem(
+  systemId: string,
+  factoryMapping: Record<string, string[]>,
+): Building[] {
+  return (factoryMapping[systemId] ?? [])
+    .map((id) => buildingById[id])
+    .filter((z): z is Building => Boolean(z));
+}
+
+/** Spread chip anchors on a ring with repulsion so labels never overlap. */
+function computeChipLayouts(
+  activeSystems: string[],
+  factoryMapping: Record<string, string[]>,
+): ChipLayout[] {
+  const items = activeSystems.map((systemId) => {
+    const zones = zonesForSystem(systemId, factoryMapping);
+    const centroidX =
+      zones.reduce((sum, z) => sum + z.pos[0], 0) / (zones.length || 1);
+    const centroidZ =
+      zones.reduce((sum, z) => sum + z.pos[1], 0) / (zones.length || 1);
+    const angle = Math.atan2(centroidZ, centroidX);
+    return { systemId, angle, centroidX, centroidZ };
+  });
+
+  items.sort((a, b) => a.angle - b.angle);
+
+  const MIN_ANGLE = 0.58;
+  let cursor = -Math.PI;
+  const placed = items.map((item, i) => {
+    const angle = Math.max(item.angle, cursor + MIN_ANGLE);
+    cursor = angle;
+    return {
+      systemId: item.systemId,
+      x: Math.cos(angle) * CHIP_RING_RADIUS,
+      z: Math.sin(angle) * CHIP_RING_RADIUS,
+      y: CHIP_BASE_Y + (i % 3) * 0.38,
+    };
+  });
+
+  for (let iter = 0; iter < 28; iter++) {
+    for (let i = 0; i < placed.length; i++) {
+      for (let j = i + 1; j < placed.length; j++) {
+        const a = placed[i];
+        const b = placed[j];
+        const dx = b.x - a.x;
+        const dz = b.z - a.z;
+        const dist = Math.sqrt(dx * dx + dz * dz);
+        if (dist < CHIP_MIN_DIST && dist > 0.001) {
+          const push = (CHIP_MIN_DIST - dist) * 0.55;
+          const nx = dx / dist;
+          const nz = dz / dist;
+          a.x -= nx * push;
+          a.z -= nz * push;
+          b.x += nx * push;
+          b.z += nz * push;
+        }
+      }
+    }
+  }
+
+  return placed;
+}
+
+function createConnectionCurve(from: Vector3, to: Vector3): CubicBezierCurve3 {
+  const mid = new Vector3().addVectors(from, to).multiplyScalar(0.5);
+  const dist = from.distanceTo(to);
+  const lift = Math.min(2.4, 0.55 + dist * 0.42);
+
+  const dir = new Vector3().subVectors(to, from);
+  const horiz = new Vector3(dir.x, 0, dir.z);
+  const perp =
+    horiz.lengthSq() > 0.0001
+      ? new Vector3(-horiz.z, 0, horiz.x).normalize()
+      : new Vector3(1, 0, 0);
+  const side = from.x * to.z - from.z * to.x >= 0 ? 1 : -1;
+  const spread = perp.clone().multiplyScalar(side * Math.min(0.55, dist * 0.12));
+
+  const c1 = new Vector3(
+    from.x + spread.x * 0.35,
+    from.y + lift * 0.4,
+    from.z + spread.z * 0.35,
+  );
+  const c2 = new Vector3(
+    mid.x + spread.x * 0.65,
+    mid.y + lift * 0.9,
+    mid.z + spread.z * 0.65,
+  );
+
+  return new CubicBezierCurve3(from.clone(), c1, c2, to.clone());
+}
 
 interface SceneProps {
   opacity?: number;
@@ -112,18 +213,77 @@ function BuildingMesh({
   );
 }
 
+/* ── bezier link + animated data dot ─────────────────────────────── */
+
+function SystemConnection({
+  from,
+  to,
+  accent,
+  opacity,
+  hover,
+  animate,
+}: {
+  from: Vector3;
+  to: Vector3;
+  accent: string;
+  opacity: number;
+  hover: boolean;
+  animate: boolean;
+}) {
+  const curve = useMemo(() => createConnectionCurve(from, to), [from, to]);
+  const points = useMemo(() => curve.getPoints(40), [curve]);
+  const lineOpacity = (hover ? 0.9 : 0.45) * opacity;
+
+  return (
+    <group>
+      <Line
+        points={points}
+        color={accent}
+        lineWidth={hover ? 1.4 : 1}
+        transparent
+        opacity={lineOpacity}
+        dashed
+        dashSize={0.08}
+        gapSize={0.05}
+      />
+      {animate && opacity > 0.35 && (
+        <>
+          <PulsingDataDot
+            curve={curve}
+            color={accent}
+            speed={0.12}
+            offset={0}
+            size={0.038}
+            opacity={opacity}
+          />
+          <PulsingDataDot
+            curve={curve}
+            color={accent}
+            speed={0.12}
+            offset={0.45}
+            size={0.03}
+            opacity={opacity * 0.85}
+          />
+        </>
+      )}
+    </group>
+  );
+}
+
 /* ── system chip above the building ──────────────────────────────────── */
 
 function SystemChip({
   systemId,
   zoneIds,
-  index,
+  position,
   chipOpacity,
+  animateLinks,
 }: {
   systemId: string;
   zoneIds: string[];
-  index: number;
+  position: Vector3;
   chipOpacity: number;
+  animateLinks: boolean;
 }) {
   const sys = systemById[systemId];
   const openApp = useStore((s) => s.openApp);
@@ -134,40 +294,26 @@ function SystemChip({
     .filter((z): z is Building => Boolean(z));
   if (!zones.length) return null;
 
-  const centroidX = zones.reduce((sum, z) => sum + z.pos[0], 0) / zones.length;
-  const centroidZ = zones.reduce((sum, z) => sum + z.pos[1], 0) / zones.length;
-  const avgHeight =
-    zones.reduce((sum, z) => sum + z.size[1], 0) / zones.length;
-
   const accent = ACCENT_HEX[sys.accent];
-  const offsetX = (index % 3 - 1) * 1.4;
-  const offsetZ = Math.floor(index / 3) * 0.9;
-
-  const top = new Vector3(
-    centroidX + offsetX,
-    avgHeight + 1.15 + (index % 2) * 0.22,
-    centroidZ + offsetZ,
-  );
+  const top = position;
 
   return (
     <group visible={chipOpacity > 0.01}>
       {zones.map((zone) => {
         const anchor = new Vector3(zone.pos[0], zone.size[1] + 0.05, zone.pos[1]);
         return (
-          <Line
+          <SystemConnection
             key={zone.id}
-            points={[top, anchor]}
-            color={accent}
-            lineWidth={1}
-            transparent
-            opacity={(hover ? 0.85 : 0.4) * chipOpacity}
-            dashed
-            dashSize={0.09}
-            gapSize={0.06}
+            from={top}
+            to={anchor}
+            accent={accent}
+            opacity={chipOpacity}
+            hover={hover}
+            animate={animateLinks}
           />
         );
       })}
-      <Html position={[top.x, top.y, top.z]} center distanceFactor={9}>
+      <Html position={[top.x, top.y, top.z]} center distanceFactor={9} zIndexRange={[40, 0]}>
         <button
           onClick={() => openApp(systemId)}
           onMouseEnter={() => setHover(true)}
@@ -240,6 +386,22 @@ export function FactoryScene({ opacity = 1, reveal = true }: SceneProps) {
         activeSystems.flatMap((id) => factoryMapping[id] ?? []),
       ),
     [activeSystems, factoryMapping],
+  );
+
+  const chipLayouts = useMemo(
+    () => computeChipLayouts(activeSystems, factoryMapping),
+    [activeSystems, factoryMapping],
+  );
+
+  const chipPositions = useMemo(
+    () =>
+      Object.fromEntries(
+        chipLayouts.map((l) => [
+          l.systemId,
+          new Vector3(l.x, l.y, l.z),
+        ]),
+      ),
+    [chipLayouts],
   );
 
   const flowCurve = useMemo(
@@ -360,15 +522,20 @@ export function FactoryScene({ opacity = 1, reveal = true }: SceneProps) {
         </>
       )}
 
-      {activeSystems.map((id, i) => (
-        <SystemChip
-          key={id}
-          systemId={id}
-          zoneIds={factoryMapping[id] ?? []}
-          index={i}
-          chipOpacity={chipOpacity * opacity}
-        />
-      ))}
+      {activeSystems.map((id) => {
+        const position = chipPositions[id];
+        if (!position) return null;
+        return (
+          <SystemChip
+            key={id}
+            systemId={id}
+            zoneIds={factoryMapping[id] ?? []}
+            position={position}
+            chipOpacity={chipOpacity * opacity}
+            animateLinks={chipOpacity > 0.5}
+          />
+        );
+      })}
     </group>
   );
 }
