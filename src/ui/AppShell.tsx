@@ -15,6 +15,8 @@ import { useStore } from '../store/useStore';
 import { AppModal } from './AppModal';
 import { PainPoints } from './PainPoints';
 import { DecisionsPanel } from './DecisionsPanel';
+import { FactoryConfigButton } from './FactoryConfigButton';
+import { FactoryConfigModal } from './FactoryConfigModal';
 
 function CentralPanel() {
   const chapter = useStore((s) => s.current());
@@ -41,18 +43,20 @@ export function AppShell() {
   const next = useStore((s) => s.next);
   const prev = useStore((s) => s.prev);
   const closeModal = useStore((s) => s.closeModal);
+  const closeFactoryConfig = useStore((s) => s.closeFactoryConfig);
 
   const is3D = chapter.scene === 'globe' || chapter.scene === 'factory';
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      const { appModal, closeApp } = useStore.getState();
+      const { appModal, closeApp, factoryConfigOpen } = useStore.getState();
       if (e.key === 'Escape') {
-        if (appModal) closeApp();
+        if (factoryConfigOpen) closeFactoryConfig();
+        else if (appModal) closeApp();
         else closeModal();
         return;
       }
-      if (appModal) return; // fullscreen open — don't change chapters
+      if (appModal || factoryConfigOpen) return;
       if (e.key === 'ArrowRight' || e.key === ' ') {
         e.preventDefault();
         next();
@@ -62,7 +66,7 @@ export function AppShell() {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [next, prev, closeModal]);
+  }, [next, prev, closeModal, closeFactoryConfig]);
 
   return (
     <div className="relative h-screen w-screen overflow-hidden bg-ink">
@@ -81,7 +85,8 @@ export function AppShell() {
         <div className="pointer-events-auto">
           <Logo />
         </div>
-        <div className="pointer-events-auto">
+        <div className="pointer-events-auto flex items-center gap-3">
+          <FactoryConfigButton />
           <ModeToggle />
         </div>
       </header>
@@ -135,6 +140,7 @@ export function AppShell() {
 
       {/* fullscreen app preview */}
       <AppModal />
+      <FactoryConfigModal />
     </div>
   );
 }

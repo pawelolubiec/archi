@@ -43,15 +43,6 @@ const REVEAL_ORDER = [
 
 const buildingById = Object.fromEntries(BUILDINGS.map((b) => [b.id, b]));
 
-const SYSTEM_ZONE: Record<string, string> = {
-  pts: 'filleting',
-  mifo: 'filleting',
-  pid: 'map',
-  workday_erp: 'office',
-  wms: 'freezing',
-  qms_lims: 'office',
-};
-
 const STAGGER = 0.12;
 const RISE_LAMBDA = 6;
 
@@ -125,40 +116,57 @@ function BuildingMesh({
 
 function SystemChip({
   systemId,
+  zoneIds,
   index,
   chipOpacity,
 }: {
   systemId: string;
+  zoneIds: string[];
   index: number;
   chipOpacity: number;
 }) {
   const sys = systemById[systemId];
-  const zone = buildingById[SYSTEM_ZONE[systemId]];
   const openApp = useStore((s) => s.openApp);
   const [hover, setHover] = useState(false);
-  if (!zone) return null;
+
+  const zones = zoneIds
+    .map((id) => buildingById[id])
+    .filter((z): z is Building => Boolean(z));
+  if (!zones.length) return null;
+
+  const centroidX = zones.reduce((sum, z) => sum + z.pos[0], 0) / zones.length;
+  const centroidZ = zones.reduce((sum, z) => sum + z.pos[1], 0) / zones.length;
+  const avgHeight =
+    zones.reduce((sum, z) => sum + z.size[1], 0) / zones.length;
 
   const accent = ACCENT_HEX[sys.accent];
-  const baseY = zone.size[1];
-  const sameZone = Object.entries(SYSTEM_ZONE).filter(([, z]) => z === SYSTEM_ZONE[systemId]);
-  const slot = sameZone.findIndex(([id]) => id === systemId);
-  const offsetX = sameZone.length > 1 ? (slot - 0.5) * 1.4 : 0;
+  const offsetX = (index % 3 - 1) * 1.4;
+  const offsetZ = Math.floor(index / 3) * 0.9;
 
-  const top = new Vector3(zone.pos[0] + offsetX, baseY + 1.15 + (index % 2) * 0.22, zone.pos[1]);
-  const anchor = new Vector3(zone.pos[0] + offsetX * 0.4, baseY + 0.05, zone.pos[1]);
+  const top = new Vector3(
+    centroidX + offsetX,
+    avgHeight + 1.15 + (index % 2) * 0.22,
+    centroidZ + offsetZ,
+  );
 
   return (
     <group visible={chipOpacity > 0.01}>
-      <Line
-        points={[top, anchor]}
-        color={accent}
-        lineWidth={1}
-        transparent
-        opacity={(hover ? 0.85 : 0.4) * chipOpacity}
-        dashed
-        dashSize={0.09}
-        gapSize={0.06}
-      />
+      {zones.map((zone) => {
+        const anchor = new Vector3(zone.pos[0], zone.size[1] + 0.05, zone.pos[1]);
+        return (
+          <Line
+            key={zone.id}
+            points={[top, anchor]}
+            color={accent}
+            lineWidth={1}
+            transparent
+            opacity={(hover ? 0.85 : 0.4) * chipOpacity}
+            dashed
+            dashSize={0.09}
+            gapSize={0.06}
+          />
+        );
+      })}
       <Html position={[top.x, top.y, top.z]} center distanceFactor={9}>
         <button
           onClick={() => openApp(systemId)}
@@ -192,6 +200,7 @@ function SystemChip({
 
 export function FactoryScene({ opacity = 1, reveal = true }: SceneProps) {
   const chapter = useStore((s) => s.current());
+  const factoryMapping = useStore((s) => s.factoryMapping);
   const groupRef = useRef<Group>(null);
 
   const scales = useRef<Record<string, number>>(
@@ -218,13 +227,19 @@ export function FactoryScene({ opacity = 1, reveal = true }: SceneProps) {
   }, [reveal, chapter.id]);
 
   const activeSystems = useMemo(
-    () => Object.keys(SYSTEM_ZONE).filter((id) => chapter.activeSystems.includes(id)),
-    [chapter.activeSystems],
+    () =>
+      chapter.activeSystems.filter(
+        (id) => (factoryMapping[id]?.length ?? 0) > 0,
+      ),
+    [chapter.activeSystems, factoryMapping],
   );
 
   const highlightZones = useMemo(
-    () => new Set(activeSystems.map((id) => SYSTEM_ZONE[id])),
-    [activeSystems],
+    () =>
+      new Set<string>(
+        activeSystems.flatMap((id) => factoryMapping[id] ?? []),
+      ),
+    [activeSystems, factoryMapping],
   );
 
   const flowCurve = useMemo(
@@ -346,7 +361,13 @@ export function FactoryScene({ opacity = 1, reveal = true }: SceneProps) {
       )}
 
       {activeSystems.map((id, i) => (
-        <SystemChip key={id} systemId={id} index={i} chipOpacity={chipOpacity * opacity} />
+        <SystemChip
+          key={id}
+          systemId={id}
+          zoneIds={factoryMapping[id] ?? []}
+          index={i}
+          chipOpacity={chipOpacity * opacity}
+        />
       ))}
     </group>
   );

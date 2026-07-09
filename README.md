@@ -5,7 +5,7 @@ cosmos → sales offices and customers → the factory in Poland → internal sy
 hybrid architecture → KPIs → governance → decision simulation → 2026–2030 roadmap.
 
 Board-level, dark mode, Milarex branding (navy / sea / gold / green).
-One continuous 3D scene + a 2D layer, driven by 10 chapters.
+One continuous 3D scene + a 2D layer, driven by 11 chapters.
 
 ## Stack
 
@@ -29,7 +29,7 @@ npm run preview
 ## Controls
 
 - **→ / Space** — next chapter · **←** — previous
-- **Esc** — close the system modal
+- **Esc** — close modals (factory config, app preview, system panel)
 - Click the progress dots (bottom) or a system in the factory scene / in the list
 - The **strategic / technical** toggle (top right) reveals integrations and details
 
@@ -46,7 +46,7 @@ the whole scene is tied together with a subtle **bloom**.
 ```
 src/
   data/        the data model = the single source of truth
-    chapters.ts      10 chapters: camera, visible points, flows, scene, modal
+    chapters.ts      11 chapters: camera, visible points, flows, scene, modal
     locations.ts     factory + offices + customers (lat/lng)
     systems.ts       ERP/PTS/PID/MiFo/WMS/QMS/APS/Data/AI
     dataFlows.ts     customer → office → factory flows
@@ -98,7 +98,9 @@ Regenerating continent dots: `npm run gen:land`.
 - Factory scene: **isometric buildings** matching the real plant layout — a
   standalone Office/Lab building plus a processing hall with Receiving,
   Filleting, Slicing D, Slicing S, MAP, and Freezing, ending at Output — with
-  a material flow line and clickable system cards.
+  a material flow line and clickable system cards. Use **Configure** (cogs, top
+  right on the factory slide) to map each system to one or more zones; mappings
+  persist in `localStorage`.
 - Scenes 6–10 (architecture, KPI, governance, simulation, roadmap) are polished
   2D panels over a dimmed globe — they can be moved into 3D if needed.
 - Globe camera positions were computed from the location normals; worth fine-tuning

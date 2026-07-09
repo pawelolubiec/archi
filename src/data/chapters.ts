@@ -112,28 +112,11 @@ export const chapters: Chapter[] = [
     index: 4,
     scene: 'factory',
     eyebrow: 'Operations',
-    title: 'The factory in Poland',
-    description:
-      'Descending from orbit into the operational core. Zones: Receiving, Filleting, Slicing D/S, MAP, Freezing, Output, and the Office / Lab.',
-    businessMessage:
-      'This is where value is created — and where every operational system meets.',
-    cameraPosition: [6.5, 7, 9],
-    cameraTarget: [0, 0.4, 0],
-    visibleLocations: ['factory_poland'],
-    activeFlows: [],
-    activeSystems: ['pts', 'wms', 'qms_lims'],
-    kpiPanel: false,
-  },
-  {
-    id: 'factory-systems',
-    index: 5,
-    scene: 'factory',
-    eyebrow: 'Systems',
     title: "The factory's internal systems",
     description:
-      'ERP, PTS, PID, MiFo, WMS, and QMS/LIMS as the digital blueprint of operations. Click a system to see details.',
+      'Descending from orbit into the operational core. Zones: Receiving, Filleting, Slicing D/S, MAP, Freezing, Output, and the Office / Lab. ERP, PTS, PID, MiFo, WMS, and QMS/LIMS as the digital blueprint — click a system for details, or configure zone mappings.',
     businessMessage:
-      'Every area has a specialized system — not one monolith for everything.',
+      'Every area has a specialized system — not one monolith for everything. This is where value is created.',
     cameraPosition: [4.5, 8.5, 6.5],
     cameraTarget: [0, 0.4, 0],
     visibleLocations: ['factory_poland'],
@@ -143,7 +126,7 @@ export const chapters: Chapter[] = [
   },
   {
     id: 'architecture',
-    index: 6,
+    index: 5,
     scene: 'architecture',
     eyebrow: 'Architecture',
     title: 'Hybrid architecture',
@@ -171,7 +154,7 @@ export const chapters: Chapter[] = [
   },
   {
     id: 'business-impact',
-    index: 7,
+    index: 6,
     scene: 'kpi',
     eyebrow: 'Impact',
     title: 'Business impact',
@@ -188,7 +171,7 @@ export const chapters: Chapter[] = [
   },
   {
     id: 'governance',
-    index: 8,
+    index: 7,
     scene: 'scenario',
     eyebrow: 'Governance',
     title: 'One accountability model',
@@ -205,7 +188,7 @@ export const chapters: Chapter[] = [
   },
   {
     id: 'simulation',
-    index: 9,
+    index: 8,
     scene: 'scenario',
     eyebrow: 'Simulation',
     title: 'Decision simulation',
@@ -222,7 +205,7 @@ export const chapters: Chapter[] = [
   },
   {
     id: 'roadmap',
-    index: 10,
+    index: 9,
     scene: 'roadmap',
     eyebrow: 'Roadmap',
     title: 'Roadmap 2026–2030',
@@ -239,7 +222,7 @@ export const chapters: Chapter[] = [
   },
   {
     id: 'decisions',
-    index: 11,
+    index: 10,
     scene: 'decisions',
     eyebrow: 'Decisions',
     title: 'What we need from the board',
