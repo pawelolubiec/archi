@@ -10,11 +10,11 @@ export const chapters: Chapter[] = [
     index: 0,
     scene: 'globe',
     eyebrow: 'Ecosystem',
-    title: 'A connected digital ecosystem',
+    title: 'A hybrid digital ecosystem',
     description:
-      'Milarex as a single model: factory, sales offices, customers, and data tied together in one coherent architecture.',
+      'Milarex as a single model: factory, sales offices, customers, and data tied together in one coherent architecture — specialized systems for each job, with ERP as one building block, not the owner of everything.',
     businessMessage:
-      'One group, one data model — not a collection of disconnected systems.',
+      'One group, one data model — deliberately hybrid. ERP does what ERP is good at; it does not take everything.',
     cameraPosition: [6.4, 7.7, -0.9],
     cameraTarget: [0, 0, 0],
     visibleLocations: [
@@ -97,9 +97,9 @@ export const chapters: Chapter[] = [
     eyebrow: 'Integration',
     title: 'One order, same-day to the factory',
     description:
-      'Follow a single customer order from the sales office to the production plan in Poland — this flow is the whole point of the architecture.',
+      'Follow a single customer order from the sales office to the production plan in Poland — and the real cost of producing it flowing back. The loop, not the one-way message, is the point of the architecture.',
     businessMessage:
-      'A same-day demand signal to the factory is margin and working capital — not IT plumbing.',
+      'Same-day both ways — demand to the factory, real cost back to sales. Without the return leg we never know what is best for us to sell.',
     prominentTakeaway: true,
     cameraPosition: [2.72, 3.99, -0.84],
     cameraTarget: [1.11, 1.63, -0.34],

@@ -16,11 +16,13 @@ export function Overlay() {
   const chapter = useStore((s) => s.current());
   const description = chapterDescription(chapter.id, chapter.description);
   const isFactory = chapter.scene === 'factory';
+  const isIntegration = chapter.id === 'germany-factory';
+  const compactTitle = isFactory || isIntegration;
 
   return (
     <div
       className={`pointer-events-none slide-chrome ${
-        isFactory ? 'max-w-lg' : 'max-w-2xl'
+        isFactory ? 'max-w-lg' : isIntegration ? 'max-w-md' : 'max-w-2xl'
       }`}
     >
       <AnimatePresence mode="wait">
@@ -45,7 +47,7 @@ export function Overlay() {
 
           <h1
             className={`font-display leading-tight text-paper ${
-              isFactory ? 'text-slide-title' : 'text-slide-display'
+              compactTitle ? 'text-slide-title' : 'text-slide-display'
             }`}
           >
             {chapter.title}
