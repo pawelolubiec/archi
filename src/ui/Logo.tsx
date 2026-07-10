@@ -22,8 +22,8 @@ export function Logo() {
         />
       </svg>
       <div className="leading-none">
-        <div className="font-display text-lg tracking-wide text-paper">MILAREX</div>
-        <div className="text-[9px] uppercase tracking-[0.34em] text-mist">
+        <div className="font-display text-xl tracking-wide text-paper">MILAREX</div>
+        <div className="text-slide-caption uppercase tracking-[0.34em] text-mist">
           Digital Architecture
         </div>
       </div>

@@ -15,9 +15,14 @@ export function Overlay() {
   const index = useStore((s) => s.index);
   const chapter = useStore((s) => s.current());
   const description = chapterDescription(chapter.id, chapter.description);
+  const isFactory = chapter.scene === 'factory';
 
   return (
-    <div className="pointer-events-none max-w-xl">
+    <div
+      className={`pointer-events-none slide-chrome ${
+        isFactory ? 'max-w-lg' : 'max-w-2xl'
+      }`}
+    >
       <AnimatePresence mode="wait">
         <motion.div
           key={chapter.id}
@@ -27,25 +32,35 @@ export function Overlay() {
           transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
         >
           <div className="mb-3 flex items-baseline gap-3">
-            <span className="font-display text-5xl leading-none text-gold/80">
+            <span className="font-display text-5xl leading-none text-gold/80 sm:text-6xl">
               {String(index + 1).padStart(2, '0')}
             </span>
-            <span className="text-xs uppercase tracking-eyebrow text-sea">
+            <span className="text-slide-kicker uppercase tracking-eyebrow text-sea">
               {chapter.eyebrow}
             </span>
-            <span className="text-xs text-mist">
+            <span className="text-slide-caption text-mist">
               / {String(TOTAL_CHAPTERS).padStart(2, '0')}
             </span>
           </div>
 
-          <h1 className="font-display text-4xl leading-tight text-paper">
+          <h1
+            className={`font-display leading-tight text-paper ${
+              isFactory ? 'text-slide-title' : 'text-slide-display'
+            }`}
+          >
             {chapter.title}
           </h1>
 
-          <p className="mt-4 text-base leading-relaxed text-mist">{description}</p>
+          <p
+            className={`mt-4 text-slide-body leading-relaxed text-mist ${
+              isFactory ? 'line-clamp-2' : ''
+            }`}
+          >
+            {description}
+          </p>
 
           <div
-            className={`mt-6 pl-4 ${
+            className={`mt-5 pl-4 ${
               chapter.prominentTakeaway
                 ? 'border-l-[3px] border-gold'
                 : 'border-l-2 border-gold/60'
@@ -54,8 +69,8 @@ export function Overlay() {
             <p
               className={
                 chapter.prominentTakeaway
-                  ? 'text-lg font-medium leading-relaxed text-paper'
-                  : 'text-sm font-medium leading-relaxed text-paper/90'
+                  ? 'text-slide-takeaway font-medium leading-relaxed text-paper'
+                  : 'text-slide-takeaway font-medium leading-relaxed text-paper/90'
               }
             >
               {chapter.businessMessage}

@@ -23,6 +23,14 @@ export default {
         display: ['Georgia', 'Cambria', 'Times New Roman', 'serif'],
         sans: ['Inter', 'system-ui', 'sans-serif'],
       },
+      fontSize: {
+        'slide-kicker': ['clamp(0.8125rem, 0.75rem + 0.35vw, 1rem)', { lineHeight: '1.4' }],
+        'slide-body': ['clamp(1.125rem, 1rem + 0.55vw, 1.375rem)', { lineHeight: '1.55' }],
+        'slide-title': ['clamp(1.625rem, 1.4rem + 0.9vw, 2rem)', { lineHeight: '1.25' }],
+        'slide-display': ['clamp(2.5rem, 2rem + 2vw, 3.5rem)', { lineHeight: '1.1' }],
+        'slide-takeaway': ['clamp(1.25rem, 1.1rem + 0.6vw, 1.5rem)', { lineHeight: '1.45' }],
+        'slide-caption': ['clamp(0.8125rem, 0.75rem + 0.3vw, 1rem)', { lineHeight: '1.4' }],
+      },
       letterSpacing: {
         eyebrow: '0.34em',
       },

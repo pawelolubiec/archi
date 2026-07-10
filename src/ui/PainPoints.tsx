@@ -56,9 +56,9 @@ export function PainPoints() {
             <div className="flex items-start gap-3">
               <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-[#F87171]" />
               <div>
-                <h3 className="font-display text-xl text-paper">{p.title}</h3>
-                <p className="mt-1.5 text-sm leading-relaxed text-mist">{p.detail}</p>
-                <p className="mt-2 text-xs font-medium text-[#F8A9A9]">
+                <h3 className="font-display text-2xl text-paper">{p.title}</h3>
+                <p className="mt-2 text-slide-body leading-relaxed text-mist">{p.detail}</p>
+                <p className="mt-2 text-base font-medium text-[#F8A9A9]">
                   Cost: {p.cost}
                 </p>
               </div>
@@ -70,7 +70,7 @@ export function PainPoints() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.55 }}
-        className="mt-4 text-center text-sm text-paper/80"
+        className="mt-4 text-center text-slide-body text-paper/80"
       >
         <span className="mr-2 text-gold">▸</span>
         This isn't an IT problem — it's a brake on margin, working capital, and decision speed.

@@ -26,7 +26,7 @@ export function CameraRig() {
     c.smoothTime = 0.9;
     c.draggingSmoothTime = 0.25;
     c.minDistance = 3;
-    c.maxDistance = 16;
+    c.maxDistance = chapter.scene === 'factory' ? 20 : 16;
     c.dollyToCursor = false;
 
     const onStart = () => {
@@ -41,7 +41,7 @@ export function CameraRig() {
       c.removeEventListener('controlstart', onStart);
       c.removeEventListener('controlend', onEnd);
     };
-  }, []);
+  }, [chapter.scene]);
 
   // intro flight on first load
   useFrame((_, delta) => {

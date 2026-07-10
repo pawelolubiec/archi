@@ -22,8 +22,8 @@ export function KPIBoard({ compact = false }: { compact?: boolean }) {
   const scenario = scenarioId ? scenarioById[scenarioId] : null;
 
   return (
-    <div className="pointer-events-auto w-full max-w-5xl">
-      <div className={`grid gap-3 ${compact ? 'grid-cols-5' : 'grid-cols-5'}`}>
+    <div className="pointer-events-auto w-full max-w-[90vw]">
+      <div className={`grid gap-4 ${compact ? 'grid-cols-5' : 'grid-cols-5'}`}>
         {kpis.map((kpi, i) => {
           const value = projectedValue(kpi, scenario?.kpiDeltas);
           const delta = value - kpi.baseline;
@@ -37,20 +37,20 @@ export function KPIBoard({ compact = false }: { compact?: boolean }) {
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.04, duration: 0.4 }}
-              className="rounded-xl border border-white/10 bg-navy-900/60 p-3 backdrop-blur-sm"
+              className="slide-card p-4"
             >
-              <div className="text-[10px] uppercase tracking-[0.16em] text-mist">
+              <div className="text-slide-caption uppercase tracking-[0.16em] text-mist">
                 {kpi.name}
               </div>
-              <div className="mt-1 flex items-baseline gap-1.5">
-                <span className="font-display text-2xl text-paper">
+              <div className="mt-1.5 flex items-baseline gap-1.5">
+                <span className="font-display text-3xl text-paper">
                   <AnimatedNumber
                     value={value}
                     decimals={decimals}
                     delay={i * 0.05}
                   />
                 </span>
-                <span className="text-[10px] text-mist">{kpi.unit}</span>
+                <span className="text-slide-caption text-mist">{kpi.unit}</span>
                 {scenario && delta !== 0 && (
                   <AnimatedDelta delta={delta} improved={improved} decimals={decimals} />
                 )}
@@ -63,17 +63,17 @@ export function KPIBoard({ compact = false }: { compact?: boolean }) {
                   delay={i * 0.05 + 0.15}
                 />
               </div>
-              <div className="mt-1 flex justify-between text-[9px] text-mist">
+              <div className="mt-1.5 flex justify-between text-slide-caption text-mist">
                 <span>base {kpi.baseline}</span>
                 <span>target {kpi.target}</span>
               </div>
 
               {!compact && (
-                <div className="mt-2 flex flex-wrap gap-1">
+                <div className="mt-2 flex flex-wrap gap-1.5">
                   {kpi.affectedBy.slice(0, 4).map((sid) => (
                     <span
                       key={sid}
-                      className="rounded border border-white/10 px-1.5 py-0.5 text-[9px] text-sea"
+                      className="rounded border border-white/10 px-2 py-0.5 text-slide-caption text-sea"
                     >
                       {systemById[sid]?.short ?? sid}
                     </span>
@@ -85,7 +85,7 @@ export function KPIBoard({ compact = false }: { compact?: boolean }) {
         })}
       </div>
       {!compact && (
-        <p className="mt-3 text-center text-[11px] text-mist/70">
+        <p className="mt-3 text-center text-slide-caption text-mist/70">
           Baseline values and targets — to be validated with Data Platform (Superset) before the meeting.
         </p>
       )}

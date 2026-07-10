@@ -42,11 +42,11 @@ export function OrderFlow() {
                 ease: [0.22, 1, 0.36, 1],
               }}
             >
-              <div className="rounded-xl border border-white/10 bg-navy-900/70 p-3 backdrop-blur-md sm:p-4">
-                <div className="text-xs font-semibold text-paper sm:text-sm">
+              <div className="rounded-xl border border-white/10 bg-navy-900/70 p-4 backdrop-blur-md">
+                <div className="text-base font-semibold text-paper lg:text-lg">
                   {step.title}
                 </div>
-                <p className="mt-1.5 text-[11px] leading-snug text-mist sm:text-xs">
+                <p className="mt-2 text-sm leading-snug text-mist lg:text-base">
                   {step.description}
                 </p>
               </div>
@@ -79,16 +79,16 @@ export function OrderFlow() {
           ease: [0.22, 1, 0.36, 1],
         }}
       >
-        <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-xs sm:text-sm">
-          <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-mist">
+        <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-slide-body">
+          <span className="font-mono text-slide-caption uppercase tracking-[0.18em] text-mist">
             Today
           </span>
           <span className="text-paper/70">
             e-mail and re-keying · 2–3 days late · conflicting versions
           </span>
         </div>
-        <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-xs sm:text-sm">
-          <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-sea">
+        <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-slide-body">
+          <span className="font-mono text-slide-caption uppercase tracking-[0.18em] text-sea">
             Target
           </span>
           <span className="text-paper/90">
@@ -98,7 +98,7 @@ export function OrderFlow() {
       </motion.div>
 
       <motion.p
-        className="mt-4 max-w-2xl text-xs leading-relaxed text-mist sm:text-sm"
+        className="mt-4 max-w-2xl text-slide-body leading-relaxed text-mist"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{

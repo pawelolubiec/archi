@@ -14,7 +14,7 @@ export function ScenarioPanel() {
     <div className="pointer-events-auto flex w-full max-w-6xl gap-6">
       {/* scenario selection */}
       <div className="w-64 shrink-0 space-y-2">
-        <div className="mb-2 text-[10px] uppercase tracking-[0.22em] text-mist">
+        <div className="mb-2 text-slide-caption uppercase tracking-[0.22em] text-mist">
           Investment scenario
         </div>
         {scenarios.map((s) => {
@@ -23,7 +23,7 @@ export function ScenarioPanel() {
             <button
               key={s.id}
               onClick={() => setScenario(active ? null : s.id)}
-              className="w-full rounded-lg border px-3 py-2.5 text-left text-sm transition"
+              className="w-full rounded-lg border px-4 py-3 text-left text-slide-body transition"
               style={{
                 borderColor: active ? '#D6BF9199' : 'rgba(255,255,255,0.08)',
                 background: active ? 'rgba(214,191,145,0.10)' : 'rgba(255,255,255,0.03)',
@@ -50,22 +50,22 @@ export function ScenarioPanel() {
               <div className="rounded-2xl border border-white/10 bg-navy-900/60 p-5 backdrop-blur-sm">
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <h3 className="font-display text-2xl text-paper">
+                    <h3 className="font-display text-slide-title text-paper">
                       {scenario.name}
                     </h3>
-                    <p className="mt-1 max-w-xl text-sm text-mist">
+                    <p className="mt-1 max-w-xl text-slide-body text-mist">
                       {scenario.summary}
                     </p>
                   </div>
                   <div className="shrink-0 text-right">
-                    <div className="text-[10px] uppercase tracking-[0.2em] text-mist">
+                    <div className="text-slide-caption uppercase tracking-[0.2em] text-mist">
                       Horizon
                     </div>
-                    <div className="text-sm text-paper">{scenario.horizon}</div>
+                    <div className="text-slide-body text-paper">{scenario.horizon}</div>
                   </div>
                 </div>
 
-                <div className="mt-4 grid grid-cols-4 gap-3 text-sm">
+                <div className="mt-4 grid grid-cols-4 gap-3 text-slide-body">
                   <Stat label="CAPEX" tone="#D6BF91" prefix="€ " suffix="M" numeric={scenario.capexK / 1000} decimals={1} />
                   <Stat label="OPEX / year" tone="#9DB4CC" prefix="€ " suffix="k" numeric={scenario.opexAnnualK} />
                   <Stat label="EBITDA / year" tone="#34D399" prefix="+€ " suffix="k" numeric={scenario.ebitdaAnnualK} />
@@ -73,14 +73,14 @@ export function ScenarioPanel() {
                 </div>
 
                 <div className="mt-3">
-                  <div className="text-[10px] uppercase tracking-[0.2em] text-mist">
+                  <div className="text-slide-caption uppercase tracking-[0.2em] text-mist">
                     Activates systems
                   </div>
                   <div className="mt-1 flex flex-wrap gap-1.5">
                     {scenario.activatesSystems.map((id) => (
                       <span
                         key={id}
-                        className="rounded border border-sea/30 bg-sea/5 px-1.5 py-0.5 text-xs text-sea"
+                        className="rounded border border-sea/30 bg-sea/5 px-2 py-0.5 text-slide-caption text-sea"
                       >
                         {systemById[id]?.short ?? id}
                       </span>
@@ -95,11 +95,11 @@ export function ScenarioPanel() {
               </div>
 
               <div className="mt-4">
-                <div className="mb-2 text-[10px] uppercase tracking-[0.22em] text-mist">
+                <div className="mb-2 text-slide-caption uppercase tracking-[0.22em] text-mist">
                   KPI impact projection
                 </div>
                 <KPIBoard compact />
-                <p className="mt-2 text-[11px] text-mist/70">
+                <p className="mt-2 text-slide-caption text-mist/70">
                   Reference estimates — CAPEX/OPEX/EBITDA to be validated with Controlling,
                   KPI baselines to be validated with Data Platform.
                 </p>
@@ -110,7 +110,7 @@ export function ScenarioPanel() {
               key="empty"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="flex h-64 items-center justify-center rounded-2xl border border-dashed border-white/10 text-center text-mist"
+              className="flex h-64 items-center justify-center rounded-2xl border border-dashed border-white/10 text-center text-slide-body text-mist"
             >
               Select a scenario to see the impact on architecture and KPIs.
             </motion.div>
@@ -138,8 +138,8 @@ function Stat({
 }) {
   return (
     <div>
-      <div className="text-[10px] uppercase tracking-[0.2em] text-mist">{label}</div>
-      <div className="text-base font-semibold" style={{ color: tone }}>
+      <div className="text-slide-caption uppercase tracking-[0.2em] text-mist">{label}</div>
+      <div className="text-lg font-semibold" style={{ color: tone }}>
         {prefix}
         <AnimatedNumber value={numeric} decimals={decimals} />
         {suffix}
@@ -161,12 +161,12 @@ function Block({
 }) {
   return (
     <div>
-      <div className="text-[10px] uppercase tracking-[0.2em] text-mist">{title}</div>
-      <ul className="mt-2 space-y-1.5">
+      <div className="text-slide-caption uppercase tracking-[0.2em] text-mist">{title}</div>
+      <ul className="mt-2 space-y-2">
         {items.map((it, i) => (
-          <li key={it} className="flex items-center gap-2 text-sm text-paper/85">
+          <li key={it} className="flex items-center gap-2 text-slide-body text-paper/90">
             {numbered ? (
-              <span className="text-xs text-sea">{i + 1}.</span>
+              <span className="text-slide-caption text-sea">{i + 1}.</span>
             ) : (
               <span className="h-1.5 w-1.5 rounded-full" style={{ background: dot }} />
             )}

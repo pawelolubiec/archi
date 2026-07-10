@@ -118,8 +118,8 @@ export const chapters: Chapter[] = [
       'Descending from orbit into the operational core. Zones: Receiving, Filleting, Slicing D/S, MAP, Freezing, Output, and the Office / Lab. ERP, PTS, PID, MiFo, WMS, and QMS/LIMS as the digital blueprint — click a system for details, or configure zone mappings.',
     businessMessage:
       'Every area has a specialized system — not one monolith for everything. This is where value is created.',
-    cameraPosition: [4.5, 8.5, 6.5],
-    cameraTarget: [0, 0.4, 0],
+    cameraPosition: [7.0, 10.5, 8.5],
+    cameraTarget: [0, 0.5, 0],
     visibleLocations: ['factory_poland'],
     activeFlows: [],
     activeSystems: ['workday_erp', 'pts', 'pid', 'mifo', 'wms', 'qms_lims'],

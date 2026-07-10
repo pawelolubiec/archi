@@ -49,17 +49,17 @@ export function DecisionsPanel() {
           transition={{ delay: i * 0.12, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           className="flex gap-5 rounded-2xl border border-gold/25 bg-navy-900/70 p-5 backdrop-blur-sm"
         >
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-gold/50 bg-gold/10 font-display text-lg text-gold">
+          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border border-gold/50 bg-gold/10 font-display text-xl text-gold">
             {d.no}
           </div>
           <div className="min-w-0 flex-1">
-            <h3 className="font-display text-xl leading-snug text-paper">{d.title}</h3>
-            <p className="mt-1.5 text-sm leading-relaxed text-mist">{d.scope}</p>
-            <p className="mt-2 text-sm text-paper/85">
+            <h3 className="font-display text-slide-title leading-snug text-paper">{d.title}</h3>
+            <p className="mt-2 text-slide-body leading-relaxed text-mist">{d.scope}</p>
+            <p className="mt-2 text-slide-body text-paper/90">
               <span className="text-sea">Consequence:</span> {d.consequence}
             </p>
           </div>
-          <div className="shrink-0 self-center rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-gold">
+          <div className="shrink-0 self-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-slide-caption text-gold">
             {d.deadline}
           </div>
         </motion.div>
@@ -68,7 +68,7 @@ export function DecisionsPanel() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5 }}
-        className="pt-1 text-center text-xs text-mist"
+        className="pt-1 text-center text-slide-caption text-mist"
       >
         Financial figures are reference estimates — to be validated with Controlling before formal approval.
       </motion.p>

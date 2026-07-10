@@ -45,9 +45,9 @@ const buildingById = Object.fromEntries(BUILDINGS.map((b) => [b.id, b]));
 
 const STAGGER = 0.12;
 const RISE_LAMBDA = 6;
-const CHIP_MIN_DIST = 2.35;
-const CHIP_RING_RADIUS = 5.4;
-const CHIP_BASE_Y = 2.35;
+const CHIP_MIN_DIST = 1.9;
+const CHIP_RING_RADIUS = 3.8;
+const CHIP_BASE_Y = 2.0;
 
 interface ChipLayout {
   systemId: string;
@@ -201,9 +201,9 @@ function BuildingMesh({
         <meshBasicMaterial color={accent} toneMapped={false} />
       </mesh>
 
-      <Html position={[0, h + 0.42, 0]} center distanceFactor={11}>
+      <Html position={[0, h + 0.42, 0]} center distanceFactor={8}>
         <span
-          className="pointer-events-none whitespace-nowrap text-[11px] font-medium uppercase tracking-[0.24em] text-mist transition-opacity"
+          className="pointer-events-none whitespace-nowrap text-xs font-medium uppercase tracking-[0.24em] text-mist transition-opacity"
           style={{ opacity: labelOpacity }}
         >
           {b.label}
@@ -313,12 +313,12 @@ function SystemChip({
           />
         );
       })}
-      <Html position={[top.x, top.y, top.z]} center distanceFactor={9} zIndexRange={[40, 0]}>
+      <Html position={[top.x, top.y, top.z]} center distanceFactor={6} zIndexRange={[40, 0]}>
         <button
           onClick={() => openApp(systemId)}
           onMouseEnter={() => setHover(true)}
           onMouseLeave={() => setHover(false)}
-          className="group rounded-xl border bg-ink/85 px-3.5 py-2 text-left shadow-panel backdrop-blur-sm transition-transform hover:scale-105"
+          className="group rounded-xl border bg-ink/85 px-4 py-2.5 text-left shadow-panel backdrop-blur-sm transition-transform hover:scale-105"
           style={{
             borderColor: hover ? accent : `${accent}55`,
             boxShadow: hover ? `0 0 24px -6px ${accent}` : undefined,
@@ -326,14 +326,14 @@ function SystemChip({
           }}
         >
           <div className="flex items-center gap-2">
-            <span className="text-sm font-semibold" style={{ color: accent }}>
+            <span className="text-base font-semibold" style={{ color: accent }}>
               {sys.short}
             </span>
-            <span className="text-[9px] text-mist opacity-0 transition-opacity group-hover:opacity-100">
+            <span className="text-slide-caption text-mist opacity-0 transition-opacity group-hover:opacity-100">
               open ↗
             </span>
           </div>
-          <div className="text-[10px] uppercase tracking-[0.14em] text-mist">
+          <div className="text-slide-caption uppercase tracking-[0.14em] text-mist">
             {sys.owner}
           </div>
         </button>

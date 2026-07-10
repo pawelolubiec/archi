@@ -138,7 +138,13 @@ export function AppShell() {
       {/* center content */}
       {is3D ? (
         <>
-          <div className="absolute left-10 top-1/2 z-10 -translate-y-1/2">
+          <div
+            className={`absolute z-10 ${
+              chapter.scene === 'factory'
+                ? 'left-10 top-28 max-w-lg'
+                : 'left-10 top-1/2 -translate-y-1/2'
+            }`}
+          >
             <Overlay />
           </div>
           {isGermanyFactory ? (
@@ -153,24 +159,24 @@ export function AppShell() {
         </>
       ) : isArchitecture ? (
         <>
-          <div className="pointer-events-none absolute left-8 top-20 z-10">
+          <div className="pointer-events-none absolute left-8 top-20 z-10 slide-chrome">
             <div className="mb-0.5 flex items-baseline gap-2">
-              <span className="font-display text-2xl text-gold/80">
+              <span className="font-display text-4xl text-gold/80">
                 {String(chapter.index + 1).padStart(2, '0')}
               </span>
-              <span className="text-[10px] uppercase tracking-eyebrow text-sea">
+              <span className="text-slide-kicker uppercase tracking-eyebrow text-sea">
                 {chapter.eyebrow}
               </span>
             </div>
-            <h1 className="font-display text-xl text-paper">{chapter.title}</h1>
+            <h1 className="font-display text-slide-title text-paper">{chapter.title}</h1>
           </div>
 
-          <div className="absolute inset-x-4 top-36 bottom-[5.5rem] z-10 flex flex-col sm:inset-x-6 lg:inset-x-8">
+          <div className="absolute inset-x-4 top-32 bottom-[5.5rem] z-10 flex flex-col sm:inset-x-6 lg:inset-x-8">
             <CentralPanel />
           </div>
 
           <div className="pointer-events-none absolute inset-x-0 bottom-24 z-10 flex justify-center px-8">
-            <p className="max-w-4xl text-center text-xs font-medium text-paper/75">
+            <p className="max-w-4xl text-center text-slide-takeaway font-medium text-paper/80">
               <span className="mr-2 text-gold">▸</span>
               {chapter.businessMessage}
             </p>
@@ -179,27 +185,27 @@ export function AppShell() {
       ) : (
         <>
           {/* compact chapter header */}
-          <div className="pointer-events-none absolute left-10 top-24 max-w-md">
+          <div className="pointer-events-none absolute left-10 top-28 slide-chrome">
             <div className="mb-1 flex items-baseline gap-2">
-              <span className="font-display text-3xl text-gold/80">
+              <span className="font-display text-4xl text-gold/80">
                 {String(chapter.index + 1).padStart(2, '0')}
               </span>
-              <span className="text-xs uppercase tracking-eyebrow text-sea">
+              <span className="text-slide-kicker uppercase tracking-eyebrow text-sea">
                 {chapter.eyebrow}
               </span>
             </div>
-            <h1 className="font-display text-3xl text-paper">{chapter.title}</h1>
-            <p className="mt-2 text-sm text-mist">{chapter.description}</p>
+            <h1 className="font-display text-slide-title text-paper">{chapter.title}</h1>
+            <p className="mt-2 text-slide-body text-mist line-clamp-2">{chapter.description}</p>
           </div>
 
           {/* center panel */}
-          <div className="absolute inset-0 flex items-center justify-center px-10 pt-16">
+          <div className="absolute inset-0 flex items-center justify-center px-6 pt-36 pb-24 lg:px-10">
             <CentralPanel />
           </div>
 
           {/* business message */}
-          <div className="pointer-events-none absolute inset-x-0 bottom-28 flex justify-center px-10">
-            <p className="max-w-3xl text-center text-sm font-medium text-paper/80">
+          <div className="pointer-events-none absolute inset-x-0 bottom-24 flex justify-center px-10">
+            <p className="max-w-4xl text-center text-slide-takeaway font-medium text-paper/85">
               <span className="mr-2 text-gold">▸</span>
               {chapter.businessMessage}
             </p>

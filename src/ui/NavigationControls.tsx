@@ -11,14 +11,14 @@ export function NavigationControls() {
       <button
         onClick={prev}
         disabled={index === 0}
-        className="rounded-full border border-white/10 bg-white/5 px-5 py-2 text-sm font-medium text-paper transition hover:border-sea/50 hover:bg-sea/10 disabled:cursor-not-allowed disabled:opacity-30"
+        className="rounded-full border border-white/10 bg-white/5 px-6 py-2.5 text-base font-medium text-paper transition hover:border-sea/50 hover:bg-sea/10 disabled:cursor-not-allowed disabled:opacity-30"
       >
         ← Back
       </button>
       <button
         onClick={next}
         disabled={index === TOTAL_CHAPTERS - 1}
-        className="rounded-full border px-6 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-30"
+        className="rounded-full border px-7 py-2.5 text-base font-semibold transition disabled:cursor-not-allowed disabled:opacity-30"
         style={{
           borderColor: '#D6BF9166',
           background: 'rgba(214,191,145,0.10)',

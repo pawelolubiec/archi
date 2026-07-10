@@ -30,6 +30,16 @@ body {
   border-radius: 999px;
 }
 
+@layer components {
+  .slide-chrome {
+    @apply max-w-2xl;
+  }
+
+  .slide-card {
+    @apply rounded-2xl border border-white/10 bg-navy-900/60 p-5 backdrop-blur-sm;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   * {
     animation-duration: 0.01ms !important;

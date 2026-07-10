@@ -1,5 +1,6 @@
-import { Suspense, useMemo } from 'react';
-import { Canvas } from '@react-three/fiber';
+import { Suspense, useMemo, useEffect } from 'react';
+import { Canvas, useThree } from '@react-three/fiber';
+import { PerspectiveCamera } from 'three';
 import { Stars } from '@react-three/drei';
 import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing';
 import { CameraRig } from './CameraRig';
@@ -106,6 +107,37 @@ function SceneSwitch() {
   );
 }
 
+function PostEffects() {
+  const chapter = useStore((s) => s.current());
+  const isFactory = chapter.scene === 'factory';
+
+  return (
+    <EffectComposer multisampling={0}>
+      <Bloom
+        intensity={0.7}
+        luminanceThreshold={0.35}
+        luminanceSmoothing={0.4}
+        mipmapBlur
+        radius={0.5}
+      />
+      <Vignette eskil={false} offset={0.25} darkness={isFactory ? 0.45 : 0.7} />
+    </EffectComposer>
+  );
+}
+
+function CameraFovSync() {
+  const chapter = useStore((s) => s.current());
+  const { camera } = useThree();
+
+  useEffect(() => {
+    const cam = camera as PerspectiveCamera;
+    cam.fov = chapter.scene === 'factory' ? 44 : 38;
+    cam.updateProjectionMatrix();
+  }, [camera, chapter.scene]);
+
+  return null;
+}
+
 export function Experience() {
   const hasWebGL = useMemo(detectWebGL, []);
 
@@ -150,18 +182,10 @@ export function Experience() {
         />
         <SceneSwitch />
         <CameraRig />
+        <CameraFovSync />
       </Suspense>
 
-      <EffectComposer multisampling={0}>
-        <Bloom
-          intensity={0.7}
-          luminanceThreshold={0.35}
-          luminanceSmoothing={0.4}
-          mipmapBlur
-          radius={0.5}
-        />
-        <Vignette eskil={false} offset={0.25} darkness={0.7} />
-      </EffectComposer>
+      <PostEffects />
     </Canvas>
   );
 }

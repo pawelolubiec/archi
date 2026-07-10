@@ -53,7 +53,7 @@ function ProcessChevron({
       title={`${proc.order}. ${proc.label}`}
     >
       <span
-        className="text-[9px] font-semibold leading-tight sm:text-[10px]"
+        className="text-slide-caption font-semibold leading-tight sm:text-sm"
         style={{ color: proc.order >= 10 ? '#1a2332' : '#fff' }}
       >
         <span className="mr-1 opacity-75">{proc.order}</span>
@@ -74,7 +74,7 @@ function ProcessStrip({
 
   return (
     <div className="shrink-0">
-      <div className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-mist">
+      <div className="mb-2 text-slide-caption font-semibold uppercase tracking-[0.18em] text-mist">
         Business Process Layer
       </div>
       <div className="grid grid-cols-11 gap-0.5">
@@ -119,20 +119,20 @@ function ElementChip({
   const openApp = useStore((s) => s.openApp);
 
   const baseClass = compact
-    ? 'inline-flex items-center gap-1.5 rounded-md border bg-white/5 px-2.5 py-1 text-xs'
-    : 'inline-flex items-center gap-2 rounded-lg border bg-white/5 px-3 py-2 text-sm';
+    ? 'inline-flex items-center gap-1.5 rounded-md border bg-white/5 px-3 py-1.5 text-slide-caption'
+    : 'inline-flex items-center gap-2 rounded-lg border bg-white/5 px-3.5 py-2.5 text-slide-body';
 
   const inner = (
     <>
       <span className="font-medium text-paper/95">{element.label}</span>
       {badges && (
-        <span className="text-[10px] font-semibold opacity-80" style={{ color }}>
+        <span className="text-slide-caption font-semibold opacity-80" style={{ color }}>
           {badges}
         </span>
       )}
       {element.systemId && (
         <span
-          className={`text-[10px] text-sea transition-opacity ${
+          className={`text-slide-caption text-sea transition-opacity ${
             highlighted ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
           }`}
         >
@@ -213,7 +213,7 @@ function LayerSection({
         grow ? 'min-h-0 flex-1' : 'shrink-0'
       }`}
     >
-      <div className="mb-3 shrink-0 text-sm font-semibold text-sea">
+      <div className="mb-3 shrink-0 text-slide-body font-semibold text-sea">
         {ARCH_LAYER_LABELS[layerId]}
       </div>
       <div
@@ -332,7 +332,7 @@ export function ArchitectureLayers() {
       </div>
 
       {mode === 'technical' && (
-        <p className="shrink-0 text-center text-[11px] text-mist">
+        <p className="shrink-0 text-center text-slide-caption text-mist">
           {isHovering
             ? 'Hover links processes ↔ layer elements by color.'
             : 'Hover a process or element to see connections.'}
