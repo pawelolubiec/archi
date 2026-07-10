@@ -3,6 +3,7 @@ import { useFrame } from '@react-three/fiber';
 import { CatmullRomCurve3, CubicBezierCurve3, Group, Vector3 } from 'three';
 import { Html, Line, Edges } from '@react-three/drei';
 import { BRAND, ACCENT_HEX } from '../../data/brand';
+import { ZONE_COORDS } from '../../data/factoryLayout';
 import { systemById } from '../../data/systems';
 import { useStore } from '../../store/useStore';
 import { PulsingDataDot } from '../objects/PulsingDataDot';
@@ -19,14 +20,14 @@ interface Building {
 }
 
 const BUILDINGS: Building[] = [
-  { id: 'office', label: 'Office / Lab', pos: [-1.3, -3.4], size: [2.4, 0.75, 0.9], accent: BRAND.gold },
-  { id: 'receiving', label: 'Receiving', pos: [-0.1, -2.1], size: [4.4, 0.55, 0.9] },
-  { id: 'filleting', label: 'Filleting', pos: [-0.1, -0.2], size: [4.4, 1.2, 2.2], accent: BRAND.green },
-  { id: 'slicing_d', label: 'Slicing D', pos: [-2.9, -0.2], size: [1.6, 0.85, 1.8], accent: BRAND.sea },
-  { id: 'map', label: 'MAP', pos: [3.0, -0.2], size: [1.9, 0.85, 2.0], accent: BRAND.sea },
-  { id: 'freezing', label: 'Freezing', pos: [0.5, 2.0], size: [2.6, 1.0, 1.4], accent: BRAND.sea },
-  { id: 'slicing_s', label: 'Slicing S', pos: [-2.1, 2.0], size: [1.7, 0.85, 1.6] },
-  { id: 'output', label: 'Output', pos: [-3.2, 3.4], size: [1.4, 0.6, 1.0] },
+  { id: 'office', label: 'Office / Lab', pos: ZONE_COORDS.office, size: [2.4, 0.75, 0.9], accent: BRAND.gold },
+  { id: 'receiving', label: 'Receiving', pos: ZONE_COORDS.receiving, size: [4.4, 0.55, 0.9] },
+  { id: 'filleting', label: 'Filleting', pos: ZONE_COORDS.filleting, size: [4.4, 1.2, 2.2], accent: BRAND.green },
+  { id: 'slicing_d', label: 'Slicing D', pos: ZONE_COORDS.slicing_d, size: [1.6, 0.85, 1.8], accent: BRAND.sea },
+  { id: 'map', label: 'MAP', pos: ZONE_COORDS.map, size: [1.9, 0.85, 2.0], accent: BRAND.sea },
+  { id: 'freezing', label: 'Freezing', pos: ZONE_COORDS.freezing, size: [2.6, 1.0, 1.4], accent: BRAND.sea },
+  { id: 'slicing_s', label: 'Slicing S', pos: ZONE_COORDS.slicing_s, size: [1.7, 0.85, 1.6] },
+  { id: 'output', label: 'Output', pos: ZONE_COORDS.output, size: [1.4, 0.6, 1.0] },
 ];
 
 /** Rise-in order along the production line. */
@@ -278,12 +279,14 @@ function SystemChip({
   position,
   chipOpacity,
   animateLinks,
+  dimmed = false,
 }: {
   systemId: string;
   zoneIds: string[];
   position: Vector3;
   chipOpacity: number;
   animateLinks: boolean;
+  dimmed?: boolean;
 }) {
   const sys = systemById[systemId];
   const openApp = useStore((s) => s.openApp);
@@ -318,7 +321,9 @@ function SystemChip({
           onClick={() => openApp(systemId)}
           onMouseEnter={() => setHover(true)}
           onMouseLeave={() => setHover(false)}
-          className="group rounded-xl border bg-ink/85 px-4 py-2.5 text-left shadow-panel backdrop-blur-sm transition-transform hover:scale-105"
+          className={`group rounded-xl border bg-ink/85 px-4 py-2.5 text-left shadow-panel backdrop-blur-sm transition-transform hover:scale-105 ${
+            dimmed ? 'pointer-events-none' : ''
+          }`}
           style={{
             borderColor: hover ? accent : `${accent}55`,
             boxShadow: hover ? `0 0 24px -6px ${accent}` : undefined,
@@ -347,6 +352,7 @@ function SystemChip({
 export function FactoryScene({ opacity = 1, reveal = true }: SceneProps) {
   const chapter = useStore((s) => s.current());
   const factoryMapping = useStore((s) => s.factoryMapping);
+  const tourSystem = useStore((s) => s.factoryTourSystem);
   const groupRef = useRef<Group>(null);
 
   const scales = useRef<Record<string, number>>(
@@ -383,9 +389,11 @@ export function FactoryScene({ opacity = 1, reveal = true }: SceneProps) {
   const highlightZones = useMemo(
     () =>
       new Set<string>(
-        activeSystems.flatMap((id) => factoryMapping[id] ?? []),
+        (tourSystem ? [tourSystem] : activeSystems).flatMap(
+          (id) => factoryMapping[id] ?? [],
+        ),
       ),
-    [activeSystems, factoryMapping],
+    [activeSystems, factoryMapping, tourSystem],
   );
 
   const chipLayouts = useMemo(
@@ -525,14 +533,16 @@ export function FactoryScene({ opacity = 1, reveal = true }: SceneProps) {
       {activeSystems.map((id) => {
         const position = chipPositions[id];
         if (!position) return null;
+        const dimmed = tourSystem !== null && tourSystem !== id;
         return (
           <SystemChip
             key={id}
             systemId={id}
             zoneIds={factoryMapping[id] ?? []}
             position={position}
-            chipOpacity={chipOpacity * opacity}
-            animateLinks={chipOpacity > 0.5}
+            chipOpacity={chipOpacity * opacity * (dimmed ? 0.12 : 1)}
+            animateLinks={chipOpacity > 0.5 && !dimmed}
+            dimmed={dimmed}
           />
         );
       })}

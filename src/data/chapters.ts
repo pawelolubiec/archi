@@ -115,7 +115,7 @@ export const chapters: Chapter[] = [
     eyebrow: 'Operations',
     title: "The factory's internal systems",
     description:
-      'Descending from orbit into the operational core. Zones: Receiving, Filleting, Slicing D/S, MAP, Freezing, Output, and the Office / Lab. ERP, PTS, PID, MiFo, WMS, and QMS/LIMS as the digital blueprint — click a system for details, or configure zone mappings.',
+      'Descending from orbit into the operational core. A guided run-through of ERP, PTS, PID, MiFo, WMS, and QMS/LIMS — how each system supports the organisation — then the hall is yours to explore.',
     businessMessage:
       'Every area has a specialized system — not one monolith for everything. This is where value is created.',
     cameraPosition: [7.0, 10.5, 8.5],

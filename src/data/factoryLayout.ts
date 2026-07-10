@@ -12,6 +12,18 @@ export const FACTORY_ZONES = [
 
 export type FactoryZoneId = (typeof FACTORY_ZONES)[number]['id'];
 
+/** Zone floor coordinates [x, z] — shared by the 3D hall and the tour camera. */
+export const ZONE_COORDS: Record<FactoryZoneId, [number, number]> = {
+  office: [-1.3, -3.4],
+  receiving: [-0.1, -2.1],
+  filleting: [-0.1, -0.2],
+  slicing_d: [-2.9, -0.2],
+  map: [3.0, -0.2],
+  freezing: [0.5, 2.0],
+  slicing_s: [-2.1, 2.0],
+  output: [-3.2, 3.4],
+};
+
 export type FactoryMapping = Record<string, FactoryZoneId[]>;
 
 /** Default system → zone mapping (one system can map to many zones). */

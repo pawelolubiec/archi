@@ -18,6 +18,7 @@ import {
   saveFactoryMappingRemote,
 } from '../lib/configApi';
 import type { Chapter } from '../data/types';
+import type { CameraFocus } from '../data/factoryTour';
 
 export type Mode = 'strategic' | 'technical';
 export type SceneTransition = 'none' | 'toFactory' | 'toGlobe';
@@ -98,6 +99,8 @@ function chapterNavState(
     appModal: null,
     factoryConfigOpen: false,
     architectureConfigOpen: false,
+    factoryTourSystem: null,
+    factoryFocus: null,
     sceneTransition: transition,
     transitionProgress: transition === 'none' ? 0 : 0,
     transitionFromCamera:
@@ -122,6 +125,10 @@ interface AppState {
     position: Vector3Tuple;
     target: Vector3Tuple;
   } | null;
+  /** system currently spotlighted by the factory tour (slide 05) */
+  factoryTourSystem: string | null;
+  /** camera override while the factory tour focuses a system */
+  factoryFocus: CameraFocus | null;
   /** system → factory zone mapping (one system, many zones) */
   factoryMapping: FactoryMapping;
   factoryConfigOpen: boolean;
@@ -144,6 +151,7 @@ interface AppState {
   openApp: (systemId: string) => void;
   closeApp: () => void;
   setScenario: (id: string | null) => void;
+  setFactoryTour: (systemId: string | null, focus: CameraFocus | null) => void;
   setTransitionProgress: (progress: number) => void;
   finishTransition: () => void;
   setTransitionFromCamera: (cam: {
@@ -173,6 +181,8 @@ export const useStore = create<AppState>((set, get) => ({
   manualModal: null,
   appModal: null,
   scenarioId: null,
+  factoryTourSystem: null,
+  factoryFocus: null,
   sceneTransition: 'none',
   transitionProgress: 0,
   transitionFromCamera: null,
@@ -226,6 +236,8 @@ export const useStore = create<AppState>((set, get) => ({
   openApp: (systemId) => set({ appModal: systemId }),
   closeApp: () => set({ appModal: null }),
   setScenario: (id) => set({ scenarioId: id }),
+  setFactoryTour: (systemId, focus) =>
+    set({ factoryTourSystem: systemId, factoryFocus: focus }),
 
   openFactoryConfig: () => set({ factoryConfigOpen: true }),
   closeFactoryConfig: () => set({ factoryConfigOpen: false }),

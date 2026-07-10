@@ -15,6 +15,8 @@ export function CameraRig() {
   const sceneTransition = useStore((s) => s.sceneTransition);
   const index = useStore((s) => s.index);
 
+  const factoryFocus = useStore((s) => s.factoryFocus);
+
   const introDone = useRef(false);
   const introElapsed = useRef(0);
   const lastChapterId = useRef(chapter.id);
@@ -84,6 +86,24 @@ export function CameraRig() {
     c.setLookAt(px, py, pz, tx, ty, tz, true);
   }, [chapter, sceneTransition, index]);
 
+  // factory tour: fly to the focused system, restore the overview when it ends
+  useEffect(() => {
+    const c = ref.current;
+    if (!c || sceneTransition !== 'none' || !introDone.current) return;
+
+    if (factoryFocus) {
+      const [px, py, pz] = factoryFocus.position;
+      const [tx, ty, tz] = factoryFocus.target;
+      c.setLookAt(px, py, pz, tx, ty, tz, true);
+    } else if (chapter.scene === 'factory') {
+      const [px, py, pz] = chapter.cameraPosition;
+      const [tx, ty, tz] = chapter.cameraTarget;
+      c.setLookAt(px, py, pz, tx, ty, tz, true);
+    }
+    // only react to focus changes; chapter changes are handled above
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [factoryFocus]);
+
   // subtle idle orbital drift on 3D chapters
   useFrame((_, delta) => {
     const c = ref.current;
@@ -97,6 +117,9 @@ export function CameraRig() {
 
     const is3D = chapter.scene === 'globe' || chapter.scene === 'factory';
     if (!is3D) return;
+
+    // hold still while the tour is focusing a system
+    if (useStore.getState().factoryFocus) return;
 
     c.rotate(IDLE_AZIMUTH_SPEED * delta, 0, false);
   });

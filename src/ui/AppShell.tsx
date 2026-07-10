@@ -21,6 +21,7 @@ import { FactoryConfigModal } from './FactoryConfigModal';
 import { ArchitectureConfigButton } from './ArchitectureConfigButton';
 import { ArchitectureConfigModal } from './ArchitectureConfigModal';
 import { OrderFlow } from './OrderFlow';
+import { FactoryTourPanel } from './FactoryTourPanel';
 
 function CentralPanel() {
   const chapter = useStore((s) => s.current());
@@ -154,6 +155,11 @@ export function AppShell() {
           ) : (
             <div className="absolute right-10 top-28 z-10">
               <SystemModal />
+            </div>
+          )}
+          {chapter.scene === 'factory' && (
+            <div className="absolute bottom-28 right-10 z-50">
+              <FactoryTourPanel />
             </div>
           )}
         </>
