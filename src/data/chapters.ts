@@ -60,11 +60,12 @@ export const chapters: Chapter[] = [
     index: 2,
     scene: 'globe',
     eyebrow: 'Sales',
-    title: 'Sales offices · MiFo',
+    title: 'Selling with the margin in view',
     description:
-      'Zooming into the sales offices. MiFo — Milarex Forecasting, Ordering & Profitability — manages customers, demand forecast, orders, quotes, and margin visibility.',
+      'Today a sales office quotes a customer without seeing the real margin, and our demand forecast is right 64% of the time — so production plans against guesses. MiFo closes that gap at the very first customer contact.',
     businessMessage:
-      'Sales starts the data chain — from the very first customer contact.',
+      'Sales starts the data chain — margin is visible before we commit, not after.',
+    prominentTakeaway: true,
     cameraPosition: [3.03, 3.96, -0.43],
     cameraTarget: [1.21, 1.58, -0.17],
     visibleLocations: [
@@ -94,11 +95,12 @@ export const chapters: Chapter[] = [
     index: 3,
     scene: 'globe',
     eyebrow: 'Integration',
-    title: 'Sales feeds production',
+    title: 'One order, same-day to the factory',
     description:
-      'Orders, forecast, prices, complaints, and customer requirements flow from MiFo into the operational core in Poland.',
+      'Follow a single customer order from the sales office to the production plan in Poland — this flow is the whole point of the architecture.',
     businessMessage:
-      "Sales isn't a silo — its data drives planning and operational decisions.",
+      'A same-day demand signal to the factory is margin and working capital — not IT plumbing.',
+    prominentTakeaway: true,
     cameraPosition: [2.72, 3.99, -0.84],
     cameraTarget: [1.11, 1.63, -0.34],
     visibleLocations: ['office_germany', 'factory_poland'],

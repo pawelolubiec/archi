@@ -20,6 +20,7 @@ import { FactoryConfigButton } from './FactoryConfigButton';
 import { FactoryConfigModal } from './FactoryConfigModal';
 import { ArchitectureConfigButton } from './ArchitectureConfigButton';
 import { ArchitectureConfigModal } from './ArchitectureConfigModal';
+import { OrderFlow } from './OrderFlow';
 
 function CentralPanel() {
   const chapter = useStore((s) => s.current());
@@ -54,6 +55,8 @@ export function AppShell() {
 
   const is3D = chapter.scene === 'globe' || chapter.scene === 'factory';
   const isArchitecture = chapter.scene === 'architecture';
+  const isGermanyFactory = chapter.id === 'germany-factory';
+  const isSalesSlide = chapter.id === 'germany' || isGermanyFactory;
 
   useEffect(() => {
     hydrateConfig();
@@ -61,10 +64,11 @@ export function AppShell() {
 
   // Close stale panels on slide change; open chapter modal only when landing on that slide.
   useEffect(() => {
-    closeModal();
     const chapterModal = chapters[index]?.modal;
     if (chapterModal) {
       openModal(chapterModal);
+    } else {
+      closeModal();
     }
   }, [index, closeModal, openModal]);
 
@@ -109,6 +113,16 @@ export function AppShell() {
         />
       )}
 
+      {/* dimmed globe + left-column scrim for sales/integration slides */}
+      {is3D && isSalesSlide && (
+        <>
+          {isGermanyFactory && (
+            <div className="pointer-events-none absolute inset-0 bg-ink/35" />
+          )}
+          <div className="pointer-events-none absolute inset-y-0 left-0 w-[min(42rem,55vw)] bg-gradient-to-r from-ink/75 via-ink/45 to-transparent" />
+        </>
+      )}
+
       {/* top bar */}
       <header className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-8">
         <div className="pointer-events-auto">
@@ -124,12 +138,18 @@ export function AppShell() {
       {/* center content */}
       {is3D ? (
         <>
-          <div className="absolute left-10 top-1/2 -translate-y-1/2">
+          <div className="absolute left-10 top-1/2 z-10 -translate-y-1/2">
             <Overlay />
           </div>
-          <div className="absolute right-10 top-28">
-            <SystemModal />
-          </div>
+          {isGermanyFactory ? (
+            <div className="absolute inset-y-0 right-8 z-10 flex w-[min(58%,52rem)] items-center justify-center pt-20 pb-28">
+              <OrderFlow />
+            </div>
+          ) : (
+            <div className="absolute right-10 top-28 z-10">
+              <SystemModal />
+            </div>
+          )}
         </>
       ) : isArchitecture ? (
         <>

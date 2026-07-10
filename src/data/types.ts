@@ -120,6 +120,8 @@ export interface Chapter {
   hideLocationLabels?: boolean;
   /** if set, only these location ids show their label pill (others show dot only) */
   labeledLocations?: string[];
+  /** render businessMessage with larger, higher-contrast takeaway styling */
+  prominentTakeaway?: boolean;
 }
 
 export interface RoadmapPhase {
