@@ -164,59 +164,63 @@ export function AppShell() {
           )}
         </>
       ) : isArchitecture ? (
-        <>
-          <div className="pointer-events-none absolute left-8 top-20 z-10 slide-chrome">
-            <div className="mb-0.5 flex items-baseline gap-2">
-              <span className="font-display text-4xl text-gold/80">
-                {String(chapter.index + 1).padStart(2, '0')}
-              </span>
-              <span className="text-slide-kicker uppercase tracking-eyebrow text-sea">
-                {chapter.eyebrow}
-              </span>
-            </div>
-            <h1 className="font-display text-slide-title text-paper">{chapter.title}</h1>
+        <div className="absolute inset-x-4 top-[7.5rem] bottom-[4.75rem] z-10 flex flex-col sm:inset-x-6 lg:inset-x-8">
+          <div className="pointer-events-none mb-2.5 flex shrink-0 items-baseline gap-3 slide-chrome">
+            <span className="font-display text-3xl leading-none text-gold/80">
+              {String(chapter.index + 1).padStart(2, '0')}
+            </span>
+            <h1 className="font-display text-slide-title leading-none text-paper">
+              {chapter.title}
+            </h1>
+            <span className="text-slide-kicker uppercase tracking-eyebrow text-sea">
+              {chapter.eyebrow}
+            </span>
           </div>
 
-          <div className="absolute inset-x-4 top-32 bottom-[5.5rem] z-10 flex flex-col sm:inset-x-6 lg:inset-x-8">
+          <div className="flex min-h-0 flex-1 flex-col">
             <CentralPanel />
           </div>
 
-          <div className="pointer-events-none absolute inset-x-0 bottom-24 z-10 flex justify-center px-8">
-            <p className="max-w-4xl text-center text-slide-takeaway font-medium text-paper/80">
+          <div className="pointer-events-none mt-2.5 flex shrink-0 justify-center px-8">
+            <p className="max-w-4xl text-center text-slide-takeaway font-medium leading-snug text-paper/80">
               <span className="mr-2 text-gold">▸</span>
               {chapter.businessMessage}
             </p>
           </div>
-        </>
+        </div>
       ) : (
-        <>
+        <div className="absolute inset-x-0 top-[7.5rem] bottom-[4.75rem] z-10 flex flex-col px-6 lg:px-10">
           {/* compact chapter header */}
-          <div className="pointer-events-none absolute left-10 top-28 slide-chrome">
-            <div className="mb-1 flex items-baseline gap-2">
-              <span className="font-display text-4xl text-gold/80">
+          <div className="pointer-events-none shrink-0 slide-chrome">
+            <div className="flex items-baseline gap-3">
+              <span className="font-display text-3xl leading-none text-gold/80">
                 {String(chapter.index + 1).padStart(2, '0')}
               </span>
+              <h1 className="font-display text-slide-title leading-none text-paper">
+                {chapter.title}
+              </h1>
               <span className="text-slide-kicker uppercase tracking-eyebrow text-sea">
                 {chapter.eyebrow}
               </span>
             </div>
-            <h1 className="font-display text-slide-title text-paper">{chapter.title}</h1>
-            <p className="mt-2 text-slide-body text-mist line-clamp-2">{chapter.description}</p>
+            <p className="mt-1.5 max-w-4xl text-sm text-mist line-clamp-2 lg:text-base">
+              {chapter.description}
+            </p>
           </div>
 
           {/* center panel */}
-          <div className="absolute inset-0 flex items-center justify-center px-6 pt-36 pb-24 lg:px-10">
+          <div className="flex min-h-0 flex-1 items-center justify-center py-3">
             <CentralPanel />
           </div>
 
           {/* business message */}
-          <div className="pointer-events-none absolute inset-x-0 bottom-24 flex justify-center px-10">
-            <p className="max-w-4xl text-center text-slide-takeaway font-medium text-paper/85">
+          <div className="pointer-events-none flex shrink-0 justify-center px-8">
+            <p className="max-w-4xl text-center text-slide-takeaway font-medium leading-snug text-paper/85">
               <span className="mr-2 text-gold">▸</span>
               {chapter.businessMessage}
             </p>
           </div>
-        </>
+        </div>
       )}
 
       {/* bottom bar */}

@@ -30,22 +30,22 @@ export function RoadmapTimeline() {
             transition={{ delay: i * 0.1, duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
             className="slide-card min-w-0 p-4 lg:p-5"
           >
-            <div className="flex items-baseline justify-between gap-2">
+            <div>
               <span className="font-display text-2xl text-gold lg:text-3xl">{phase.year}</span>
-              <span className="text-slide-caption uppercase tracking-[0.14em] text-sea">
+              <div className="mt-0.5 text-xs uppercase tracking-[0.14em] text-sea">
                 {phase.theme}
-              </span>
+              </div>
             </div>
-            <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/10">
+            <div className="mt-2.5 h-1.5 overflow-hidden rounded-full bg-white/10">
               <div
                 className="h-full rounded-full bg-gradient-to-r from-sea to-green"
                 style={{ width: `${phase.valueIndex * 100}%` }}
               />
             </div>
-            <ul className="mt-3 space-y-1.5">
+            <ul className="mt-2.5 space-y-1.5">
               {phase.items.map((it) => (
-                <li key={it} className="flex items-center gap-2 text-slide-body text-paper/90">
-                  <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-sea" />
+                <li key={it} className="flex items-start gap-2 text-sm text-paper/90 lg:text-base">
+                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-sea" />
                   {it}
                 </li>
               ))}
@@ -53,8 +53,8 @@ export function RoadmapTimeline() {
           </motion.div>
         ))}
       </div>
-      <p className="mt-5 text-center text-base text-mist">
-        Business value accumulates with every phase — a sequence, not a big bang.
+      <p className="mt-4 text-center text-sm text-mist">
+        Business value accumulates with every phase.
       </p>
     </div>
   );

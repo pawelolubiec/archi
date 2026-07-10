@@ -120,7 +120,7 @@ function ElementChip({
 
   const baseClass = compact
     ? 'inline-flex items-center gap-1.5 rounded-md border bg-white/5 px-3 py-1.5 text-slide-caption'
-    : 'inline-flex items-center gap-2 rounded-lg border bg-white/5 px-3.5 py-2.5 text-slide-body';
+    : 'inline-flex items-center gap-2 rounded-lg border bg-white/5 px-3 py-1.5 text-sm lg:text-base';
 
   const inner = (
     <>
@@ -209,11 +209,11 @@ function LayerSection({
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-      className={`flex flex-col rounded-xl border border-white/10 bg-navy-900/75 px-5 py-4 backdrop-blur-md ${
+      className={`flex flex-col rounded-xl border border-white/10 bg-navy-900/75 px-4 py-3 backdrop-blur-md ${
         grow ? 'min-h-0 flex-1' : 'shrink-0'
       }`}
     >
-      <div className="mb-3 shrink-0 text-slide-body font-semibold text-sea">
+      <div className="mb-2 shrink-0 text-sm font-semibold text-sea lg:text-base">
         {ARCH_LAYER_LABELS[layerId]}
       </div>
       <div

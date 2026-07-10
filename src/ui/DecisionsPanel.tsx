@@ -40,35 +40,39 @@ const DECISIONS: Decision[] = [
 
 export function DecisionsPanel() {
   return (
-    <div className="pointer-events-auto w-full max-w-4xl space-y-3">
-      {DECISIONS.map((d, i) => (
-        <motion.div
-          key={d.no}
-          initial={{ opacity: 0, x: -24 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: i * 0.12, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          className="flex gap-5 rounded-2xl border border-gold/25 bg-navy-900/70 p-5 backdrop-blur-sm"
-        >
-          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border border-gold/50 bg-gold/10 font-display text-xl text-gold">
-            {d.no}
-          </div>
-          <div className="min-w-0 flex-1">
-            <h3 className="font-display text-slide-title leading-snug text-paper">{d.title}</h3>
-            <p className="mt-2 text-slide-body leading-relaxed text-mist">{d.scope}</p>
-            <p className="mt-2 text-slide-body text-paper/90">
+    <div className="pointer-events-auto w-full max-w-6xl">
+      <div className="grid grid-cols-3 gap-4">
+        {DECISIONS.map((d, i) => (
+          <motion.div
+            key={d.no}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.12, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            className="flex flex-col rounded-2xl border border-gold/25 bg-navy-900/70 p-4 backdrop-blur-sm lg:p-5"
+          >
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-gold/50 bg-gold/10 font-display text-lg text-gold">
+                {d.no}
+              </div>
+              <div className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-gold">
+                {d.deadline}
+              </div>
+            </div>
+            <h3 className="mt-3 font-display text-lg leading-snug text-paper lg:text-xl">
+              {d.title}
+            </h3>
+            <p className="mt-2 text-sm leading-relaxed text-mist">{d.scope}</p>
+            <p className="mt-2 text-sm leading-relaxed text-paper/90">
               <span className="text-sea">Consequence:</span> {d.consequence}
             </p>
-          </div>
-          <div className="shrink-0 self-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-slide-caption text-gold">
-            {d.deadline}
-          </div>
-        </motion.div>
-      ))}
+          </motion.div>
+        ))}
+      </div>
       <motion.p
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5 }}
-        className="pt-1 text-center text-slide-caption text-mist"
+        className="mt-3 text-center text-xs text-mist"
       >
         Financial figures are reference estimates — to be validated with Controlling before formal approval.
       </motion.p>

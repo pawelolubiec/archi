@@ -41,24 +41,26 @@ const PAINS: Pain[] = [
 
 export function PainPoints() {
   return (
-    <div className="pointer-events-auto w-full max-w-5xl">
-      <div className="grid grid-cols-2 gap-3">
+    <div className="pointer-events-auto w-full max-w-6xl">
+      <div className="grid grid-cols-6 gap-3">
         {PAINS.map((p, i) => (
           <motion.div
             key={p.title}
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.08, duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-            className={`rounded-xl border border-white/10 bg-navy-900/60 p-5 backdrop-blur-sm ${
-              i === PAINS.length - 1 ? 'col-span-2' : ''
+            className={`rounded-xl border border-white/10 bg-navy-900/60 p-4 backdrop-blur-sm ${
+              i < 3 ? 'col-span-2' : 'col-span-3'
             }`}
           >
             <div className="flex items-start gap-3">
-              <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-[#F87171]" />
+              <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[#F87171]" />
               <div>
-                <h3 className="font-display text-2xl text-paper">{p.title}</h3>
-                <p className="mt-2 text-slide-body leading-relaxed text-mist">{p.detail}</p>
-                <p className="mt-2 text-base font-medium text-[#F8A9A9]">
+                <h3 className="font-display text-lg text-paper lg:text-xl">{p.title}</h3>
+                <p className="mt-1.5 text-sm leading-relaxed text-mist lg:text-base">
+                  {p.detail}
+                </p>
+                <p className="mt-1.5 text-xs font-medium text-[#F8A9A9] lg:text-sm">
                   Cost: {p.cost}
                 </p>
               </div>
@@ -66,15 +68,6 @@ export function PainPoints() {
           </motion.div>
         ))}
       </div>
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.55 }}
-        className="mt-4 text-center text-slide-body text-paper/80"
-      >
-        <span className="mr-2 text-gold">▸</span>
-        This isn't an IT problem — it's a brake on margin, working capital, and decision speed.
-      </motion.p>
     </div>
   );
 }
