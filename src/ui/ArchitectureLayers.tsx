@@ -253,8 +253,8 @@ function LayerSection({
         </span>
       </div>
       <div
-        className={`flex flex-wrap content-start gap-2 ${
-          grow ? 'min-h-0 flex-1 overflow-y-auto' : ''
+        className={`flex flex-wrap gap-2 ${
+          grow ? 'min-h-0 flex-1 content-center overflow-y-auto' : 'content-start'
         }`}
       >
         {elements.map((el, i) => {
@@ -375,6 +375,14 @@ export function ArchitectureLayers() {
         const diff = LAYER_RANK[other.layer] - LAYER_RANK[el.layer];
         if (diff > 0) add(mk(el.id, other.id, color));
         else if (diff < 0) add(mk(other.id, el.id, color));
+        // complete the chain: connected AI elements reach the process strip
+        if (other.layer === 'ai') {
+          other.linkedProcessIds
+            .filter((pid) => el.linkedProcessIds.includes(pid))
+            .forEach((pid) =>
+              add(mk(other.id, `proc:${pid}`, getProcessColor(pid))),
+            );
+        }
       });
       if (el.layer === 'ai') {
         el.linkedProcessIds.forEach((pid) =>

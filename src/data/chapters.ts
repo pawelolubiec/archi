@@ -211,9 +211,9 @@ export const chapters: Chapter[] = [
     eyebrow: 'Roadmap',
     title: 'Roadmap 2026–2030',
     description:
-      'From data foundations to autonomous decision support. Business value accumulates with every phase.',
+      'From data foundations to autonomous decision support — five tracks that can run in parallel, not in sequence. Toggle the pace to see how the 2030 scope can land by end-2028.',
     businessMessage:
-      'A sequence, not a big bang. Value accumulates year after year.',
+      'A sequence, not a big bang — and with parallel tracks and AI-assisted delivery, the 2030 scope can land by 2028.',
     cameraPosition: [0, 1, 9.5],
     cameraTarget: [0, 0, 0],
     visibleLocations: [],
