@@ -12,7 +12,46 @@ export interface ArchitectureElement {
   label: string;
   layer: ArchLayerId;
   linkedProcessIds: string[];
+  /**
+   * Explicit connections to other elements. `undefined` means "derive from
+   * shared business processes"; an array (even empty) pins the exact set.
+   */
+  linkedElementIds?: string[];
   systemId?: string;
+}
+
+/** Vertical position of each layer — used to decide flow direction. */
+export const LAYER_RANK: Record<ArchLayerId, number> = { apps: 0, data: 1, ai: 2 };
+
+/**
+ * Effective element-to-element connections. Explicit links (from either side)
+ * always count; when neither side pins its links, cross-layer elements sharing
+ * a business process are connected.
+ */
+export function connectedElementIds(
+  el: ArchitectureElement,
+  all: ArchitectureElement[],
+): Set<string> {
+  const out = new Set<string>();
+  const shares = (a: ArchitectureElement, b: ArchitectureElement) =>
+    a.linkedProcessIds.some((p) => b.linkedProcessIds.includes(p));
+
+  all.forEach((o) => {
+    if (o.id === el.id) return;
+    const elExplicit = Array.isArray(el.linkedElementIds);
+    const oExplicit = Array.isArray(o.linkedElementIds);
+    if (
+      (elExplicit && el.linkedElementIds!.includes(o.id)) ||
+      (oExplicit && o.linkedElementIds!.includes(el.id))
+    ) {
+      out.add(o.id);
+      return;
+    }
+    if (!elExplicit && !oExplicit && o.layer !== el.layer && shares(el, o)) {
+      out.add(o.id);
+    }
+  });
+  return out;
 }
 
 export interface ArchitectureConfig {

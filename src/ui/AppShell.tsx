@@ -180,19 +180,12 @@ export function AppShell() {
           <div className="flex min-h-0 flex-1 flex-col">
             <CentralPanel />
           </div>
-
-          <div className="pointer-events-none mt-2.5 flex shrink-0 justify-center px-8">
-            <p className="max-w-4xl text-center text-slide-takeaway font-medium leading-snug text-paper/80">
-              <span className="mr-2 text-gold">▸</span>
-              {chapter.businessMessage}
-            </p>
-          </div>
         </div>
       ) : (
         <div className="absolute inset-x-0 top-[7.5rem] bottom-[4.75rem] z-10 flex flex-col px-6 lg:px-10">
           {/* chapter header — hero style on the pain slide, compact elsewhere */}
           {chapter.scene === 'pain' ? (
-            <div className="pointer-events-none shrink-0 slide-chrome">
+            <div className="pointer-events-none shrink-0">
               <div className="mb-2 flex items-baseline gap-3">
                 <span className="font-display text-5xl leading-none text-gold/80 sm:text-6xl">
                   {String(chapter.index + 1).padStart(2, '0')}
@@ -207,7 +200,7 @@ export function AppShell() {
               <h1 className="font-display text-slide-display leading-tight text-paper">
                 {chapter.title}
               </h1>
-              <p className="mt-2.5 max-w-3xl text-slide-body leading-relaxed text-mist">
+              <p className="mt-2.5 max-w-4xl text-slide-body leading-relaxed text-mist">
                 {chapter.description}
               </p>
             </div>
@@ -231,13 +224,13 @@ export function AppShell() {
           )}
 
           {/* center panel */}
-          <div className="flex min-h-0 flex-1 items-center justify-center py-3">
+          <div className="flex min-h-0 flex-1 items-center justify-center py-1.5">
             <CentralPanel />
           </div>
 
           {/* business message */}
           <div className="pointer-events-none flex shrink-0 justify-center px-8">
-            <p className="max-w-4xl text-center text-slide-takeaway font-medium leading-snug text-paper/85">
+            <p className="max-w-5xl text-center text-slide-takeaway font-medium leading-snug text-paper/85">
               <span className="mr-2 text-gold">▸</span>
               {chapter.businessMessage}
             </p>

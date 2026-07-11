@@ -156,8 +156,8 @@ export function OrderFlow() {
                 style={
                   isActive
                     ? {
-                        borderColor: `${accent}66`,
-                        boxShadow: `0 0 24px ${accent}1f`,
+                        borderColor: `${accent}cc`,
+                        boxShadow: `0 0 0 1px ${accent}55, 0 0 14px -2px ${accent}99, 0 0 38px -6px ${accent}66`,
                       }
                     : undefined
                 }
@@ -246,7 +246,11 @@ export function OrderFlow() {
         transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
         style={
           feedbackActive
-            ? { borderColor: '#D6BF9166', boxShadow: '0 0 24px #D6BF911f' }
+            ? {
+                borderColor: '#D6BF91cc',
+                boxShadow:
+                  '0 0 0 1px #D6BF9155, 0 0 14px -2px #D6BF9199, 0 0 38px -6px #D6BF9166',
+              }
             : undefined
         }
       >

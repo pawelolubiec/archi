@@ -1,9 +1,11 @@
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStore } from '../store/useStore';
 import { systems } from '../data/systems';
 import {
   ARCH_LAYER_LABELS,
   BUSINESS_PROCESSES,
+  connectedElementIds,
   type ArchLayerId,
   type ArchitectureElement,
 } from '../data/architectureLayout';
@@ -11,19 +13,78 @@ import { SaveStatus } from './ConfigSaveStatus';
 
 const LAYER_ORDER: ArchLayerId[] = ['ai', 'data', 'apps'];
 
+function ConnectionsEditor({
+  element,
+  allElements,
+  onToggleConnection,
+}: {
+  element: ArchitectureElement;
+  allElements: ArchitectureElement[];
+  onToggleConnection: (otherId: string) => void;
+}) {
+  const connected = connectedElementIds(element, allElements);
+
+  return (
+    <div className="mt-2 space-y-1.5 border-t border-white/5 pt-2">
+      {LAYER_ORDER.filter((layer) =>
+        allElements.some((o) => o.layer === layer && o.id !== element.id),
+      ).map((layer) => (
+        <div key={layer} className="flex flex-wrap items-baseline gap-1.5">
+          <span className="w-24 shrink-0 text-[10px] uppercase tracking-[0.14em] text-mist/60">
+            {layer === 'ai' ? 'AI layer' : layer === 'data' ? 'Data' : 'Apps'}
+          </span>
+          {allElements
+            .filter((o) => o.layer === layer && o.id !== element.id)
+            .map((o) => {
+              const active = connected.has(o.id);
+              return (
+                <button
+                  key={o.id}
+                  type="button"
+                  onClick={() => onToggleConnection(o.id)}
+                  className="rounded-full border px-2 py-0.5 text-[10px] font-medium transition"
+                  style={{
+                    borderColor: active ? '#2EC5C5' : 'rgba(255,255,255,0.12)',
+                    background: active ? 'rgba(46,197,197,0.15)' : 'transparent',
+                    color: active ? '#2EC5C5' : '#9DB4CC',
+                  }}
+                >
+                  {o.label}
+                </button>
+              );
+            })}
+        </div>
+      ))}
+      {element.linkedElementIds === undefined && (
+        <p className="text-[10px] text-mist/50">
+          Currently derived from shared processes — toggling any connection pins
+          the list for this element.
+        </p>
+      )}
+    </div>
+  );
+}
+
 function ElementRow({
   element,
+  allElements,
   onLabelChange,
   onToggleProcess,
   onSystemChange,
+  onToggleConnection,
   onDelete,
 }: {
   element: ArchitectureElement;
+  allElements: ArchitectureElement[];
   onLabelChange: (label: string) => void;
   onToggleProcess: (processId: string) => void;
   onSystemChange: (systemId: string | undefined) => void;
+  onToggleConnection: (otherId: string) => void;
   onDelete: () => void;
 }) {
+  const [showConnections, setShowConnections] = useState(false);
+  const connectionCount = connectedElementIds(element, allElements).size;
+
   return (
     <div className="rounded-lg border border-white/8 bg-ink/40 p-3">
       <div className="mb-2 flex items-center gap-2">
@@ -48,6 +109,14 @@ function ElementRow({
             </option>
           ))}
         </select>
+        <button
+          type="button"
+          onClick={() => setShowConnections((v) => !v)}
+          className="rounded-md border border-white/10 px-2 py-1 text-xs text-mist transition hover:border-sea/40 hover:text-sea"
+          title="Configure connections to other elements"
+        >
+          Links ({connectionCount}) {showConnections ? '▴' : '▾'}
+        </button>
         <button
           type="button"
           onClick={onDelete}
@@ -77,6 +146,13 @@ function ElementRow({
           );
         })}
       </div>
+      {showConnections && (
+        <ConnectionsEditor
+          element={element}
+          allElements={allElements}
+          onToggleConnection={onToggleConnection}
+        />
+      )}
     </div>
   );
 }
@@ -84,17 +160,21 @@ function ElementRow({
 function LayerSection({
   layerId,
   elements,
+  allElements,
   onAdd,
   onUpdate,
   onDelete,
   onToggleProcess,
+  onToggleConnection,
 }: {
   layerId: ArchLayerId;
   elements: ArchitectureElement[];
+  allElements: ArchitectureElement[];
   onAdd: () => void;
   onUpdate: (id: string, patch: Partial<ArchitectureElement>) => void;
   onDelete: (id: string) => void;
   onToggleProcess: (id: string, processId: string) => void;
+  onToggleConnection: (id: string, otherId: string) => void;
 }) {
   return (
     <section>
@@ -115,10 +195,12 @@ function LayerSection({
           <ElementRow
             key={el.id}
             element={el}
+            allElements={allElements}
             onLabelChange={(label) => onUpdate(el.id, { label })}
             onSystemChange={(systemId) => onUpdate(el.id, { systemId })}
             onDelete={() => onDelete(el.id)}
             onToggleProcess={(processId) => onToggleProcess(el.id, processId)}
+            onToggleConnection={(otherId) => onToggleConnection(el.id, otherId)}
           />
         ))}
         {!elements.length && (
@@ -150,6 +232,31 @@ export function ArchitectureConfigModal() {
     setElementProcessLinks(elementId, next);
   };
 
+  const toggleConnection = (elementId: string, otherId: string) => {
+    const el = config.elements.find((e) => e.id === elementId);
+    const other = config.elements.find((e) => e.id === otherId);
+    if (!el || !other) return;
+    const effective = connectedElementIds(el, config.elements);
+    if (effective.has(otherId)) {
+      updateArchitectureElement(elementId, {
+        linkedElementIds: [...effective].filter((id) => id !== otherId),
+      });
+      // also strip a reciprocal explicit link so the connection really goes away
+      if (
+        Array.isArray(other.linkedElementIds) &&
+        other.linkedElementIds.includes(elementId)
+      ) {
+        updateArchitectureElement(otherId, {
+          linkedElementIds: other.linkedElementIds.filter((id) => id !== elementId),
+        });
+      }
+    } else {
+      updateArchitectureElement(elementId, {
+        linkedElementIds: [...effective, otherId],
+      });
+    }
+  };
+
   return (
     <AnimatePresence>
       {open && (
@@ -176,7 +283,8 @@ export function ArchitectureConfigModal() {
                   Architecture layer mapping
                 </h2>
                 <p className="mt-1 text-sm text-mist">
-                  Add elements to each layer and link them to business processes.
+                  Add elements to each layer, link them to business processes,
+                  and configure connections between elements via “Links”.
                   Changes save to the shared database automatically.
                 </p>
                 <SaveStatus
@@ -230,10 +338,12 @@ export function ArchitectureConfigModal() {
                     key={layerId}
                     layerId={layerId}
                     elements={config.elements.filter((el) => el.layer === layerId)}
+                    allElements={config.elements}
                     onAdd={() => addArchitectureElement(layerId, 'New item')}
                     onUpdate={(id, patch) => updateArchitectureElement(id, patch)}
                     onDelete={removeArchitectureElement}
                     onToggleProcess={toggleProcess}
+                    onToggleConnection={toggleConnection}
                   />
                 ))}
               </div>

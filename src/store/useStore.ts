@@ -167,7 +167,12 @@ interface AppState {
   addArchitectureElement: (layer: ArchLayerId, label: string) => void;
   updateArchitectureElement: (
     id: string,
-    patch: Partial<Pick<ArchitectureElement, 'label' | 'layer' | 'systemId' | 'linkedProcessIds'>>,
+    patch: Partial<
+      Pick<
+        ArchitectureElement,
+        'label' | 'layer' | 'systemId' | 'linkedProcessIds' | 'linkedElementIds'
+      >
+    >,
   ) => void;
   removeArchitectureElement: (id: string) => void;
   setElementProcessLinks: (id: string, processIds: string[]) => void;

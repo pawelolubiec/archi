@@ -40,6 +40,13 @@ body {
   }
 }
 
+/* upward data-flow connectors on the architecture slide */
+@keyframes arch-flow {
+  to {
+    stroke-dashoffset: -24;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   * {
     animation-duration: 0.01ms !important;
