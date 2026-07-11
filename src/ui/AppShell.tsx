@@ -12,7 +12,7 @@ import { GovernanceCard } from './GovernanceCard';
 import { ScenarioPanel } from './ScenarioPanel';
 import { RoadmapTimeline } from './RoadmapTimeline';
 import { useStore } from '../store/useStore';
-import { chapters } from '../data/chapters';
+import { chapters, TOTAL_CHAPTERS } from '../data/chapters';
 import { AppModal } from './AppModal';
 import { PainPoints } from './PainPoints';
 import { DecisionsPanel } from './DecisionsPanel';
@@ -190,23 +190,45 @@ export function AppShell() {
         </div>
       ) : (
         <div className="absolute inset-x-0 top-[7.5rem] bottom-[4.75rem] z-10 flex flex-col px-6 lg:px-10">
-          {/* compact chapter header */}
-          <div className="pointer-events-none shrink-0 slide-chrome">
-            <div className="flex items-baseline gap-3">
-              <span className="font-display text-3xl leading-none text-gold/80">
-                {String(chapter.index + 1).padStart(2, '0')}
-              </span>
-              <h1 className="font-display text-slide-title leading-none text-paper">
+          {/* chapter header — hero style on the pain slide, compact elsewhere */}
+          {chapter.scene === 'pain' ? (
+            <div className="pointer-events-none shrink-0 slide-chrome">
+              <div className="mb-2 flex items-baseline gap-3">
+                <span className="font-display text-5xl leading-none text-gold/80 sm:text-6xl">
+                  {String(chapter.index + 1).padStart(2, '0')}
+                </span>
+                <span className="text-slide-kicker uppercase tracking-eyebrow text-sea">
+                  {chapter.eyebrow}
+                </span>
+                <span className="text-slide-caption text-mist">
+                  / {String(TOTAL_CHAPTERS).padStart(2, '0')}
+                </span>
+              </div>
+              <h1 className="font-display text-slide-display leading-tight text-paper">
                 {chapter.title}
               </h1>
-              <span className="text-slide-kicker uppercase tracking-eyebrow text-sea">
-                {chapter.eyebrow}
-              </span>
+              <p className="mt-2.5 max-w-3xl text-slide-body leading-relaxed text-mist">
+                {chapter.description}
+              </p>
             </div>
-            <p className="mt-1.5 max-w-4xl text-sm text-mist line-clamp-2 lg:text-base">
-              {chapter.description}
-            </p>
-          </div>
+          ) : (
+            <div className="pointer-events-none shrink-0 slide-chrome">
+              <div className="flex items-baseline gap-3">
+                <span className="font-display text-3xl leading-none text-gold/80">
+                  {String(chapter.index + 1).padStart(2, '0')}
+                </span>
+                <h1 className="font-display text-slide-title leading-none text-paper">
+                  {chapter.title}
+                </h1>
+                <span className="text-slide-kicker uppercase tracking-eyebrow text-sea">
+                  {chapter.eyebrow}
+                </span>
+              </div>
+              <p className="mt-1.5 max-w-4xl text-sm text-mist line-clamp-2 lg:text-base">
+                {chapter.description}
+              </p>
+            </div>
+          )}
 
           {/* center panel */}
           <div className="flex min-h-0 flex-1 items-center justify-center py-3">

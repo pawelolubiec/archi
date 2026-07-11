@@ -56,11 +56,9 @@ export function PainPoints() {
             <div className="flex items-start gap-3">
               <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[#F87171]" />
               <div>
-                <h3 className="font-display text-lg text-paper lg:text-xl">{p.title}</h3>
-                <p className="mt-1.5 text-sm leading-relaxed text-mist lg:text-base">
-                  {p.detail}
-                </p>
-                <p className="mt-1.5 text-xs font-medium text-[#F8A9A9] lg:text-sm">
+                <h3 className="font-display text-lg text-paper">{p.title}</h3>
+                <p className="mt-1.5 text-sm leading-relaxed text-mist">{p.detail}</p>
+                <p className="mt-1.5 text-xs font-medium text-[#F8A9A9]">
                   Cost: {p.cost}
                 </p>
               </div>
