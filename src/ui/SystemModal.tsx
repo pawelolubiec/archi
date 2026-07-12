@@ -65,14 +65,19 @@ function MifoKpiRow({ kpi }: { kpi: KPI }) {
   );
 }
 
-function MifoOutcomeCards() {
+interface OutcomeCard {
+  claim: string;
+  support: string;
+  tag: string;
+  kpis: KPI[];
+}
+
+function mifoOutcomeCards(): OutcomeCard[] {
   const forecast = kpiById.forecast_accuracy;
   const service = kpiById.service_level;
   const costPerKg = kpiById.cost_per_kg;
   const ebitda = kpiById.ebitda;
-  const [openIdx, setOpenIdx] = useState(0);
-
-  const cards = [
+  return [
     {
       claim: 'Margin before the quote',
       support:
@@ -94,6 +99,45 @@ function MifoOutcomeCards() {
       kpis: [service],
     },
   ];
+}
+
+function ptsOutcomeCards(): OutcomeCard[] {
+  const yieldKpi = kpiById.yield;
+  const oee = kpiById.oee;
+  const costPerKg = kpiById.cost_per_kg;
+  return [
+    {
+      claim: `Yield ${yieldKpi.baseline}% → ${yieldKpi.target}%, live`,
+      support:
+        'Every kilogram of raw fish accounted for — filleting losses and giveaway visible while the shift can still react.',
+      tag: yieldKpi.name,
+      kpis: [yieldKpi],
+    },
+    {
+      claim: `OEE ${oee.baseline}% → ${oee.target}%`,
+      support:
+        'Stoppages and speed losses recorded per line as they happen; utilization tuned shift by shift.',
+      tag: oee.name,
+      kpis: [oee],
+    },
+    {
+      claim: 'Workforce where the fish is',
+      support:
+        'Live throughput per station shows where people create yield — staffing follows the data, cost / kg comes down.',
+      tag: costPerKg.name,
+      kpis: [costPerKg],
+    },
+  ];
+}
+
+/** Strategic-view outcome cards per chapter: which system gets the board story. */
+const OUTCOME_VIEWS: Record<string, { systemId: string; cards: () => OutcomeCard[] }> = {
+  germany: { systemId: 'mifo', cards: mifoOutcomeCards },
+  'pts-yield': { systemId: 'pts', cards: ptsOutcomeCards },
+};
+
+function OutcomeCards({ cards }: { cards: OutcomeCard[] }) {
+  const [openIdx, setOpenIdx] = useState(0);
 
   return (
     <div className="mt-4 space-y-2.5">
@@ -163,8 +207,9 @@ export function SystemModal() {
   const chapter = useStore((s) => s.current());
   const sys = modalId ? systemById[modalId] : null;
 
-  const showMifoOutcomeCards =
-    sys?.id === 'mifo' && chapter.id === 'germany' && mode === 'strategic';
+  const outcomeView = OUTCOME_VIEWS[chapter.id];
+  const showOutcomeCards =
+    mode === 'strategic' && !!sys && sys.id === outcomeView?.systemId;
 
   return (
     <AnimatePresence>
@@ -179,12 +224,14 @@ export function SystemModal() {
         >
           <div className="flex items-start justify-between">
             <div>
-              <div
-                className="text-slide-caption uppercase tracking-[0.22em]"
-                style={{ color: ACCENT_HEX[sys.accent] }}
-              >
-                {sys.short}
-              </div>
+              {sys.short !== sys.name && (
+                <div
+                  className="text-slide-caption uppercase tracking-[0.22em]"
+                  style={{ color: ACCENT_HEX[sys.accent] }}
+                >
+                  {sys.short}
+                </div>
+              )}
               <h2 className="mt-1 font-display text-slide-title text-paper">{sys.name}</h2>
               <div className="mt-1 text-slide-caption text-mist">Owner: {sys.owner}</div>
             </div>
@@ -202,7 +249,7 @@ export function SystemModal() {
             {STATUS_LABEL[sys.status]}
           </div>
 
-          {!showMifoOutcomeCards && (
+          {!showOutcomeCards && (
             <p className="mt-4 text-slide-body leading-relaxed text-mist">{sys.description}</p>
           )}
 
@@ -215,8 +262,8 @@ export function SystemModal() {
             View app — screenshot ↗
           </button>
 
-          {showMifoOutcomeCards ? (
-            <MifoOutcomeCards />
+          {showOutcomeCards ? (
+            <OutcomeCards cards={outcomeView.cards()} />
           ) : (
             <>
               <div className="mt-5">

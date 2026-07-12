@@ -8,6 +8,11 @@ function chapterDescription(chapterId: string, fallback: string): string {
     const forecast = kpiById.forecast_accuracy;
     return `Today a sales office quotes a customer without seeing the real margin, and our demand forecast is right ${forecast.baseline}% of the time — so production plans against guesses. MiFo closes that gap at the very first customer contact.`;
   }
+  if (chapterId === 'pts-yield') {
+    const yieldKpi = kpiById.yield;
+    const oee = kpiById.oee;
+    return `Today we learn that yield was ${yieldKpi.baseline}% and OEE ${oee.baseline}% after the fact — too late to react. PTS makes every kilogram of raw fish, every machine and every shift visible live, while the outcome can still be changed.`;
+  }
   return fallback;
 }
 

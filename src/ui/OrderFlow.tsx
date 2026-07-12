@@ -331,7 +331,7 @@ export function OrderFlow() {
             >
               <div className="flex items-center gap-3">
                 <span
-                  className="w-14 shrink-0 font-mono text-slide-caption uppercase tracking-[0.18em]"
+                  className="w-20 shrink-0 font-mono text-slide-caption uppercase tracking-[0.18em]"
                   style={{ color: meta.accent }}
                 >
                   {meta.label}

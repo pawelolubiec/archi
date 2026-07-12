@@ -109,8 +109,28 @@ export const chapters: Chapter[] = [
     kpiPanel: false,
   },
   {
-    id: 'poland',
+    id: 'pts-yield',
     index: 4,
+    scene: 'globe',
+    eyebrow: 'Production',
+    title: 'Producing with the yield in view',
+    description:
+      'Today yield and OEE are reconstructed after the fact — too late to react. PTS makes every kilogram of raw fish, every machine and every shift visible live, while the outcome can still be changed.',
+    businessMessage:
+      'Yield is won or lost during the shift — PTS makes it visible while we can still act.',
+    prominentTakeaway: true,
+    cameraPosition: [2.72, 3.99, -0.84],
+    cameraTarget: [1.11, 1.63, -0.34],
+    visibleLocations: ['factory_poland'],
+    activeFlows: [],
+    labeledLocations: ['factory_poland'],
+    activeSystems: ['pts'],
+    modal: 'pts',
+    kpiPanel: false,
+  },
+  {
+    id: 'poland',
+    index: 5,
     scene: 'factory',
     eyebrow: 'Operations',
     title: "The factory's internal systems",
@@ -127,7 +147,7 @@ export const chapters: Chapter[] = [
   },
   {
     id: 'architecture',
-    index: 5,
+    index: 6,
     scene: 'architecture',
     eyebrow: 'Architecture',
     title: 'Hybrid architecture',
@@ -155,7 +175,7 @@ export const chapters: Chapter[] = [
   },
   {
     id: 'business-impact',
-    index: 6,
+    index: 7,
     scene: 'kpi',
     eyebrow: 'Impact',
     title: 'Business impact',
@@ -172,7 +192,7 @@ export const chapters: Chapter[] = [
   },
   {
     id: 'governance',
-    index: 7,
+    index: 8,
     scene: 'scenario',
     eyebrow: 'Governance',
     title: 'One accountability model',
@@ -189,7 +209,7 @@ export const chapters: Chapter[] = [
   },
   {
     id: 'simulation',
-    index: 8,
+    index: 9,
     scene: 'scenario',
     eyebrow: 'Simulation',
     title: 'Decision simulation',
@@ -206,7 +226,7 @@ export const chapters: Chapter[] = [
   },
   {
     id: 'roadmap',
-    index: 9,
+    index: 10,
     scene: 'roadmap',
     eyebrow: 'Roadmap',
     title: 'Roadmap 2026–2030',
@@ -223,7 +243,7 @@ export const chapters: Chapter[] = [
   },
   {
     id: 'decisions',
-    index: 10,
+    index: 11,
     scene: 'decisions',
     eyebrow: 'Decisions',
     title: 'What we need from the board',

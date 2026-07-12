@@ -57,7 +57,8 @@ export function AppShell() {
   const is3D = chapter.scene === 'globe' || chapter.scene === 'factory';
   const isArchitecture = chapter.scene === 'architecture';
   const isGermanyFactory = chapter.id === 'germany-factory';
-  const isSalesSlide = chapter.id === 'germany' || isGermanyFactory;
+  const isSalesSlide =
+    chapter.id === 'germany' || chapter.id === 'pts-yield' || isGermanyFactory;
 
   useEffect(() => {
     hydrateConfig();
