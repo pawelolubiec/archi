@@ -60,7 +60,7 @@ export function Overlay() {
 
           <p
             className={`mt-4 text-slide-body leading-relaxed text-mist ${
-              isFactory ? 'line-clamp-2' : ''
+              isFactory ? 'line-clamp-2' : isIntegration ? 'line-clamp-3' : ''
             }`}
           >
             {description}

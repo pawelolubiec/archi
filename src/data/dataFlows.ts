@@ -70,6 +70,82 @@ export const dataFlows: DataFlow[] = [
   },
 ];
 
+/* ── acquisition docking: the three contracts of a new office ──────── */
+
+dataFlows.push(
+  {
+    id: 'es_mifo',
+    from: 'office_spain',
+    to: 'factory_poland',
+    type: 'orders',
+    description:
+      'Commercial docking — MiFo accounts over the existing local sales tool; quotes and orders reach the group same-day.',
+    frequency: 'daily',
+    systems: ['mifo'],
+    kpisAffected: ['forecast_accuracy', 'service_level'],
+    lift: 0.3,
+  },
+  {
+    id: 'es_data',
+    from: 'office_spain',
+    to: 'factory_poland',
+    type: 'data',
+    description:
+      'Data docking — one canonical connector into the lakehouse; group BI and forecasting see the entity.',
+    frequency: 'daily',
+    systems: ['data_platform'],
+    kpisAffected: ['forecast_accuracy'],
+    lift: 0.38,
+  },
+  {
+    id: 'es_finance',
+    from: 'office_spain',
+    to: 'factory_poland',
+    type: 'finance',
+    description:
+      'Finance docking — trial-balance consolidation feed to the lean group ERP; the local ERP stays.',
+    frequency: 'monthly',
+    systems: ['workday_erp'],
+    kpisAffected: ['ebitda'],
+    lift: 0.46,
+  },
+);
+
+/* ── outbound product logistics from the factory ─────────────────── */
+
+const truckFlow = (id: string, to: string, market: string): DataFlow => ({
+  id,
+  from: 'factory_poland',
+  to,
+  type: 'truck',
+  description: `Finished product to the ${market} market by truck.`,
+  frequency: 'daily',
+  systems: ['wms', 'workday_erp'],
+  kpisAffected: ['lead_time', 'service_level'],
+  lift: 0.08,
+});
+
+const oceanFlow = (id: string, to: string, market: string): DataFlow => ({
+  id,
+  from: 'factory_poland',
+  to,
+  type: 'ocean',
+  description: `Finished product to the ${market} market by ocean freight.`,
+  frequency: 'weekly',
+  systems: ['wms', 'workday_erp'],
+  kpisAffected: ['lead_time', 'inventory_days'],
+  lift: 0.12,
+});
+
+dataFlows.push(
+  truckFlow('factory_to_de', 'office_germany', 'German'),
+  truckFlow('factory_to_fr', 'office_france', 'French'),
+  truckFlow('factory_to_it', 'office_italy', 'Italian'),
+  oceanFlow('factory_to_us', 'office_usa', 'US'),
+  oceanFlow('factory_to_jp', 'office_japan', 'Japanese'),
+  oceanFlow('factory_to_au', 'office_australia', 'Australian'),
+);
+
 export const dataFlowById = Object.fromEntries(
   dataFlows.map((f) => [f.id, f]),
 ) as Record<string, DataFlow>;

@@ -42,7 +42,14 @@ export function DataFlowArc({
   );
 
   const allPoints = useMemo(() => sampleCurve(curve, 80), [curve]);
-  const color = flow.type === 'orders' ? BRAND.green : BRAND.sea;
+  // orders green · truck/finance gold · data/ocean sea-blue
+  const color =
+    flow.type === 'orders'
+      ? BRAND.green
+      : flow.type === 'truck' || flow.type === 'finance'
+        ? BRAND.gold
+        : BRAND.sea;
+  const dotSpeed = flow.type === 'ocean' ? 0.08 : flow.type === 'truck' ? 0.14 : 0.22;
 
   const wasActive = useRef(active);
   const drawStart = useRef<number | null>(null);
@@ -91,14 +98,14 @@ export function DataFlowArc({
             curve={curve}
             color={color}
             offset={0}
-            speed={subdued ? 0.14 : 0.22}
+            speed={subdued ? 0.14 : dotSpeed}
             opacity={opacity}
           />
           <PulsingDataDot
             curve={curve}
             color={color}
             offset={0.4}
-            speed={subdued ? 0.14 : 0.22}
+            speed={subdued ? 0.14 : dotSpeed}
             opacity={opacity}
           />
           {!subdued && (
@@ -106,7 +113,7 @@ export function DataFlowArc({
               curve={curve}
               color={color}
               offset={0.75}
-              speed={0.22}
+              speed={dotSpeed}
               opacity={opacity}
             />
           )}

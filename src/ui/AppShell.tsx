@@ -22,6 +22,10 @@ import { ArchitectureConfigButton } from './ArchitectureConfigButton';
 import { ArchitectureConfigModal } from './ArchitectureConfigModal';
 import { OrderFlow } from './OrderFlow';
 import { FactoryTourPanel } from './FactoryTourPanel';
+import { FactoryDemoPanel } from './FactoryDemoPanel';
+import { LiveOrderFeed } from './LiveOrderFeed';
+import { GrowthPanel } from './GrowthPanel';
+import { FACTORY_DEMO_STEPS } from '../data/factoryDemo';
 
 function CentralPanel() {
   const chapter = useStore((s) => s.current());
@@ -53,12 +57,17 @@ export function AppShell() {
   const hydrateConfig = useStore((s) => s.hydrateConfig);
   const openModal = useStore((s) => s.openModal);
   const index = useStore((s) => s.index);
+  const factoryDemoStep = useStore((s) => s.factoryDemoStep);
 
   const is3D = chapter.scene === 'globe' || chapter.scene === 'factory';
   const isArchitecture = chapter.scene === 'architecture';
   const isGermanyFactory = chapter.id === 'germany-factory';
+  const isGrowth = chapter.id === 'growth';
   const isSalesSlide =
-    chapter.id === 'germany' || chapter.id === 'pts-yield' || isGermanyFactory;
+    chapter.id === 'germany' ||
+    chapter.id === 'pts-yield' ||
+    isGermanyFactory ||
+    isGrowth;
 
   useEffect(() => {
     hydrateConfig();
@@ -76,16 +85,35 @@ export function AppShell() {
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      const { appModal, closeApp, factoryConfigOpen, architectureConfigOpen } =
-        useStore.getState();
+      const {
+        appModal,
+        closeApp,
+        factoryConfigOpen,
+        architectureConfigOpen,
+        factoryDemoStep: demoStep,
+        setFactoryDemoStep,
+      } = useStore.getState();
       if (e.key === 'Escape') {
         if (factoryConfigOpen) closeFactoryConfig();
         else if (architectureConfigOpen) closeArchitectureConfig();
         else if (appModal) closeApp();
+        else if (demoStep !== null) setFactoryDemoStep(null);
         else closeModal();
         return;
       }
       if (appModal || factoryConfigOpen || architectureConfigOpen) return;
+      // while the factory demo runs, arrows step the demo instead of slides
+      if (demoStep !== null) {
+        if (e.key === 'ArrowRight' || e.key === ' ') {
+          e.preventDefault();
+          setFactoryDemoStep(
+            demoStep < FACTORY_DEMO_STEPS.length - 1 ? demoStep + 1 : null,
+          );
+        } else if (e.key === 'ArrowLeft' && demoStep > 0) {
+          setFactoryDemoStep(demoStep - 1);
+        }
+        return;
+      }
       if (e.key === 'ArrowRight' || e.key === ' ') {
         e.preventDefault();
         next();
@@ -133,25 +161,38 @@ export function AppShell() {
         <div className="pointer-events-auto flex items-center gap-3">
           <FactoryConfigButton />
           <ArchitectureConfigButton />
-          <ModeToggle />
+          {chapter.scene === 'factory' && <ModeToggle />}
         </div>
       </header>
 
       {/* center content */}
       {is3D ? (
         <>
-          <div
-            className={`absolute z-10 ${
-              chapter.scene === 'factory'
-                ? 'left-10 top-28 max-w-lg'
-                : 'left-10 top-1/2 -translate-y-1/2'
-            }`}
-          >
-            <Overlay />
-          </div>
+          {factoryDemoStep === null && (
+            <div
+              className={`absolute z-10 ${
+                chapter.scene === 'factory'
+                  ? 'left-10 top-28 max-w-lg'
+                  : isGermanyFactory
+                    ? 'left-10 top-32'
+                    : 'left-10 top-1/2 -translate-y-1/2'
+              }`}
+            >
+              <Overlay />
+            </div>
+          )}
           {isGermanyFactory ? (
-            <div className="absolute inset-y-0 right-8 z-10 flex w-[min(58%,52rem)] items-center justify-center pt-20 pb-28">
-              <OrderFlow />
+            <>
+              <div className="absolute inset-y-0 right-8 z-10 flex w-[min(58%,52rem)] items-center justify-center pt-20 pb-28">
+                <OrderFlow />
+              </div>
+              <div className="absolute bottom-24 left-10 z-10">
+                <LiveOrderFeed />
+              </div>
+            </>
+          ) : isGrowth ? (
+            <div className="absolute right-10 top-28 z-10">
+              <GrowthPanel />
             </div>
           ) : (
             <div className="absolute right-10 top-28 z-10">
@@ -159,9 +200,12 @@ export function AppShell() {
             </div>
           )}
           {chapter.scene === 'factory' && (
-            <div className="absolute bottom-28 right-10 z-50">
-              <FactoryTourPanel />
-            </div>
+            <>
+              <div className="absolute bottom-28 right-10 z-50">
+                <FactoryTourPanel />
+              </div>
+              <FactoryDemoPanel />
+            </>
           )}
         </>
       ) : isArchitecture ? (

@@ -4,6 +4,7 @@ import { CatmullRomCurve3, CubicBezierCurve3, Group, Vector3 } from 'three';
 import { Html, Line, Edges } from '@react-three/drei';
 import { BRAND, ACCENT_HEX } from '../../data/brand';
 import { ZONE_COORDS } from '../../data/factoryLayout';
+import { FACTORY_DEMO_STEPS } from '../../data/factoryDemo';
 import { systemById } from '../../data/systems';
 import { useStore } from '../../store/useStore';
 import { PulsingDataDot } from '../objects/PulsingDataDot';
@@ -353,6 +354,9 @@ export function FactoryScene({ opacity = 1, reveal = true }: SceneProps) {
   const chapter = useStore((s) => s.current());
   const factoryMapping = useStore((s) => s.factoryMapping);
   const tourSystem = useStore((s) => s.factoryTourSystem);
+  const demoStepIndex = useStore((s) => s.factoryDemoStep);
+  const demoStep =
+    demoStepIndex !== null ? FACTORY_DEMO_STEPS[demoStepIndex] : null;
   const groupRef = useRef<Group>(null);
 
   const scales = useRef<Record<string, number>>(
@@ -386,15 +390,14 @@ export function FactoryScene({ opacity = 1, reveal = true }: SceneProps) {
     [chapter.activeSystems, factoryMapping],
   );
 
-  const highlightZones = useMemo(
-    () =>
-      new Set<string>(
-        (tourSystem ? [tourSystem] : activeSystems).flatMap(
-          (id) => factoryMapping[id] ?? [],
-        ),
+  const highlightZones = useMemo(() => {
+    if (demoStep) return new Set<string>(demoStep.zoneIds);
+    return new Set<string>(
+      (tourSystem ? [tourSystem] : activeSystems).flatMap(
+        (id) => factoryMapping[id] ?? [],
       ),
-    [activeSystems, factoryMapping, tourSystem],
-  );
+    );
+  }, [activeSystems, factoryMapping, tourSystem, demoStep]);
 
   const chipLayouts = useMemo(
     () => computeChipLayouts(activeSystems, factoryMapping),
@@ -533,7 +536,9 @@ export function FactoryScene({ opacity = 1, reveal = true }: SceneProps) {
       {activeSystems.map((id) => {
         const position = chipPositions[id];
         if (!position) return null;
-        const dimmed = tourSystem !== null && tourSystem !== id;
+        const dimmed = demoStep
+          ? demoStep.systems.length > 0 && !demoStep.systems.includes(id)
+          : tourSystem !== null && tourSystem !== id;
         return (
           <SystemChip
             key={id}

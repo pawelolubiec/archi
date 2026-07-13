@@ -30,14 +30,9 @@ export interface CameraFocus {
   target: Vector3Tuple;
 }
 
-/** 3/4 fly-to view centred on the system's mapped zones. */
-export function tourCameraFor(
-  systemId: string,
-  mapping: FactoryMapping,
-): CameraFocus | null {
-  const coords = (mapping[systemId] ?? [])
-    .map((z) => ZONE_COORDS[z as FactoryZoneId])
-    .filter(Boolean);
+/** 3/4 fly-to view centred on a set of factory zones. */
+export function zoneCameraFor(zoneIds: FactoryZoneId[]): CameraFocus | null {
+  const coords = zoneIds.map((z) => ZONE_COORDS[z]).filter(Boolean);
   if (!coords.length) return null;
 
   const cx = coords.reduce((s, c) => s + c[0], 0) / coords.length;
@@ -47,4 +42,12 @@ export function tourCameraFor(
     position: [cx + 5.2, 5.0, cz + 6.0],
     target: [cx, 0.5, cz],
   };
+}
+
+/** 3/4 fly-to view centred on the system's mapped zones. */
+export function tourCameraFor(
+  systemId: string,
+  mapping: FactoryMapping,
+): CameraFocus | null {
+  return zoneCameraFor((mapping[systemId] ?? []) as FactoryZoneId[]);
 }

@@ -17,6 +17,7 @@ interface Props {
 export function GlobeScene({ opacity = 1, ambientMode = false }: Props) {
   const groupRef = useRef<Group>(null);
   const chapter = useStore((s) => s.current());
+  const growthDemo = useStore((s) => s.growthDemo);
   const isCosmos = chapter.id === 'cosmos';
 
   useFrame((_, delta) => {
@@ -36,13 +37,37 @@ export function GlobeScene({ opacity = 1, ambientMode = false }: Props) {
     g.rotation.y = MathUtils.damp(y, 0, 4, delta);
   });
 
-  const visibleLocations = ambientMode
+  let visibleLocations = ambientMode
     ? ['factory_poland', 'office_germany', 'office_france']
     : chapter.visibleLocations;
 
-  const activeFlows = ambientMode
+  let activeFlows = ambientMode
     ? ['de_to_factory', 'fr_to_factory']
     : chapter.activeFlows;
+
+  // growth slide: the acquire/divest demo docks or unplugs an office live
+  let demoLabeled: string[] | null = null;
+  if (chapter.id === 'growth' && growthDemo && !ambientMode) {
+    if (growthDemo.mode === 'acquire' && growthDemo.stage >= 1) {
+      visibleLocations = [...visibleLocations, 'office_spain'];
+      demoLabeled = ['office_spain'];
+      const docking = ['es_mifo', 'es_data', 'es_finance'].slice(
+        0,
+        growthDemo.stage,
+      );
+      activeFlows = [...activeFlows, ...docking];
+    }
+    if (growthDemo.mode === 'divest' && growthDemo.stage >= 1) {
+      activeFlows = activeFlows.filter((id) => id !== 'au_to_factory');
+      if (growthDemo.stage >= 2) {
+        visibleLocations = visibleLocations.filter(
+          (id) => id !== 'office_australia',
+        );
+      } else {
+        demoLabeled = ['office_australia'];
+      }
+    }
+  }
 
   return (
     <group ref={groupRef}>
@@ -52,11 +77,13 @@ export function GlobeScene({ opacity = 1, ambientMode = false }: Props) {
           if (!visibleLocations.includes(loc.id)) return null;
           const showLabel = ambientMode
             ? false
-            : chapter.hideLocationLabels
-              ? false
-              : chapter.labeledLocations
-                ? chapter.labeledLocations.includes(loc.id)
-                : true;
+            : demoLabeled?.includes(loc.id)
+              ? true
+              : chapter.hideLocationLabels
+                ? false
+                : chapter.labeledLocations
+                  ? chapter.labeledLocations.includes(loc.id)
+                  : true;
           return (
             <LocationMarker
               key={loc.id}

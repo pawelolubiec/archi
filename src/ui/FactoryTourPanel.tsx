@@ -19,9 +19,15 @@ export function FactoryTourPanel() {
   const mapping = useStore((s) => s.factoryMapping);
   const setFactoryTour = useStore((s) => s.setFactoryTour);
   const openApp = useStore((s) => s.openApp);
+  const demoActive = useStore((s) => s.factoryDemoStep !== null);
 
   const [phase, setPhase] = useState<Phase>('intro');
   const [step, setStep] = useState(0);
+
+  // the "go inside" demo takes over the scene — stand down, don't auto-start
+  useEffect(() => {
+    if (demoActive) setPhase('done');
+  }, [demoActive]);
 
   const tourSystems = useMemo(
     () =>
@@ -56,7 +62,7 @@ export function FactoryTourPanel() {
     return () => clearTimeout(t);
   }, [phase, tourSystems, goTo]);
 
-  if (!tourSystems.length) return null;
+  if (!tourSystems.length || demoActive) return null;
 
   const sys = phase === 'tour' ? systemById[tourSystems[step]] : null;
   const accent = sys ? ACCENT_HEX[sys.accent] : undefined;

@@ -18,9 +18,11 @@ import {
   saveFactoryMappingRemote,
 } from '../lib/configApi';
 import type { Chapter } from '../data/types';
-import type { CameraFocus } from '../data/factoryTour';
+import { zoneCameraFor, type CameraFocus } from '../data/factoryTour';
+import { FACTORY_DEMO_STEPS } from '../data/factoryDemo';
 
 export type Mode = 'strategic' | 'technical';
+export type GrowthDemo = { mode: 'acquire' | 'divest'; stage: number } | null;
 export type SceneTransition = 'none' | 'toFactory' | 'toGlobe';
 export type ConfigSaveStatus = 'idle' | 'saving' | 'saved' | 'error';
 
@@ -101,6 +103,8 @@ function chapterNavState(
     architectureConfigOpen: false,
     factoryTourSystem: null,
     factoryFocus: null,
+    factoryDemoStep: null,
+    growthDemo: null,
     sceneTransition: transition,
     transitionProgress: transition === 'none' ? 0 : 0,
     transitionFromCamera:
@@ -125,8 +129,12 @@ interface AppState {
     position: Vector3Tuple;
     target: Vector3Tuple;
   } | null;
-  /** system currently spotlighted by the factory tour (slide 05) */
+  /** system currently spotlighted by the factory tour */
   factoryTourSystem: string | null;
+  /** active step of the "go inside the factory" demo (null = not running) */
+  factoryDemoStep: number | null;
+  /** acquire/divest demo on the growth slide */
+  growthDemo: GrowthDemo;
   /** camera override while the factory tour focuses a system */
   factoryFocus: CameraFocus | null;
   /** system → factory zone mapping (one system, many zones) */
@@ -152,6 +160,8 @@ interface AppState {
   closeApp: () => void;
   setScenario: (id: string | null) => void;
   setFactoryTour: (systemId: string | null, focus: CameraFocus | null) => void;
+  setFactoryDemoStep: (step: number | null) => void;
+  setGrowthDemo: (demo: GrowthDemo) => void;
   setTransitionProgress: (progress: number) => void;
   finishTransition: () => void;
   setTransitionFromCamera: (cam: {
@@ -188,6 +198,8 @@ export const useStore = create<AppState>((set, get) => ({
   scenarioId: null,
   factoryTourSystem: null,
   factoryFocus: null,
+  factoryDemoStep: null,
+  growthDemo: null,
   sceneTransition: 'none',
   transitionProgress: 0,
   transitionFromCamera: null,
@@ -243,6 +255,24 @@ export const useStore = create<AppState>((set, get) => ({
   setScenario: (id) => set({ scenarioId: id }),
   setFactoryTour: (systemId, focus) =>
     set({ factoryTourSystem: systemId, factoryFocus: focus }),
+
+  setGrowthDemo: (demo) => set({ growthDemo: demo }),
+
+  setFactoryDemoStep: (step) => {
+    if (step === null) {
+      set({ factoryDemoStep: null, factoryFocus: null });
+      return;
+    }
+    const demoStep = FACTORY_DEMO_STEPS[step];
+    if (!demoStep) return;
+    set({
+      factoryDemoStep: step,
+      factoryTourSystem: null,
+      factoryFocus: demoStep.zoneIds.length
+        ? zoneCameraFor(demoStep.zoneIds)
+        : null,
+    });
+  },
 
   openFactoryConfig: () => set({ factoryConfigOpen: true }),
   closeFactoryConfig: () => set({ factoryConfigOpen: false }),
@@ -356,4 +386,9 @@ export const useStore = create<AppState>((set, get) => ({
 /** Active modal: manual click only (chapter modals open once on enter via AppShell). */
 export function useActiveModal(): string | null {
   return useStore((s) => s.manualModal);
+}
+
+// dev-only handle for debugging from the browser console
+if (import.meta.env.DEV) {
+  (window as unknown as Record<string, unknown>).__store = useStore;
 }

@@ -87,6 +87,19 @@ export const locations: Location[] = [
     pinLabel: 'Australia',
   },
   {
+    id: 'office_spain',
+    name: 'Acquired Sales Office',
+    country: 'Spain',
+    type: 'office',
+    lat: 40.42,
+    lng: -3.7, // Madrid
+    description:
+      'A newly acquired sales office — different ERP, different sales software. Docks into the group through three contracts: commercial (MiFo), data (lakehouse), finance (consolidation feed).',
+    connectedSystems: ['mifo'],
+    pinLabel: 'Spain — acquired',
+    labelOffsetY: 0.1,
+  },
+  {
     id: 'market_japan',
     name: 'Japan market',
     country: 'Japan',
