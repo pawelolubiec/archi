@@ -3,7 +3,7 @@ import type { SystemDef } from './types';
 export const systems: SystemDef[] = [
   {
     id: 'workday_erp',
-    name: 'ERP (Workday / IFS)',
+    name: 'Group ERP',
     short: 'ERP',
     category: 'erp',
     owner: 'Finance',

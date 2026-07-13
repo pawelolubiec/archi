@@ -180,7 +180,12 @@ interface AppState {
     patch: Partial<
       Pick<
         ArchitectureElement,
-        'label' | 'layer' | 'systemId' | 'linkedProcessIds' | 'linkedElementIds'
+        | 'label'
+        | 'layer'
+        | 'systemId'
+        | 'linkedProcessIds'
+        | 'linkedElementIds'
+        | 'status'
       >
     >,
   ) => void;

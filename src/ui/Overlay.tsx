@@ -13,6 +13,18 @@ function chapterDescription(chapterId: string, fallback: string): string {
     const oee = kpiById.oee;
     return `Today we learn that yield was ${yieldKpi.baseline}% and OEE ${oee.baseline}% after the fact — too late to react. PTS makes every kilogram of raw fish, every machine and every shift visible live, while the outcome can still be changed.`;
   }
+  if (chapterId === 'pid-spec') {
+    const yieldKpi = kpiById.yield;
+    return `Recipes, BOMs, allergens and customer specs live once in PID, versioned — every line, label and certificate works from the same truth. The ${yieldKpi.baseline}% → ${yieldKpi.target}% yield path starts in the product data.`;
+  }
+  if (chapterId === 'erp-core') {
+    const inventory = kpiById.inventory_days;
+    return `One lean group ERP for ledger, closing and valuation — deliberately not an operational monolith. Operations stay in the specialized systems; the ledger carries one truth for money and the ${inventory.baseline} → ${inventory.target} days working-capital target.`;
+  }
+  if (chapterId === 'ai-automation') {
+    const forecast = kpiById.forecast_accuracy;
+    return `Our demand forecast is right ${forecast.baseline}% of the time today. Agents on the canonical data layer take it to ${forecast.target}% — and bring prediction, simulation and automation to every application at once.`;
+  }
   return fallback;
 }
 

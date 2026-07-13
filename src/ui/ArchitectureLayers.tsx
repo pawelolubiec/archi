@@ -1,17 +1,33 @@
-import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import {
+  useCallback,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react';
 import { motion } from 'framer-motion';
 import { useStore } from '../store/useStore';
 import {
   ARCH_LAYER_LABELS,
   BUSINESS_PROCESSES,
+  ELEMENT_STATUS_META,
   LAYER_RANK,
   connectedElementIds,
+  elementStatus,
   formatProcessBadges,
   getProcessColor,
   primaryProcessColor,
   type ArchLayerId,
   type ArchitectureElement,
 } from '../data/architectureLayout';
+
+type ArchView = 'asis' | 'tobe';
+
+const VIEW_META: Record<ArchView, { label: string; accent: string }> = {
+  asis: { label: 'As is', accent: '#2EC5C5' },
+  tobe: { label: 'To be', accent: '#D6BF91' },
+};
 
 /** How data travels up the stack — shown at the right of each layer header. */
 const LAYER_FLOW_HINTS: Record<ArchLayerId, string> = {
@@ -89,17 +105,22 @@ function ProcessStrip({
   highlightedProcessIds,
   onHoverProcess,
   registerNode,
+  headerRight,
 }: {
   highlightedProcessIds: Set<string>;
   onHoverProcess: (id: string) => void;
   registerNode: (key: string) => (node: HTMLElement | null) => void;
+  headerRight?: ReactNode;
 }) {
   const isFiltering = highlightedProcessIds.size > 0;
 
   return (
     <div className="shrink-0">
-      <div className="mb-2 text-slide-caption font-semibold uppercase tracking-[0.18em] text-mist">
-        Business Process Layer
+      <div className="mb-2 flex items-center justify-between gap-4">
+        <span className="text-slide-caption font-semibold uppercase tracking-[0.18em] text-mist">
+          Business Process Layer
+        </span>
+        {headerRight}
       </div>
       <div className="grid grid-cols-11 gap-0.5">
         {BUSINESS_PROCESSES.map((proc, i) => {
@@ -130,6 +151,8 @@ function ElementChip({
   compact,
   highlighted,
   dimmed,
+  ghosted = false,
+  showStatus = false,
   onHover,
   nodeRef,
 }: {
@@ -138,11 +161,17 @@ function ElementChip({
   compact?: boolean;
   highlighted: boolean;
   dimmed: boolean;
+  /** as-is view: not running yet — faint outline only */
+  ghosted?: boolean;
+  /** to-be view: show the delivery-status dot */
+  showStatus?: boolean;
   onHover: () => void;
   nodeRef: (node: HTMLElement | null) => void;
 }) {
   const color = primaryProcessColor(element.linkedProcessIds);
   const badges = formatProcessBadges(element.linkedProcessIds);
+  const status = elementStatus(element);
+  const statusMeta = ELEMENT_STATUS_META[status];
   const openApp = useStore((s) => s.openApp);
 
   const baseClass = compact
@@ -151,6 +180,17 @@ function ElementChip({
 
   const inner = (
     <>
+      {showStatus && (
+        <span
+          className="h-1.5 w-1.5 shrink-0 rounded-full"
+          title={statusMeta.label}
+          style={
+            status === 'todo'
+              ? { border: `1px solid ${statusMeta.color}` }
+              : { background: statusMeta.color }
+          }
+        />
+      )}
       <span className="font-medium text-paper/95">{element.label}</span>
       {badges && (
         <span className="text-slide-caption font-semibold opacity-80" style={{ color }}>
@@ -169,24 +209,32 @@ function ElementChip({
     </>
   );
 
+  const opacity = ghosted ? 0.15 : dimmed ? 0.28 : 1;
+
   const style = {
-    borderColor: highlighted ? color : `${color}99`,
+    borderColor: ghosted
+      ? 'rgba(157,180,204,0.4)'
+      : highlighted
+        ? color
+        : `${color}99`,
     borderLeftWidth: '3px',
-    boxShadow: highlighted
-      ? `0 0 0 1px ${color}, 0 0 32px -6px ${color}`
-      : `0 0 24px -12px ${color}77`,
-    opacity: dimmed ? 0.28 : 1,
+    boxShadow: ghosted
+      ? undefined
+      : highlighted
+        ? `0 0 0 1px ${color}, 0 0 32px -6px ${color}`
+        : `0 0 24px -12px ${color}77`,
+    opacity,
     transform: highlighted ? 'scale(1.04)' : undefined,
   };
 
-  const hoverHandlers = { onMouseEnter: onHover };
+  const hoverHandlers = ghosted ? {} : { onMouseEnter: onHover };
 
-  if (element.systemId) {
+  if (element.systemId && !ghosted) {
     return (
       <motion.button
         ref={nodeRef}
         initial={{ opacity: 0, scale: 0.96 }}
-        animate={{ opacity: dimmed ? 0.28 : 1, scale: highlighted ? 1.04 : 1 }}
+        animate={{ opacity, scale: highlighted ? 1.04 : 1 }}
         transition={{ delay: 0.1 + index * 0.03, duration: 0.2 }}
         onClick={() => openApp(element.systemId!)}
         className={`group ${baseClass} cursor-pointer transition hover:border-sea/60`}
@@ -203,9 +251,9 @@ function ElementChip({
     <motion.span
       ref={nodeRef}
       initial={{ opacity: 0, scale: 0.96 }}
-      animate={{ opacity: dimmed ? 0.28 : 1, scale: highlighted ? 1.04 : 1 }}
+      animate={{ opacity, scale: highlighted ? 1.04 : 1 }}
       transition={{ delay: 0.1 + index * 0.03, duration: 0.2 }}
-      className={`${baseClass} cursor-pointer`}
+      className={`${baseClass} ${ghosted ? '' : 'cursor-pointer'}`}
       style={style}
       {...hoverHandlers}
     >
@@ -219,6 +267,7 @@ function LayerSection({
   elements,
   delay,
   grow,
+  view,
   highlightedElementIds,
   onHoverElement,
   registerNode,
@@ -227,6 +276,7 @@ function LayerSection({
   elements: ArchitectureElement[];
   delay: number;
   grow?: boolean;
+  view: ArchView;
   highlightedElementIds: Set<string>;
   onHoverElement: (id: string) => void;
   registerNode: (key: string) => (node: HTMLElement | null) => void;
@@ -260,6 +310,7 @@ function LayerSection({
         {elements.map((el, i) => {
           const highlighted = highlightedElementIds.has(el.id);
           const dimmed = isFiltering && !highlighted;
+          const ghosted = view === 'asis' && elementStatus(el) !== 'live';
           return (
             <ElementChip
               key={el.id}
@@ -268,6 +319,8 @@ function LayerSection({
               compact={layerId === 'data'}
               highlighted={highlighted}
               dimmed={dimmed}
+              ghosted={ghosted}
+              showStatus={view === 'tobe'}
               onHover={() => onHoverElement(el.id)}
               nodeRef={registerNode(el.id)}
             />
@@ -280,6 +333,7 @@ function LayerSection({
 
 export function ArchitectureLayers() {
   const elements = useStore((s) => s.architectureConfig.elements);
+  const [view, setView] = useState<ArchView>('asis');
   const [hoveredProcessId, setHoveredProcessId] = useState<string | null>(null);
   const [hoveredElementId, setHoveredElementId] = useState<string | null>(null);
   const [flowLines, setFlowLines] = useState<FlowLine[]>([]);
@@ -296,9 +350,18 @@ export function ArchitectureLayers() {
     [elements],
   );
 
+  /** In the as-is view only running elements participate in hover/connections. */
+  const visibleElements = useMemo(
+    () =>
+      view === 'asis'
+        ? elements.filter((el) => elementStatus(el) === 'live')
+        : elements,
+    [elements, view],
+  );
+
   const { highlightedProcessIds, highlightedElementIds } = useMemo(() => {
     if (hoveredProcessId) {
-      const connected = elements
+      const connected = visibleElements
         .filter((el) => el.linkedProcessIds.includes(hoveredProcessId))
         .map((el) => el.id);
       return {
@@ -315,7 +378,7 @@ export function ArchitectureLayers() {
           highlightedElementIds: new Set<string>(),
         };
       }
-      const ids = new Set([el.id, ...connectedElementIds(el, elements)]);
+      const ids = new Set([el.id, ...connectedElementIds(el, visibleElements)]);
       return {
         highlightedProcessIds: new Set(el.linkedProcessIds),
         highlightedElementIds: ids,
@@ -327,7 +390,7 @@ export function ArchitectureLayers() {
       highlightedElementIds: new Set<string>(),
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hoveredProcessId, hoveredElementId, elements, elementById]);
+  }, [hoveredProcessId, hoveredElementId, visibleElements, elementById]);
 
   /** Line factory measuring chip positions relative to the container. */
   const makeMeasurer = useCallback(() => {
@@ -369,7 +432,8 @@ export function ArchitectureLayers() {
     const el = hoveredElementId ? elementById[hoveredElementId] : null;
     if (el) {
       const color = primaryProcessColor(el.linkedProcessIds);
-      connectedElementIds(el, elements).forEach((id) => {
+      const coveredPids = new Set<string>();
+      connectedElementIds(el, visibleElements).forEach((id) => {
         const other = elementById[id];
         if (!other) return;
         const diff = LAYER_RANK[other.layer] - LAYER_RANK[el.layer];
@@ -379,26 +443,34 @@ export function ArchitectureLayers() {
         if (other.layer === 'ai') {
           other.linkedProcessIds
             .filter((pid) => el.linkedProcessIds.includes(pid))
-            .forEach((pid) =>
-              add(mk(other.id, `proc:${pid}`, getProcessColor(pid))),
-            );
+            .forEach((pid) => {
+              add(mk(other.id, `proc:${pid}`, getProcessColor(pid)));
+              coveredPids.add(pid);
+            });
         }
       });
       if (el.layer === 'ai') {
         el.linkedProcessIds.forEach((pid) =>
           add(mk(el.id, `proc:${pid}`, getProcessColor(pid))),
         );
+      } else {
+        // processes no AI chain reaches still connect straight from the element
+        el.linkedProcessIds
+          .filter((pid) => !coveredPids.has(pid))
+          .forEach((pid) =>
+            add(mk(el.id, `proc:${pid}`, getProcessColor(pid))),
+          );
       }
     } else if (hoveredProcessId) {
       const color = getProcessColor(hoveredProcessId);
-      elements
+      visibleElements
         .filter((o) => o.linkedProcessIds.includes(hoveredProcessId))
         .forEach((o) => add(mk(o.id, `proc:${hoveredProcessId}`, color)));
     }
 
     setFlowLines([...lines.values()]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hoveredElementId, hoveredProcessId, elements, elementById, makeMeasurer]);
+  }, [hoveredElementId, hoveredProcessId, visibleElements, elementById, makeMeasurer]);
 
   const hoverProcess = (id: string) => {
     setHoveredProcessId(id);
@@ -428,6 +500,32 @@ export function ArchitectureLayers() {
         highlightedProcessIds={highlightedProcessIds}
         onHoverProcess={hoverProcess}
         registerNode={registerNode}
+        headerRight={
+          <div className="pointer-events-auto flex gap-1.5">
+            {(Object.keys(VIEW_META) as ArchView[]).map((v) => {
+              const selected = view === v;
+              const meta = VIEW_META[v];
+              return (
+                <button
+                  key={v}
+                  type="button"
+                  onClick={() => setView(v)}
+                  className="rounded-full border px-3.5 py-1 text-xs font-medium uppercase tracking-[0.08em] transition"
+                  style={{
+                    borderColor: selected ? `${meta.accent}cc` : 'rgba(255,255,255,0.12)',
+                    background: selected ? `${meta.accent}14` : 'transparent',
+                    color: selected ? meta.accent : '#9DB4CC',
+                    boxShadow: selected
+                      ? `0 0 0 1px ${meta.accent}40, 0 0 16px -4px ${meta.accent}80`
+                      : undefined,
+                  }}
+                >
+                  {meta.label}
+                </button>
+              );
+            })}
+          </div>
+        }
       />
 
       <div className="flex min-h-0 flex-1 flex-col gap-2">
@@ -436,6 +534,7 @@ export function ArchitectureLayers() {
           elements={byLayer('ai')}
           delay={0.08}
           grow
+          view={view}
           highlightedElementIds={highlightedElementIds}
           onHoverElement={hoverElement}
           registerNode={registerNode}
@@ -444,6 +543,7 @@ export function ArchitectureLayers() {
           layerId="data"
           elements={byLayer('data')}
           delay={0.14}
+          view={view}
           highlightedElementIds={highlightedElementIds}
           onHoverElement={hoverElement}
           registerNode={registerNode}
@@ -453,6 +553,7 @@ export function ArchitectureLayers() {
           elements={byLayer('apps')}
           delay={0.2}
           grow
+          view={view}
           highlightedElementIds={highlightedElementIds}
           onHoverElement={hoverElement}
           registerNode={registerNode}
@@ -483,9 +584,30 @@ export function ArchitectureLayers() {
       )}
 
       <p className="shrink-0 text-center text-xs text-mist/80">
-        {isHovering
-          ? 'Dashed lines show the connections — operational data travels up, decision support flows down.'
-          : 'Hover any element or process to see its connections — apps feed data, data feeds AI, AI supports decisions.'}
+        {isHovering ? (
+          'Dashed lines show the connections — operational data travels up, decision support flows down.'
+        ) : view === 'tobe' ? (
+          <>
+            {(['live', 'in_dev', 'todo'] as const).map((s, i) => (
+              <span key={s} className="whitespace-nowrap">
+                {i > 0 && <span className="mx-2 text-mist/40">·</span>}
+                <span
+                  className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full align-middle"
+                  style={
+                    s === 'todo'
+                      ? { border: `1px solid ${ELEMENT_STATUS_META[s].color}` }
+                      : { background: ELEMENT_STATUS_META[s].color }
+                  }
+                />
+                {ELEMENT_STATUS_META[s].label}
+              </span>
+            ))}
+            <span className="mx-2 text-mist/40">—</span>
+            the target architecture, ticked off as the strategy delivers.
+          </>
+        ) : (
+          'As is — what runs today. Switch to “To be” for the 2030 target architecture.'
+        )}
       </p>
     </div>
   );

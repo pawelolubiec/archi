@@ -7,6 +7,18 @@ export interface BusinessProcess {
 
 export type ArchLayerId = 'ai' | 'data' | 'apps';
 
+/** Delivery status of an element — the strategy tick-off state. */
+export type ElementStatus = 'todo' | 'in_dev' | 'live';
+
+export const ELEMENT_STATUS_META: Record<
+  ElementStatus,
+  { label: string; color: string }
+> = {
+  live: { label: 'Running', color: '#34D399' },
+  in_dev: { label: 'In development', color: '#2EC5C5' },
+  todo: { label: 'To be done', color: '#D6BF91' },
+};
+
 export interface ArchitectureElement {
   id: string;
   label: string;
@@ -18,6 +30,8 @@ export interface ArchitectureElement {
    */
   linkedElementIds?: string[];
   systemId?: string;
+  /** to be done / in development / running — absent = derived from the system */
+  status?: ElementStatus;
 }
 
 /** Vertical position of each layer — used to decide flow direction. */
@@ -56,6 +70,16 @@ export function connectedElementIds(
 
 export interface ArchitectureConfig {
   elements: ArchitectureElement[];
+}
+
+/**
+ * Effective status: explicit tag wins; otherwise derive from the linked
+ * system's status (old saved configs have no `status` field).
+ */
+export function elementStatus(el: ArchitectureElement): ElementStatus {
+  if (el.status) return el.status;
+  const def = DEFAULT_ELEMENTS.find((d) => d.id === el.id);
+  return def?.status ?? 'todo';
 }
 
 export const BUSINESS_PROCESSES: BusinessProcess[] = [
@@ -99,20 +123,20 @@ const DEFAULT_ELEMENTS: ArchitectureElement[] = [
   { id: 'data_master', label: 'Master Data', layer: 'data', linkedProcessIds: ['sourcing', 'production_planning'] },
   { id: 'data_semantic', label: 'Semantic Layer', layer: 'data', linkedProcessIds: ['finance', 'performance'] },
   { id: 'data_kpi', label: 'KPI model', layer: 'data', linkedProcessIds: ['finance', 'performance'], systemId: 'data_platform' },
-  { id: 'data_bi', label: 'BI / Superset', layer: 'data', linkedProcessIds: ['performance'] },
+  { id: 'data_bi', label: 'BI / Superset', layer: 'data', linkedProcessIds: ['performance'], status: 'live' },
   { id: 'data_ai_feat', label: 'AI Features', layer: 'data', linkedProcessIds: ['forecasting', 'performance'] },
 
   // Applications (unified)
-  { id: 'app_mifo', label: 'MiFo', layer: 'apps', linkedProcessIds: ['market_demand', 'forecasting', 'sales_logistics'], systemId: 'mifo' },
+  { id: 'app_mifo', label: 'MiFo', layer: 'apps', linkedProcessIds: ['market_demand', 'forecasting', 'sales_logistics'], systemId: 'mifo', status: 'live' },
   { id: 'app_aps', label: 'APS', layer: 'apps', linkedProcessIds: ['production_planning', 'forecasting'], systemId: 'aps' },
-  { id: 'app_pts', label: 'PTS', layer: 'apps', linkedProcessIds: ['raw_material', 'production_planning', 'processing'], systemId: 'pts' },
-  { id: 'app_pid', label: 'PID', layer: 'apps', linkedProcessIds: ['forecasting', 'processing', 'quality'], systemId: 'pid' },
+  { id: 'app_pts', label: 'PTS', layer: 'apps', linkedProcessIds: ['raw_material', 'production_planning', 'processing'], systemId: 'pts', status: 'live' },
+  { id: 'app_pid', label: 'PID', layer: 'apps', linkedProcessIds: ['forecasting', 'processing', 'quality'], systemId: 'pid', status: 'live' },
   { id: 'app_wms', label: 'WMS', layer: 'apps', linkedProcessIds: ['warehousing', 'sales_logistics'], systemId: 'wms' },
   { id: 'app_qms', label: 'QMS / LIMS', layer: 'apps', linkedProcessIds: ['quality'], systemId: 'qms_lims' },
-  { id: 'app_erp', label: 'ERP (Workday / IFS)', layer: 'apps', linkedProcessIds: ['sourcing', 'finance', 'warehousing'], systemId: 'workday_erp' },
+  { id: 'app_erp', label: 'Group ERP', layer: 'apps', linkedProcessIds: ['sourcing', 'finance', 'warehousing'], systemId: 'workday_erp' },
   { id: 'app_trace', label: 'Traceability Platform', layer: 'apps', linkedProcessIds: ['quality', 'processing'] },
-  { id: 'app_helpdesk', label: 'Helpdesk', layer: 'apps', linkedProcessIds: ['performance'] },
-  { id: 'app_scada', label: 'SCADA', layer: 'apps', linkedProcessIds: ['processing', 'performance'] },
+  { id: 'app_helpdesk', label: 'Helpdesk', layer: 'apps', linkedProcessIds: ['performance'], status: 'live' },
+  { id: 'app_scada', label: 'SCADA', layer: 'apps', linkedProcessIds: ['processing', 'performance'], status: 'live' },
 ];
 
 export const DEFAULT_ARCHITECTURE_CONFIG: ArchitectureConfig = {

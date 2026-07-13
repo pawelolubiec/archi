@@ -5,10 +5,15 @@ import { systems } from '../data/systems';
 import {
   ARCH_LAYER_LABELS,
   BUSINESS_PROCESSES,
+  ELEMENT_STATUS_META,
   connectedElementIds,
+  elementStatus,
   type ArchLayerId,
   type ArchitectureElement,
+  type ElementStatus,
 } from '../data/architectureLayout';
+
+const STATUS_ORDER: ElementStatus[] = ['todo', 'in_dev', 'live'];
 import { SaveStatus } from './ConfigSaveStatus';
 
 const LAYER_ORDER: ArchLayerId[] = ['ai', 'data', 'apps'];
@@ -72,6 +77,7 @@ function ElementRow({
   onToggleProcess,
   onSystemChange,
   onToggleConnection,
+  onStatusChange,
   onDelete,
 }: {
   element: ArchitectureElement;
@@ -80,10 +86,12 @@ function ElementRow({
   onToggleProcess: (processId: string) => void;
   onSystemChange: (systemId: string | undefined) => void;
   onToggleConnection: (otherId: string) => void;
+  onStatusChange: (status: ElementStatus) => void;
   onDelete: () => void;
 }) {
   const [showConnections, setShowConnections] = useState(false);
   const connectionCount = connectedElementIds(element, allElements).size;
+  const status = elementStatus(element);
 
   return (
     <div className="rounded-lg border border-white/8 bg-ink/40 p-3">
@@ -109,6 +117,29 @@ function ElementRow({
             </option>
           ))}
         </select>
+        <div
+          className="flex overflow-hidden rounded-md border border-white/10"
+          title="Delivery status — the strategy tick-off"
+        >
+          {STATUS_ORDER.map((s) => {
+            const active = status === s;
+            const meta = ELEMENT_STATUS_META[s];
+            return (
+              <button
+                key={s}
+                type="button"
+                onClick={() => onStatusChange(s)}
+                className="px-2 py-1 text-[10px] font-medium transition"
+                style={{
+                  background: active ? `${meta.color}22` : 'transparent',
+                  color: active ? meta.color : '#9DB4CC77',
+                }}
+              >
+                {meta.label}
+              </button>
+            );
+          })}
+        </div>
         <button
           type="button"
           onClick={() => setShowConnections((v) => !v)}
@@ -198,6 +229,7 @@ function LayerSection({
             allElements={allElements}
             onLabelChange={(label) => onUpdate(el.id, { label })}
             onSystemChange={(systemId) => onUpdate(el.id, { systemId })}
+            onStatusChange={(status) => onUpdate(el.id, { status })}
             onDelete={() => onDelete(el.id)}
             onToggleProcess={(processId) => onToggleProcess(el.id, processId)}
             onToggleConnection={(otherId) => onToggleConnection(el.id, otherId)}

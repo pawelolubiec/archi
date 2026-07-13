@@ -130,17 +130,105 @@ function ptsOutcomeCards(): OutcomeCard[] {
   ];
 }
 
+function pidOutcomeCards(): OutcomeCard[] {
+  const quality = kpiById.quality;
+  const yieldKpi = kpiById.yield;
+  return [
+    {
+      claim: 'One source of truth for every spec',
+      support:
+        'Recipes, BOM, allergens and packaging versioned once — every label works from the same data.',
+      tag: quality.name,
+      kpis: [quality],
+    },
+    {
+      claim: 'Yield starts in the recipe',
+      support:
+        'The right spec drives the right cut and pack — giveaway shrinks before the knife moves.',
+      tag: yieldKpi.name,
+      kpis: [yieldKpi],
+    },
+    {
+      claim: 'Customer specs validated automatically',
+      support:
+        'Order requirements checked against the product data — no surprises at QC or at the customer.',
+      tag: quality.name,
+      kpis: [quality],
+    },
+  ];
+}
+
+function erpOutcomeCards(): OutcomeCard[] {
+  const ebitda = kpiById.ebitda;
+  const inventory = kpiById.inventory_days;
+  return [
+    {
+      claim: 'Ledger, closing, valuation — nothing else',
+      support:
+        'The lean financial core — deliberately not an operational monolith.',
+      tag: ebitda.name,
+      kpis: [ebitda],
+    },
+    {
+      claim: 'One truth for money and stock',
+      support:
+        'Inventory valued from the same events production records — no month-end reconciliation.',
+      tag: inventory.name,
+      kpis: [inventory],
+    },
+    {
+      claim: 'Small enough to swap, ready for M&A',
+      support:
+        'An acquired entity keeps its local ERP — a divested one unplugs cleanly.',
+      tag: ebitda.name,
+      kpis: [ebitda],
+    },
+  ];
+}
+
+function aiOutcomeCards(): OutcomeCard[] {
+  const forecast = kpiById.forecast_accuracy;
+  const costPerKg = kpiById.cost_per_kg;
+  const co2 = kpiById.co2_per_kg;
+  return [
+    {
+      claim: `Forecast accuracy ${forecast.baseline}% → ${forecast.target}%`,
+      support:
+        'Demand prediction over the canonical data layer — every office and product, one model.',
+      tag: forecast.name,
+      kpis: [forecast],
+    },
+    {
+      claim: 'Optimization at shift level',
+      support:
+        'Yield, throughput and staffing tuned by agents while the shift runs — not analyzed after it.',
+      tag: costPerKg.name,
+      kpis: [costPerKg],
+    },
+    {
+      claim: 'Footprint down from the same data',
+      support:
+        'Energy and CO₂ per kilogram optimized from the same event stream — no separate sustainability stack.',
+      tag: co2.name,
+      kpis: [co2],
+    },
+  ];
+}
+
 /** Strategic-view outcome cards per chapter: which system gets the board story. */
 const OUTCOME_VIEWS: Record<string, { systemId: string; cards: () => OutcomeCard[] }> = {
   germany: { systemId: 'mifo', cards: mifoOutcomeCards },
   'pts-yield': { systemId: 'pts', cards: ptsOutcomeCards },
+  'pid-spec': { systemId: 'pid', cards: pidOutcomeCards },
+  'erp-core': { systemId: 'workday_erp', cards: erpOutcomeCards },
+  'ai-automation': { systemId: 'gone_ai', cards: aiOutcomeCards },
 };
 
 function OutcomeCards({ cards }: { cards: OutcomeCard[] }) {
   const [openIdx, setOpenIdx] = useState(0);
 
   return (
-    <div className="mt-4 space-y-2.5">
+    <div className="mt-3 space-y-2">
       <div className="font-mono text-slide-caption uppercase tracking-[0.18em] text-mist/70">
         Outcomes · click to explore
       </div>
@@ -151,7 +239,7 @@ function OutcomeCards({ cards }: { cards: OutcomeCard[] }) {
             key={card.claim}
             type="button"
             onClick={() => setOpenIdx(i)}
-            className={`block w-full rounded-xl border p-3 text-left transition-colors ${
+            className={`block w-full rounded-xl border p-2.5 text-left transition-colors ${
               open
                 ? 'border-gold/35 bg-white/5'
                 : 'border-white/10 bg-white/5 hover:border-gold/25'

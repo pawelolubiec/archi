@@ -3,7 +3,7 @@ import type { Scenario, RoadmapTrack } from './types';
 export const scenarios: Scenario[] = [
   {
     id: 'workday',
-    name: 'ERP implementation (Workday/IFS)',
+    name: 'ERP implementation (financial core)',
     summary:
       'Replacing the financial core. Stabilizing the ledger, closings, and inventory valuation — without moving operations into the ERP.',
     horizon: '2026–2027',
