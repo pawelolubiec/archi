@@ -5,36 +5,32 @@ interface Decision {
   title: string;
   scope: string;
   consequence: string;
-  deadline: string;
 }
 
 const DECISIONS: Decision[] = [
   {
     no: 'D1',
-    title: 'Direction: hybrid architecture + 2026–2030 investment envelope',
+    title: 'Approve the digital strategy',
     scope:
-      'Approval of the target architecture (ERP as financial core, specialized systems, Data Platform, AI) and the program’s investment envelope — CAPEX ~€4.2M / OPEX ~€0.65M per year (estimate to be validated with Controlling).',
+      'Endorse the digital strategy — vision, target state and guiding principles for 2026–2030.',
     consequence:
-      'Launches the foundations phase: Data Platform, integrations, preparation of system selection.',
-    deadline: 'Decision: this meeting',
+      'Mandates the team to build the detailed execution plan. Without it, the program has no agreed direction.',
   },
   {
     no: 'D2',
-    title: 'Approval to start the ERP selection process (financial core)',
+    title: 'Approve the execution plan (roadmap)',
     scope:
-      'Authorization of an RFP for the financial core (candidates: Workday / IFS), with scope limited to finance — without moving operations into the ERP.',
+      'Approve the roadmap that turns strategy into delivery — prioritised initiatives, sequencing, milestones and dependencies.',
     consequence:
-      'RFP in Q3 2026, selection decision in Q1 2027, implementation 2027–2028, go-live end-2028. Scope protected against scope creep.',
-    deadline: 'RFP start: Q3 2026',
+      'Releases the first wave of initiatives. Scope protected against “creep” by governance.',
   },
   {
     no: 'D3',
-    title: 'Governance model + NIS2 / KSC compliance program',
+    title: 'Approve budget & governance model',
     scope:
-      'Adoption of a single accountability model for initiatives (portfolio, stage-gate, KPI owners, board dashboard) and approval of the NIS2/KSC program charter.',
+      'Approve the investment envelope (CAPEX/OPEX) and the accountability model — portfolio owners, steering committee, KPIs, board dashboard.',
     consequence:
-      'Every investment evaluated with the same methodology. Meeting deadlines: registry entry October 2026, full implementation April 2027.',
-    deadline: 'KSC registry: October 2026',
+      'Funds and staffs the program; every initiative is evaluated with the same methodology.',
   },
 ];
 
@@ -50,13 +46,8 @@ export function DecisionsPanel() {
             transition={{ delay: i * 0.12, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
             className="flex flex-col rounded-2xl border border-gold/25 bg-navy-900/70 p-4 backdrop-blur-sm lg:p-5"
           >
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-gold/50 bg-gold/10 font-display text-lg text-gold">
-                {d.no}
-              </div>
-              <div className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-gold">
-                {d.deadline}
-              </div>
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-gold/50 bg-gold/10 font-display text-lg text-gold">
+              {d.no}
             </div>
             <h3 className="mt-3 font-display text-lg leading-snug text-paper lg:text-xl">
               {d.title}
@@ -68,14 +59,6 @@ export function DecisionsPanel() {
           </motion.div>
         ))}
       </div>
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.5 }}
-        className="mt-3 text-center text-xs text-mist"
-      >
-        Financial figures are reference estimates — to be validated with Controlling before formal approval.
-      </motion.p>
     </div>
   );
 }

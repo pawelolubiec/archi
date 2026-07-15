@@ -403,9 +403,9 @@ export const chapters: Chapter[] = [
     eyebrow: 'Decisions',
     title: 'What we need from the board',
     description:
-      'Three decisions that open the transformation program. Each with a clear scope, consequence, and deadline.',
+      'Three approvals that turn the digital strategy into a funded, governed execution program.',
     businessMessage:
-      'Approval today = foundations start in Q3 2026 and compliance deadlines are met.',
+      'Approve the direction, the delivery roadmap, and the model that funds and governs execution.',
     cameraPosition: [0, 1, 9.5],
     cameraTarget: [0, 0, 0],
     visibleLocations: [],

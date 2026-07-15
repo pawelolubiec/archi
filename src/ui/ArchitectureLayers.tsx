@@ -651,7 +651,7 @@ export function ArchitectureLayers() {
         setHoveredElementId(null);
       }}
     >
-      <div className="shrink-0 py-1">
+      <div className="fixed left-1/2 top-4 z-30 -translate-x-1/2">
         <ArchViewSwitch view={view} onChange={setView} />
       </div>
 
