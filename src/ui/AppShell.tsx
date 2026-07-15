@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Experience } from '../three/Experience';
-import { Logo } from './Logo';
+import { SlideMenu } from './SlideMenu';
 import { Overlay } from './Overlay';
 import { SystemModal } from './SystemModal';
 import { NavigationControls } from './NavigationControls';
@@ -161,7 +161,7 @@ export function AppShell() {
       {/* top bar */}
       <header className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-8">
         <div className="pointer-events-auto">
-          <Logo />
+          <SlideMenu />
         </div>
         <div className="pointer-events-auto flex items-center gap-3">
           <FactoryConfigButton />

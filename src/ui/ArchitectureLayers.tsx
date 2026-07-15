@@ -607,19 +607,10 @@ export function ArchitectureLayers() {
         const diff = LAYER_RANK[other.layer] - LAYER_RANK[el.layer];
         if (diff > 0) add(mk(el.id, other.id, color, '6 6', 'standard'));
         else if (diff < 0) add(mk(other.id, el.id, color, '6 6', 'standard'));
-        if (other.layer === 'ai') {
-          other.linkedProcessIds
-            .filter((pid) => el.linkedProcessIds.includes(pid))
-            .forEach((pid) => {
-              add(mk(other.id, `proc:${pid}`, getProcessColor(pid), '6 6', 'standard'));
-            });
-        }
       });
-      if (el.layer === 'ai') {
-        el.linkedProcessIds.forEach((pid) =>
-          add(mk(el.id, `proc:${pid}`, getProcessColor(pid), '6 6', 'standard')),
-        );
-      }
+      el.linkedProcessIds.forEach((pid) =>
+        add(mk(el.id, `proc:${pid}`, getProcessColor(pid), '6 6', 'standard')),
+      );
     } else if (hoveredProcessId) {
       const color = getProcessColor(hoveredProcessId);
       visibleElements

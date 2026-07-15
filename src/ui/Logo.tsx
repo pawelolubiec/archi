@@ -1,6 +1,11 @@
-export function Logo() {
+interface LogoProps {
+  onEmblemClick?: () => void;
+  menuOpen?: boolean;
+}
+
+export function Logo({ onEmblemClick, menuOpen = false }: LogoProps) {
   return (
-    <div className="select-none">
+    <div className="relative select-none">
       {/* Official Milarex logo — wave emblem + wordmark, monochrome via currentColor */}
       <svg
         viewBox="0 0 378.2 108.1"
@@ -18,6 +23,18 @@ export function Logo() {
       <div className="mt-1 pl-1 text-slide-caption uppercase tracking-[0.34em] text-mist">
         Digital Strategy <span className="text-mist/50">(Draft)</span>
       </div>
+      {onEmblemClick && (
+        <button
+          type="button"
+          onClick={onEmblemClick}
+          aria-label="Open slide menu"
+          aria-expanded={menuOpen}
+          title="Open slide menu"
+          className="absolute left-0 top-0 h-12 w-12 rounded-full focus:outline-none focus:ring-2 focus:ring-sea/70"
+        >
+          <span className="sr-only">Open slide menu</span>
+        </button>
+      )}
     </div>
   );
 }
