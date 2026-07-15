@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStore } from '../store/useStore';
-import { TOTAL_CHAPTERS } from '../data/chapters';
+import { formatSlideNumber } from '../lib/slideNumber';
 import { kpiById } from '../data/kpis';
 
 function chapterDescription(chapterId: string, fallback: string): string {
@@ -52,13 +52,10 @@ export function Overlay() {
         >
           <div className="mb-3 flex items-baseline gap-3">
             <span className="font-display text-5xl leading-none text-gold/80 sm:text-6xl">
-              {String(index + 1).padStart(2, '0')}
+              {formatSlideNumber(index)}
             </span>
             <span className="text-slide-kicker uppercase tracking-eyebrow text-sea">
               {chapter.eyebrow}
-            </span>
-            <span className="text-slide-caption text-mist">
-              / {String(TOTAL_CHAPTERS).padStart(2, '0')}
             </span>
           </div>
 

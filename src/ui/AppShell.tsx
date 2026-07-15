@@ -8,11 +8,11 @@ import { ChapterProgress } from './ChapterProgress';
 import { ModeToggle } from './ModeToggle';
 import { ArchitectureLayers } from './ArchitectureLayers';
 import { KPIBoard } from './KPIBoard';
-import { GovernanceCard } from './GovernanceCard';
 import { ScenarioPanel } from './ScenarioPanel';
 import { RoadmapTimeline } from './RoadmapTimeline';
 import { useStore } from '../store/useStore';
-import { chapters, TOTAL_CHAPTERS } from '../data/chapters';
+import { chapters } from '../data/chapters';
+import { formatSlideNumber } from '../lib/slideNumber';
 import { AppModal } from './AppModal';
 import { PainPoints } from './PainPoints';
 import { DecisionsPanel } from './DecisionsPanel';
@@ -25,6 +25,8 @@ import { FactoryTourPanel } from './FactoryTourPanel';
 import { FactoryDemoPanel } from './FactoryDemoPanel';
 import { LiveOrderFeed } from './LiveOrderFeed';
 import { GrowthPanel } from './GrowthPanel';
+import { InitiativePortfolioPanel } from './InitiativePortfolioPanel';
+import { FactoryOrderPanel } from './FactoryOrderPanel';
 import { FACTORY_DEMO_STEPS } from '../data/factoryDemo';
 
 function CentralPanel() {
@@ -32,6 +34,8 @@ function CentralPanel() {
   switch (chapter.scene) {
     case 'pain':
       return <PainPoints />;
+    case 'portfolio':
+      return <InitiativePortfolioPanel />;
     case 'architecture':
       return <ArchitectureLayers />;
     case 'kpi':
@@ -41,7 +45,7 @@ function CentralPanel() {
     case 'decisions':
       return <DecisionsPanel />;
     case 'scenario':
-      return chapter.id === 'governance' ? <GovernanceCard /> : <ScenarioPanel />;
+      return <ScenarioPanel />;
     default:
       return null;
   }
@@ -62,6 +66,7 @@ export function AppShell() {
   const is3D = chapter.scene === 'globe' || chapter.scene === 'factory';
   const isArchitecture = chapter.scene === 'architecture';
   const isGermanyFactory = chapter.id === 'germany-factory';
+  const isFactoryOrder = chapter.id === 'factory-order';
   const isGrowth = chapter.id === 'growth';
   const isSalesSlide =
     chapter.id === 'germany' ||
@@ -199,7 +204,12 @@ export function AppShell() {
               <SystemModal />
             </div>
           )}
-          {chapter.scene === 'factory' && (
+          {chapter.scene === 'factory' && isFactoryOrder && (
+            <div className="absolute bottom-28 right-10 z-50">
+              <FactoryOrderPanel />
+            </div>
+          )}
+          {chapter.scene === 'factory' && !isFactoryOrder && (
             <>
               <div className="absolute bottom-28 right-10 z-50">
                 <FactoryTourPanel />
@@ -212,7 +222,7 @@ export function AppShell() {
         <div className="absolute inset-x-4 top-[7.5rem] bottom-[4.75rem] z-10 flex flex-col sm:inset-x-6 lg:inset-x-8">
           <div className="pointer-events-none mb-2.5 flex shrink-0 items-baseline gap-3 slide-chrome">
             <span className="font-display text-3xl leading-none text-gold/80">
-              {String(chapter.index + 1).padStart(2, '0')}
+              {formatSlideNumber(chapter.index)}
             </span>
             <h1 className="font-display text-slide-title leading-none text-paper">
               {chapter.title}
@@ -233,13 +243,10 @@ export function AppShell() {
             <div className="pointer-events-none shrink-0">
               <div className="mb-2 flex items-baseline gap-3">
                 <span className="font-display text-5xl leading-none text-gold/80 sm:text-6xl">
-                  {String(chapter.index + 1).padStart(2, '0')}
+                  {formatSlideNumber(chapter.index)}
                 </span>
                 <span className="text-slide-kicker uppercase tracking-eyebrow text-sea">
                   {chapter.eyebrow}
-                </span>
-                <span className="text-slide-caption text-mist">
-                  / {String(TOTAL_CHAPTERS).padStart(2, '0')}
                 </span>
               </div>
               <h1 className="font-display text-slide-display leading-tight text-paper">
@@ -253,7 +260,7 @@ export function AppShell() {
             <div className="pointer-events-none shrink-0 slide-chrome">
               <div className="flex items-baseline gap-3">
                 <span className="font-display text-3xl leading-none text-gold/80">
-                  {String(chapter.index + 1).padStart(2, '0')}
+                  {formatSlideNumber(chapter.index)}
                 </span>
                 <h1 className="font-display text-slide-title leading-none text-paper">
                   {chapter.title}

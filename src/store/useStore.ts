@@ -8,6 +8,8 @@ import {
 } from '../data/factoryLayout';
 import {
   cloneDefaultArchitectureConfig,
+  connectionsForView,
+  mergeArchitectureConfig,
   type ArchitectureConfig,
   type ArchitectureElement,
   type ArchLayerId,
@@ -20,6 +22,7 @@ import {
 import type { Chapter } from '../data/types';
 import { zoneCameraFor, type CameraFocus } from '../data/factoryTour';
 import { FACTORY_DEMO_STEPS } from '../data/factoryDemo';
+import type { FactoryOrderView } from '../data/factoryTopology';
 
 export type Mode = 'strategic' | 'technical';
 export type GrowthDemo = { mode: 'acquire' | 'divest'; stage: number } | null;
@@ -105,6 +108,7 @@ function chapterNavState(
     factoryFocus: null,
     factoryDemoStep: null,
     growthDemo: null,
+    factoryOrderView: 'asis' as FactoryOrderView,
     sceneTransition: transition,
     transitionProgress: transition === 'none' ? 0 : 0,
     transitionFromCamera:
@@ -133,6 +137,8 @@ interface AppState {
   factoryTourSystem: string | null;
   /** active step of the "go inside the factory" demo (null = not running) */
   factoryDemoStep: number | null;
+  /** as-is / to-be on the factory-order slide */
+  factoryOrderView: FactoryOrderView;
   /** acquire/divest demo on the growth slide */
   growthDemo: GrowthDemo;
   /** camera override while the factory tour focuses a system */
@@ -161,6 +167,7 @@ interface AppState {
   setScenario: (id: string | null) => void;
   setFactoryTour: (systemId: string | null, focus: CameraFocus | null) => void;
   setFactoryDemoStep: (step: number | null) => void;
+  setFactoryOrderView: (view: FactoryOrderView) => void;
   setGrowthDemo: (demo: GrowthDemo) => void;
   setTransitionProgress: (progress: number) => void;
   finishTransition: () => void;
@@ -185,12 +192,19 @@ interface AppState {
         | 'systemId'
         | 'linkedProcessIds'
         | 'linkedElementIds'
+        | 'linkedElementIdsAsIs'
+        | 'linkedElementIdsToBe'
         | 'status'
       >
     >,
   ) => void;
   removeArchitectureElement: (id: string) => void;
   setElementProcessLinks: (id: string, processIds: string[]) => void;
+  toggleArchitectureConnection: (
+    view: 'asis' | 'tobe',
+    fromId: string,
+    toId: string,
+  ) => void;
   resetArchitectureConfig: () => void;
   hydrateConfig: () => Promise<void>;
 }
@@ -205,6 +219,7 @@ export const useStore = create<AppState>((set, get) => ({
   factoryFocus: null,
   factoryDemoStep: null,
   growthDemo: null,
+  factoryOrderView: 'asis',
   sceneTransition: 'none',
   transitionProgress: 0,
   transitionFromCamera: null,
@@ -262,6 +277,8 @@ export const useStore = create<AppState>((set, get) => ({
     set({ factoryTourSystem: systemId, factoryFocus: focus }),
 
   setGrowthDemo: (demo) => set({ growthDemo: demo }),
+
+  setFactoryOrderView: (view) => set({ factoryOrderView: view }),
 
   setFactoryDemoStep: (step) => {
     if (step === null) {
@@ -347,6 +364,32 @@ export const useStore = create<AppState>((set, get) => ({
       return { architectureConfig };
     }),
 
+  toggleArchitectureConnection: (view, fromId, toId) =>
+    set((s) => {
+      const key = [fromId, toId].sort().join('|');
+      const field = view === 'asis' ? 'connectionsAsIs' : 'connectionsToBe';
+      const current = connectionsForView(s.architectureConfig, view);
+      const exists = current.some(
+        (c) => [c.fromId, c.toId].sort().join('|') === key,
+      );
+      const nextConnections = exists
+        ? current.filter((c) => [c.fromId, c.toId].sort().join('|') !== key)
+        : [
+            ...current,
+            {
+              fromId,
+              toId,
+              kind: view === 'asis' ? ('manual' as const) : ('standard' as const),
+            },
+          ];
+      const architectureConfig: ArchitectureConfig = {
+        ...s.architectureConfig,
+        [field]: nextConnections,
+      };
+      scheduleArchitectureSave(architectureConfig, set);
+      return { architectureConfig };
+    }),
+
   resetArchitectureConfig: () => {
     const architectureConfig = cloneDefaultArchitectureConfig();
     set({ architectureConfig });
@@ -367,11 +410,8 @@ export const useStore = create<AppState>((set, get) => ({
       if (remote.factoryMapping && typeof remote.factoryMapping === 'object') {
         updates.factoryMapping = remote.factoryMapping;
       }
-      if (
-        remote.architectureConfig?.elements &&
-        Array.isArray(remote.architectureConfig.elements)
-      ) {
-        updates.architectureConfig = remote.architectureConfig;
+      if (remote.architectureConfig?.elements) {
+        updates.architectureConfig = mergeArchitectureConfig(remote.architectureConfig);
       }
 
       set(updates);

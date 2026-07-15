@@ -98,7 +98,8 @@ export type SceneKey =
   | 'kpi'
   | 'scenario'
   | 'roadmap'
-  | 'decisions';
+  | 'decisions'
+  | 'portfolio';
 
 export interface Chapter {
   id: string;

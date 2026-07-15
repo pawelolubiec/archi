@@ -1,11 +1,11 @@
-# Milarex · Digital Architecture
+# Milarex · Digital Strategy
 
-Interactive 3D presentation showing the Milarex digital architecture as a journey:
+Interactive 3D presentation showing the Milarex digital strategy as a journey:
 cosmos → sales offices and customers → the factory in Poland → internal systems →
-hybrid architecture → KPIs → governance → decision simulation → 2026–2030 roadmap.
+hybrid architecture → KPIs → decision simulation → 2026–2030 roadmap.
 
 Board-level, dark mode, Milarex branding (navy / sea / gold / green).
-One continuous 3D scene + a 2D layer, driven by 11 chapters.
+One continuous 3D scene + a 2D layer, driven by 17 chapters.
 
 ## Stack
 
@@ -50,7 +50,7 @@ the whole scene is tied together with a subtle **bloom**.
 ```
 src/
   data/        the data model = the single source of truth
-    chapters.ts      11 chapters: camera, visible points, flows, scene, modal
+    chapters.ts      17 chapters: camera, visible points, flows, scene, modal
     locations.ts     factory + offices + customers (lat/lng)
     systems.ts       ERP/PTS/PID/MiFo/WMS/QMS/APS/Data/AI
     dataFlows.ts     customer → office → factory flows
@@ -68,7 +68,7 @@ src/
   ui/
     AppShell.tsx     composition + keyboard navigation + scene routing
     Overlay, SystemModal, ArchitectureLayers, KPIBoard,
-    GovernanceCard, ScenarioPanel, RoadmapTimeline, ...
+    ScenarioPanel, RoadmapTimeline, ...
 ```
 
 ## How to extend it
@@ -105,7 +105,7 @@ Regenerating continent dots: `npm run gen:land`.
   a material flow line and clickable system cards. Use **Configure** (cogs, top
   right on the factory slide) to map each system to one or more zones; mappings
   persist in **D1** (`factory_mapping` key).
-- Architecture slide (chapter 06): **process-led 4-tier layout** — 11 fixed business
+- Architecture slide: **process-led 4-tier layout** — 11 fixed business
   processes, AI orchestration, data platform, unified applications — color-linked by
   process number. Use **Configure** on the architecture slide to add layer elements
   and link them to processes; persists in **D1** (`architecture_config` key).

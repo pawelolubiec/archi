@@ -7,8 +7,10 @@ type Pace = 'standard' | 'accelerated';
 const AXIS_START = 2026;
 const AXIS_END = 2031;
 const YEARS = [2026, 2027, 2028, 2029, 2030];
-/** end-2028 boundary — where the accelerated scope lands */
-const ACCEL_LANDING = 2029.0;
+/** Today marker — Jul 2026 */
+const TODAY_MARKER = 2026.5;
+/** ERP go-live deadline — Dec 2028 */
+const ERP_LIVE_MARKER = 2028.9;
 
 const PACE: Record<Pace, { label: string; accent: string; gradient: string }> = {
   standard: {
@@ -135,13 +137,35 @@ export function RoadmapTimeline() {
             />
           ))}
 
+          {/* Today marker */}
+          <div
+            className="pointer-events-none absolute bottom-0 top-5"
+            style={{ left: `${pct(TODAY_MARKER)}%` }}
+          >
+            <div className="h-full w-px bg-sea/70" />
+            <span className="absolute -top-0.5 left-1.5 whitespace-nowrap font-mono text-[10px] uppercase tracking-[0.14em] text-sea">
+              Today · Jul 2026
+            </span>
+          </div>
+
+          {/* ERP go-live marker */}
+          <div
+            className="pointer-events-none absolute bottom-0 top-5"
+            style={{ left: `${pct(ERP_LIVE_MARKER)}%` }}
+          >
+            <div className="h-full w-px border-l border-dashed border-gold/80" />
+            <span className="absolute left-1.5 top-4 whitespace-nowrap font-mono text-[10px] uppercase tracking-[0.14em] text-gold">
+              ERP live · Dec 2028
+            </span>
+          </div>
+
           {/* accelerated landing marker */}
           <motion.div
             className="pointer-events-none absolute bottom-0 top-5"
             initial={false}
             animate={{ opacity: accelerated ? 1 : 0 }}
             transition={{ duration: 0.4 }}
-            style={{ left: `${pct(ACCEL_LANDING)}%` }}
+            style={{ left: `${pct(2029.0)}%` }}
           >
             <div className="h-full w-px border-l border-dashed border-gold/60" />
             <span className="absolute -top-0.5 left-1.5 whitespace-nowrap font-mono text-[10px] uppercase tracking-[0.14em] text-gold/90">

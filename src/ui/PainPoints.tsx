@@ -26,32 +26,36 @@ const PAINS: Pain[] = [
     cost: 'Lost margin on every production shift',
   },
   {
-    title: 'Point-to-point integrations',
+    title: 'Custom wiring between systems',
     detail:
-      'Systems are connected ad hoc; every change in one forces work in the others. Technical debt keeps growing.',
-    cost: 'Rising cost of every subsequent change · fragile operations',
+      'Every new link is built by hand between two apps. Change one system and several others need rework — there is no shared data layer in the middle.',
+    cost: 'Every change costs more than the last · operations stay fragile',
   },
   {
-    title: 'Compliance and cyber risk',
+    title: 'Inconsistent processes across the group',
     detail:
-      'NIS2 / KSC imposes obligations with hard deadlines: registry entry in October 2026, full implementation in April 2027.',
-    cost: 'Risk of sanctions and board liability · a condition for insurability',
+      'Each site and department runs its own way of working. The same decision — forecast, quality release, margin check — happens differently in Poland, Germany, and the sales offices.',
+    cost: 'Slower decisions · duplicated effort · no single way to scale best practice',
+  },
+  {
+    title: 'Margin visible too late',
+    detail:
+      'Sales quotes without live cost; production yield and OEE seen after the shift. Margin is reconstructed in spreadsheets at month-end — not when we can still change the outcome.',
+    cost: 'Lost margin every shift · quotes that look profitable but are not',
   },
 ];
 
 export function PainPoints() {
   return (
     <div className="pointer-events-auto w-full max-w-6xl">
-      <div className="grid grid-cols-6 gap-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {PAINS.map((p, i) => (
           <motion.div
             key={p.title}
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.08, duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-            className={`rounded-xl border border-white/10 bg-navy-900/60 p-3.5 backdrop-blur-sm ${
-              i < 3 ? 'col-span-2' : 'col-span-3'
-            }`}
+            className="rounded-xl border border-white/10 bg-navy-900/60 p-3.5 backdrop-blur-sm"
           >
             <div className="flex items-start gap-3">
               <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[#F87171]" />

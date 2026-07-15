@@ -29,9 +29,27 @@ export interface ArchitectureElement {
    * shared business processes"; an array (even empty) pins the exact set.
    */
   linkedElementIds?: string[];
+  /** Per-view explicit links — override linkedElementIds when set for that view. */
+  linkedElementIdsAsIs?: string[];
+  linkedElementIdsToBe?: string[];
   systemId?: string;
   /** to be done / in development / running — absent = derived from the system */
   status?: ElementStatus;
+}
+
+/** How a cross-layer link behaves in each architecture state. */
+export type ConnectionKind = 'retained' | 'manual' | 'removed' | 'new' | 'standard';
+
+export interface ArchitectureConnection {
+  fromId: string;
+  toId: string;
+  kind: ConnectionKind;
+}
+
+export interface ArchitectureConfig {
+  elements: ArchitectureElement[];
+  connectionsAsIs?: ArchitectureConnection[];
+  connectionsToBe?: ArchitectureConnection[];
 }
 
 /** Vertical position of each layer — used to decide flow direction. */
@@ -45,18 +63,36 @@ export const LAYER_RANK: Record<ArchLayerId, number> = { apps: 0, data: 1, ai: 2
 export function connectedElementIds(
   el: ArchitectureElement,
   all: ArchitectureElement[],
+  view: 'asis' | 'tobe' = 'tobe',
 ): Set<string> {
   const out = new Set<string>();
   const shares = (a: ArchitectureElement, b: ArchitectureElement) =>
     a.linkedProcessIds.some((p) => b.linkedProcessIds.includes(p));
 
+  const viewLinks =
+    view === 'asis' ? el.linkedElementIdsAsIs : el.linkedElementIdsToBe;
+
   all.forEach((o) => {
     if (o.id === el.id) return;
-    const elExplicit = Array.isArray(el.linkedElementIds);
-    const oExplicit = Array.isArray(o.linkedElementIds);
+    const elExplicit =
+      viewLinks !== undefined
+        ? true
+        : Array.isArray(el.linkedElementIds);
+    const oViewLinks =
+      view === 'asis' ? o.linkedElementIdsAsIs : o.linkedElementIdsToBe;
+    const oExplicit =
+      oViewLinks !== undefined ? true : Array.isArray(o.linkedElementIds);
+
+    const elList =
+      viewLinks ??
+      (Array.isArray(el.linkedElementIds) ? el.linkedElementIds : undefined);
+    const oList =
+      oViewLinks ??
+      (Array.isArray(o.linkedElementIds) ? o.linkedElementIds : undefined);
+
     if (
-      (elExplicit && el.linkedElementIds!.includes(o.id)) ||
-      (oExplicit && o.linkedElementIds!.includes(el.id))
+      (elExplicit && elList?.includes(o.id)) ||
+      (oExplicit && oList?.includes(el.id))
     ) {
       out.add(o.id);
       return;
@@ -68,8 +104,97 @@ export function connectedElementIds(
   return out;
 }
 
-export interface ArchitectureConfig {
-  elements: ArchitectureElement[];
+function connectionKey(fromId: string, toId: string): string {
+  return [fromId, toId].sort().join('|');
+}
+
+/** Build standard cross-layer links from shared business processes. */
+export function deriveStandardConnections(
+  elements: ArchitectureElement[],
+): ArchitectureConnection[] {
+  const seen = new Set<string>();
+  const out: ArchitectureConnection[] = [];
+  elements.forEach((el) => {
+    connectedElementIds(el, elements, 'tobe').forEach((otherId) => {
+      const key = connectionKey(el.id, otherId);
+      if (seen.has(key)) return;
+      seen.add(key);
+      out.push({ fromId: el.id, toId: otherId, kind: 'standard' });
+    });
+  });
+  return out;
+}
+
+/** As-is: fewer live links, manual handoffs, gaps where the platform is missing. */
+export function deriveAsIsConnections(
+  elements: ArchitectureElement[],
+): ArchitectureConnection[] {
+  const live = elements.filter((el) => elementStatus(el) === 'live');
+  const liveIds = new Set(live.map((el) => el.id));
+  const manualPairs: Array<[string, string]> = [
+    ['app_mifo', 'data_bi'],
+    ['app_pts', 'data_bi'],
+    ['app_pid', 'data_bi'],
+    ['app_erp', 'data_bi'],
+    ['app_scada', 'data_bi'],
+    ['app_helpdesk', 'data_bi'],
+  ];
+  const seen = new Set<string>();
+  const out: ArchitectureConnection[] = [];
+
+  manualPairs.forEach(([fromId, toId]) => {
+    if (!liveIds.has(fromId) || !liveIds.has(toId)) return;
+    const key = connectionKey(fromId, toId);
+    if (seen.has(key)) return;
+    seen.add(key);
+    out.push({ fromId, toId, kind: 'manual' });
+  });
+
+  live.forEach((el) => {
+    connectedElementIds(el, live, 'asis').forEach((otherId) => {
+      const key = connectionKey(el.id, otherId);
+      if (seen.has(key)) return;
+      seen.add(key);
+      const isManual = manualPairs.some(
+        ([a, b]) =>
+          (a === el.id && b === otherId) || (a === otherId && b === el.id),
+      );
+      out.push({
+        fromId: el.id,
+        toId: otherId,
+        kind: isManual ? 'manual' : 'retained',
+      });
+    });
+  });
+
+  return out;
+}
+
+export function connectionsForView(
+  config: ArchitectureConfig,
+  view: 'asis' | 'tobe',
+): ArchitectureConnection[] {
+  const stored =
+    view === 'asis' ? config.connectionsAsIs : config.connectionsToBe;
+  if (stored?.length) return stored;
+  return view === 'asis'
+    ? deriveAsIsConnections(config.elements)
+    : deriveStandardConnections(config.elements);
+}
+
+export function mergeArchitectureConfig(
+  remote: Partial<ArchitectureConfig> | null | undefined,
+): ArchitectureConfig {
+  const base = cloneDefaultArchitectureConfig();
+  if (!remote?.elements?.length) return base;
+  return {
+    elements: remote.elements.map((el) => ({
+      ...el,
+      linkedProcessIds: [...el.linkedProcessIds],
+    })),
+    connectionsAsIs: remote.connectionsAsIs ?? base.connectionsAsIs,
+    connectionsToBe: remote.connectionsToBe ?? base.connectionsToBe,
+  };
 }
 
 /**
@@ -144,14 +269,19 @@ export const DEFAULT_ARCHITECTURE_CONFIG: ArchitectureConfig = {
     ...el,
     linkedProcessIds: [...el.linkedProcessIds],
   })),
+  connectionsAsIs: undefined,
+  connectionsToBe: undefined,
 };
 
 export function cloneDefaultArchitectureConfig(): ArchitectureConfig {
+  const elements = DEFAULT_ARCHITECTURE_CONFIG.elements.map((el) => ({
+    ...el,
+    linkedProcessIds: [...el.linkedProcessIds],
+  }));
   return {
-    elements: DEFAULT_ARCHITECTURE_CONFIG.elements.map((el) => ({
-      ...el,
-      linkedProcessIds: [...el.linkedProcessIds],
-    })),
+    elements,
+    connectionsAsIs: deriveAsIsConnections(elements),
+    connectionsToBe: deriveStandardConnections(elements),
   };
 }
 
@@ -176,6 +306,32 @@ export function primaryProcessColor(linkedProcessIds: string[]): string {
   return getProcessColor(sorted[0]);
 }
 
+export const CONNECTION_KIND_META: Record<
+  ConnectionKind,
+  { label: string; color: string; dash?: string }
+> = {
+  retained: { label: 'Retained', color: '#9DB4CC', dash: '4 4' },
+  manual: { label: 'Manual / spreadsheet', color: '#F87171', dash: '2 6' },
+  removed: { label: 'Removed', color: '#64748B', dash: '1 8' },
+  new: { label: 'New link', color: '#34D399', dash: '6 4' },
+  standard: { label: 'Standardized', color: '#D6BF91', dash: '6 6' },
+};
+
+export const ARCH_VIEW_COPY: Record<
+  'asis' | 'tobe',
+  { headline: string; detail: string }
+> = {
+  asis: {
+    headline: 'As is — fragmented today',
+    detail:
+      'Live systems connect through manual exports and custom wiring. BI sits beside operations — not underneath them.',
+  },
+  tobe: {
+    headline: 'To be — one data layer',
+    detail:
+      'Applications feed a shared platform; AI orchestration reaches every process through standardized links — not point-to-point patches.',
+  },
+};
 export const ARCH_LAYER_LABELS: Record<ArchLayerId, string> = {
   ai: 'Decision, Automation & AI Orchestration',
   data: 'Data Platform',

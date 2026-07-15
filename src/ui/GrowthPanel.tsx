@@ -64,6 +64,29 @@ const DIVEST_STAGES: Stage[] = [
   },
 ];
 
+const HYBRID_BENEFITS = [
+  {
+    title: 'No forced ERP migration',
+    detail: 'Acquired offices keep local statutory ERP; the group gets a consolidation feed only.',
+  },
+  {
+    title: 'Three contracts, not fifty integrations',
+    detail: 'Commercial (MiFo), data (lakehouse), finance — not point-to-point per app.',
+  },
+  {
+    title: 'Clean exit on divestment',
+    detail: 'Unplug connectors; no carve-out project and no unused licenses left behind.',
+  },
+  {
+    title: 'Speed to quote',
+    detail: 'AI-assisted schema mapping gets a new office quoting through MiFo in ~30 days.',
+  },
+  {
+    title: 'Financial core stays small',
+    detail: 'ERP remains the ledger; operations stay in PTS, PID, and WMS where work happens.',
+  },
+];
+
 const CONTRACTS = [
   { label: 'Commercial → MiFo', desc: 'quotes, orders, forecast', accent: GREEN },
   { label: 'Data → Lakehouse', desc: 'one canonical connector', accent: SEA },
@@ -89,7 +112,27 @@ export function GrowthPanel() {
   }, [demo, stages.length, setDemo]);
 
   return (
-    <div className="pointer-events-auto w-[400px]">
+    <div className="pointer-events-auto flex w-[min(52rem,92vw)] flex-col gap-3 lg:flex-row lg:items-start">
+      <div className="w-full shrink-0 rounded-2xl border border-white/10 bg-navy-900/80 p-4 shadow-panel backdrop-blur-md lg:w-[17rem]">
+        <div className="text-xs font-semibold uppercase tracking-[0.16em] text-sea">
+          Hybrid architecture — why it works
+        </div>
+        <ul className="mt-3 space-y-2.5">
+          {HYBRID_BENEFITS.map((b, i) => (
+            <motion.li
+              key={b.title}
+              initial={{ opacity: 0, x: -8 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: i * 0.05, duration: 0.35 }}
+            >
+              <div className="text-sm font-medium text-paper">{b.title}</div>
+              <div className="mt-0.5 text-xs leading-relaxed text-mist/80">{b.detail}</div>
+            </motion.li>
+          ))}
+        </ul>
+      </div>
+
+      <div className="w-[400px] max-w-full">
       <AnimatePresence mode="wait">
         {!demo ? (
           <motion.div
@@ -222,6 +265,7 @@ export function GrowthPanel() {
           </motion.div>
         )}
       </AnimatePresence>
+      </div>
     </div>
   );
 }

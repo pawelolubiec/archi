@@ -60,7 +60,7 @@ export const chapters: Chapter[] = [
     index: 2,
     scene: 'architecture',
     eyebrow: 'Architecture',
-    title: 'Hybrid architecture',
+    title: 'Architecture',
     description:
       'Process-led architecture: 11 business processes on top, AI orchestration, data platform, and all applications — switch between “as is” and “to be” to see the strategy tick itself off through 2030.',
     businessMessage:
@@ -83,8 +83,25 @@ export const chapters: Chapter[] = [
     kpiPanel: false,
   },
   {
-    id: 'germany',
+    id: 'initiative-portfolio',
     index: 3,
+    scene: 'portfolio',
+    eyebrow: 'Portfolio',
+    title: 'Investment portfolio',
+    description:
+      'Each initiative has a business owner, a KPI link, and a board decision point. Foundations and ERP selection unlock everything else.',
+    businessMessage:
+      'One portfolio, sequenced for margin — not a single ERP big bang.',
+    cameraPosition: [0, 1, 9.5],
+    cameraTarget: [0, 0, 0],
+    visibleLocations: [],
+    activeFlows: [],
+    activeSystems: [],
+    kpiPanel: false,
+  },
+  {
+    id: 'germany',
+    index: 4,
     scene: 'globe',
     eyebrow: 'Sales',
     title: 'Selling with the margin in view',
@@ -119,7 +136,7 @@ export const chapters: Chapter[] = [
   },
   {
     id: 'germany-factory',
-    index: 4,
+    index: 5,
     scene: 'globe',
     eyebrow: 'Integration',
     title: 'One order, same-day to the factory',
@@ -159,7 +176,7 @@ export const chapters: Chapter[] = [
   },
   {
     id: 'pts-yield',
-    index: 5,
+    index: 6,
     scene: 'globe',
     eyebrow: 'Production',
     title: 'Producing with the yield in view',
@@ -179,7 +196,7 @@ export const chapters: Chapter[] = [
   },
   {
     id: 'pid-spec',
-    index: 6,
+    index: 7,
     scene: 'globe',
     eyebrow: 'Product data',
     title: 'One specification, every line',
@@ -199,7 +216,7 @@ export const chapters: Chapter[] = [
   },
   {
     id: 'erp-core',
-    index: 7,
+    index: 8,
     scene: 'globe',
     eyebrow: 'Financial core',
     title: 'A financial core that stays small',
@@ -227,7 +244,7 @@ export const chapters: Chapter[] = [
   },
   {
     id: 'ai-automation',
-    index: 8,
+    index: 9,
     scene: 'globe',
     eyebrow: 'AI & automation',
     title: 'AI on top of everything',
@@ -262,7 +279,7 @@ export const chapters: Chapter[] = [
   },
   {
     id: 'poland',
-    index: 9,
+    index: 10,
     scene: 'factory',
     eyebrow: 'Operations',
     title: "The factory's internal systems",
@@ -278,8 +295,25 @@ export const chapters: Chapter[] = [
     kpiPanel: false,
   },
   {
+    id: 'factory-order',
+    index: 11,
+    scene: 'factory',
+    eyebrow: 'Operations',
+    title: 'Building order in the organisation',
+    description:
+      'The same hall, two states: fragmented handoffs today versus a continuous chain from order to output when the hybrid architecture is in place.',
+    businessMessage:
+      'Order in operations means linked systems — not one monolith for everything.',
+    cameraPosition: [7.0, 10.5, 8.5],
+    cameraTarget: [0, 0.5, 0],
+    visibleLocations: ['factory_poland'],
+    activeFlows: [],
+    activeSystems: ['workday_erp', 'pts', 'pid', 'mifo', 'wms', 'qms_lims'],
+    kpiPanel: false,
+  },
+  {
     id: 'growth',
-    index: 10,
+    index: 12,
     scene: 'globe',
     eyebrow: 'Growth',
     title: 'Grow in any country',
@@ -313,7 +347,7 @@ export const chapters: Chapter[] = [
   },
   {
     id: 'business-impact',
-    index: 11,
+    index: 13,
     scene: 'kpi',
     eyebrow: 'Impact',
     title: 'Business impact',
@@ -329,25 +363,8 @@ export const chapters: Chapter[] = [
     kpiPanel: true,
   },
   {
-    id: 'governance',
-    index: 12,
-    scene: 'scenario',
-    eyebrow: 'Governance',
-    title: 'One accountability model',
-    description:
-      'One methodology for evaluating initiatives, one portfolio, one KPI owner, one business case, one stage-gate, one board dashboard.',
-    businessMessage:
-      'Every initiative is evaluated the same way — cost, ROI, KPI, risk, board decision.',
-    cameraPosition: [0, 1, 9.5],
-    cameraTarget: [0, 0, 0],
-    visibleLocations: [],
-    activeFlows: [],
-    activeSystems: [],
-    kpiPanel: false,
-  },
-  {
     id: 'simulation',
-    index: 13,
+    index: 14,
     scene: 'scenario',
     eyebrow: 'Simulation',
     title: 'Decision simulation',
@@ -364,7 +381,7 @@ export const chapters: Chapter[] = [
   },
   {
     id: 'roadmap',
-    index: 14,
+    index: 15,
     scene: 'roadmap',
     eyebrow: 'Roadmap',
     title: 'Roadmap 2026–2030',
@@ -381,7 +398,7 @@ export const chapters: Chapter[] = [
   },
   {
     id: 'decisions',
-    index: 15,
+    index: 16,
     scene: 'decisions',
     eyebrow: 'Decisions',
     title: 'What we need from the board',

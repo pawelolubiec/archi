@@ -6,20 +6,25 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useStore } from '../store/useStore';
 import {
   ARCH_LAYER_LABELS,
+  ARCH_VIEW_COPY,
   BUSINESS_PROCESSES,
+  CONNECTION_KIND_META,
   ELEMENT_STATUS_META,
   LAYER_RANK,
   connectedElementIds,
+  connectionsForView,
   elementStatus,
   formatProcessBadges,
   getProcessColor,
   primaryProcessColor,
   type ArchLayerId,
+  type ArchitectureConnection,
   type ArchitectureElement,
+  type ConnectionKind,
 } from '../data/architectureLayout';
 
 type ArchView = 'asis' | 'tobe';
@@ -29,7 +34,6 @@ const VIEW_META: Record<ArchView, { label: string; accent: string }> = {
   tobe: { label: 'To be', accent: '#D6BF91' },
 };
 
-/** How data travels up the stack — shown at the right of each layer header. */
 const LAYER_FLOW_HINTS: Record<ArchLayerId, string> = {
   ai: 'decisions & automation support every app ↓',
   data: '↑ features, KPIs & signals feed decisions',
@@ -43,6 +47,60 @@ interface FlowLine {
   x2: number;
   y2: number;
   color: string;
+  dash: string;
+  kind: ConnectionKind;
+}
+
+function ArchViewSwitch({
+  view,
+  onChange,
+}: {
+  view: ArchView;
+  onChange: (v: ArchView) => void;
+}) {
+  return (
+    <div className="flex flex-col items-center gap-2">
+      <div className="pointer-events-auto flex gap-2 rounded-full border border-white/10 bg-navy-900/80 p-1.5 shadow-panel backdrop-blur-md">
+        {(Object.keys(VIEW_META) as ArchView[]).map((v) => {
+          const selected = view === v;
+          const meta = VIEW_META[v];
+          return (
+            <button
+              key={v}
+              type="button"
+              onClick={() => onChange(v)}
+              className="rounded-full px-6 py-2.5 text-sm font-semibold uppercase tracking-[0.12em] transition"
+              style={{
+                borderColor: selected ? `${meta.accent}cc` : 'transparent',
+                background: selected ? `${meta.accent}18` : 'transparent',
+                color: selected ? meta.accent : '#9DB4CC',
+                boxShadow: selected
+                  ? `0 0 0 1px ${meta.accent}44, 0 0 24px -6px ${meta.accent}88`
+                  : undefined,
+              }}
+            >
+              {meta.label}
+            </button>
+          );
+        })}
+      </div>
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={view}
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -4 }}
+          transition={{ duration: 0.25 }}
+          className="max-w-2xl text-center"
+        >
+          <p className="text-sm font-medium text-paper">{ARCH_VIEW_COPY[view].headline}</p>
+          <p className="mt-1 text-xs leading-relaxed text-mist/85">
+            {ARCH_VIEW_COPY[view].detail}
+          </p>
+        </motion.div>
+      </AnimatePresence>
+    </div>
+  );
 }
 
 function ProcessChevron({
@@ -105,12 +163,10 @@ function ProcessStrip({
   highlightedProcessIds,
   onHoverProcess,
   registerNode,
-  headerRight,
 }: {
   highlightedProcessIds: Set<string>;
   onHoverProcess: (id: string) => void;
   registerNode: (key: string) => (node: HTMLElement | null) => void;
-  headerRight?: ReactNode;
 }) {
   const isFiltering = highlightedProcessIds.size > 0;
 
@@ -120,7 +176,6 @@ function ProcessStrip({
         <span className="text-slide-caption font-semibold uppercase tracking-[0.18em] text-mist">
           Business Process Layer
         </span>
-        {headerRight}
       </div>
       <div className="grid grid-cols-11 gap-0.5">
         {BUSINESS_PROCESSES.map((proc, i) => {
@@ -161,9 +216,7 @@ function ElementChip({
   compact?: boolean;
   highlighted: boolean;
   dimmed: boolean;
-  /** as-is view: not running yet — faint outline only */
   ghosted?: boolean;
-  /** to-be view: show the delivery-status dot */
   showStatus?: boolean;
   onHover: () => void;
   nodeRef: (node: HTMLElement | null) => void;
@@ -331,12 +384,42 @@ function LayerSection({
   );
 }
 
+function ConnectionLegend({ kinds }: { kinds: ConnectionKind[] }) {
+  const unique = [...new Set(kinds)];
+  if (!unique.length) return null;
+  return (
+    <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
+      {unique.map((kind) => {
+        const meta = CONNECTION_KIND_META[kind];
+        return (
+          <span key={kind} className="inline-flex items-center gap-1.5 text-[11px] text-mist/80">
+            <svg width="20" height="6" aria-hidden>
+              <line
+                x1="0"
+                y1="3"
+                x2="20"
+                y2="3"
+                stroke={meta.color}
+                strokeWidth="2"
+                strokeDasharray={meta.dash}
+              />
+            </svg>
+            {meta.label}
+          </span>
+        );
+      })}
+    </div>
+  );
+}
+
 export function ArchitectureLayers() {
-  const elements = useStore((s) => s.architectureConfig.elements);
+  const architectureConfig = useStore((s) => s.architectureConfig);
+  const elements = architectureConfig.elements;
   const [view, setView] = useState<ArchView>('asis');
   const [hoveredProcessId, setHoveredProcessId] = useState<string | null>(null);
   const [hoveredElementId, setHoveredElementId] = useState<string | null>(null);
   const [flowLines, setFlowLines] = useState<FlowLine[]>([]);
+  const [persistentLines, setPersistentLines] = useState<FlowLine[]>([]);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const nodeMap = useRef(new Map<string, HTMLElement>());
@@ -350,7 +433,6 @@ export function ArchitectureLayers() {
     [elements],
   );
 
-  /** In the as-is view only running elements participate in hover/connections. */
   const visibleElements = useMemo(
     () =>
       view === 'asis'
@@ -358,6 +440,32 @@ export function ArchitectureLayers() {
         : elements,
     [elements, view],
   );
+
+  const viewConnections = useMemo(
+    () => connectionsForView(architectureConfig, view),
+    [architectureConfig, view],
+  );
+
+  const otherViewConnections = useMemo(
+    () => connectionsForView(architectureConfig, view === 'asis' ? 'tobe' : 'asis'),
+    [architectureConfig, view],
+  );
+
+  const diffKinds = useMemo(() => {
+    const currentKeys = new Set(
+      viewConnections.map((c) => [c.fromId, c.toId].sort().join('|')),
+    );
+    const otherKeys = new Set(
+      otherViewConnections.map((c) => [c.fromId, c.toId].sort().join('|')),
+    );
+    const upgraded = viewConnections.filter(
+      (c) => !otherKeys.has([c.fromId, c.toId].sort().join('|')),
+    );
+    const downgraded = otherViewConnections.filter(
+      (c) => !currentKeys.has([c.fromId, c.toId].sort().join('|')),
+    );
+    return { upgraded, downgraded };
+  }, [viewConnections, otherViewConnections]);
 
   const { highlightedProcessIds, highlightedElementIds } = useMemo(() => {
     if (hoveredProcessId) {
@@ -378,7 +486,10 @@ export function ArchitectureLayers() {
           highlightedElementIds: new Set<string>(),
         };
       }
-      const ids = new Set([el.id, ...connectedElementIds(el, visibleElements)]);
+      const ids = new Set([
+        el.id,
+        ...connectedElementIds(el, visibleElements, view),
+      ]);
       return {
         highlightedProcessIds: new Set(el.linkedProcessIds),
         highlightedElementIds: ids,
@@ -389,10 +500,8 @@ export function ArchitectureLayers() {
       highlightedProcessIds: new Set<string>(),
       highlightedElementIds: new Set<string>(),
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hoveredProcessId, hoveredElementId, visibleElements, elementById]);
+  }, [hoveredProcessId, hoveredElementId, visibleElements, elementById, view]);
 
-  /** Line factory measuring chip positions relative to the container. */
   const makeMeasurer = useCallback(() => {
     const container = containerRef.current;
     if (!container) return null;
@@ -407,16 +516,48 @@ export function ArchitectureLayers() {
         cx: r.left - cRect.left + r.width / 2,
       };
     };
-    // from a lower node's top edge up to an upper node's bottom edge
-    return (fromKey: string, toKey: string, color: string): FlowLine | null => {
+    return (
+      fromKey: string,
+      toKey: string,
+      color: string,
+      dash: string,
+      kind: ConnectionKind,
+    ): FlowLine | null => {
       const a = rectOf(fromKey);
       const b = rectOf(toKey);
       if (!a || !b) return null;
-      return { key: `${fromKey}->${toKey}`, x1: a.cx, y1: a.top, x2: b.cx, y2: b.bottom, color };
+      const fromLower = LAYER_RANK[elementById[fromKey]?.layer ?? 'apps'];
+      const toLower = LAYER_RANK[elementById[toKey]?.layer ?? 'apps'];
+      const upward = fromLower > toLower;
+      return {
+        key: `${fromKey}->${toKey}`,
+        x1: a.cx,
+        y1: upward ? a.top : a.bottom,
+        x2: b.cx,
+        y2: upward ? b.bottom : b.top,
+        color,
+        dash,
+        kind,
+      };
     };
-  }, []);
+  }, [elementById]);
 
-  // Measure chip positions and build the flow connectors around the hovered node.
+  useLayoutEffect(() => {
+    const mk = makeMeasurer();
+    if (!mk) {
+      setPersistentLines([]);
+      return;
+    }
+
+    const lines: FlowLine[] = [];
+    viewConnections.forEach((conn) => {
+      const meta = CONNECTION_KIND_META[conn.kind];
+      const line = mk(conn.fromId, conn.toId, meta.color, meta.dash ?? '4 4', conn.kind);
+      if (line) lines.push(line);
+    });
+    setPersistentLines(lines);
+  }, [viewConnections, view, elements, makeMeasurer]);
+
   useLayoutEffect(() => {
     const mk = makeMeasurer();
     if (!mk) {
@@ -432,45 +573,41 @@ export function ArchitectureLayers() {
     const el = hoveredElementId ? elementById[hoveredElementId] : null;
     if (el) {
       const color = primaryProcessColor(el.linkedProcessIds);
-      const coveredPids = new Set<string>();
-      connectedElementIds(el, visibleElements).forEach((id) => {
+      connectedElementIds(el, visibleElements, view).forEach((id) => {
         const other = elementById[id];
         if (!other) return;
         const diff = LAYER_RANK[other.layer] - LAYER_RANK[el.layer];
-        if (diff > 0) add(mk(el.id, other.id, color));
-        else if (diff < 0) add(mk(other.id, el.id, color));
-        // complete the chain: connected AI elements reach the process strip
+        if (diff > 0) add(mk(el.id, other.id, color, '6 6', 'standard'));
+        else if (diff < 0) add(mk(other.id, el.id, color, '6 6', 'standard'));
         if (other.layer === 'ai') {
           other.linkedProcessIds
             .filter((pid) => el.linkedProcessIds.includes(pid))
             .forEach((pid) => {
-              add(mk(other.id, `proc:${pid}`, getProcessColor(pid)));
-              coveredPids.add(pid);
+              add(mk(other.id, `proc:${pid}`, getProcessColor(pid), '6 6', 'standard'));
             });
         }
       });
       if (el.layer === 'ai') {
         el.linkedProcessIds.forEach((pid) =>
-          add(mk(el.id, `proc:${pid}`, getProcessColor(pid))),
+          add(mk(el.id, `proc:${pid}`, getProcessColor(pid), '6 6', 'standard')),
         );
-      } else {
-        // processes no AI chain reaches still connect straight from the element
-        el.linkedProcessIds
-          .filter((pid) => !coveredPids.has(pid))
-          .forEach((pid) =>
-            add(mk(el.id, `proc:${pid}`, getProcessColor(pid))),
-          );
       }
     } else if (hoveredProcessId) {
       const color = getProcessColor(hoveredProcessId);
       visibleElements
         .filter((o) => o.linkedProcessIds.includes(hoveredProcessId))
-        .forEach((o) => add(mk(o.id, `proc:${hoveredProcessId}`, color)));
+        .forEach((o) => add(mk(o.id, `proc:${hoveredProcessId}`, color, '6 6', 'standard')));
     }
 
     setFlowLines([...lines.values()]);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hoveredElementId, hoveredProcessId, visibleElements, elementById, makeMeasurer]);
+  }, [
+    hoveredElementId,
+    hoveredProcessId,
+    visibleElements,
+    elementById,
+    makeMeasurer,
+    view,
+  ]);
 
   const hoverProcess = (id: string) => {
     setHoveredProcessId(id);
@@ -482,10 +619,28 @@ export function ArchitectureLayers() {
     setHoveredProcessId(null);
   };
 
-  const byLayer = (layer: ArchLayerId) =>
-    elements.filter((el) => el.layer === layer);
+  const byLayer = (layer: ArchLayerId) => elements.filter((el) => el.layer === layer);
 
   const isHovering = hoveredProcessId !== null || hoveredElementId !== null;
+  const legendKinds = viewConnections.map((c) => c.kind);
+
+  const renderLines = (lines: FlowLine[], opacity: number, animate: boolean) =>
+    lines.map((l) => {
+      const midY = (l.y1 + l.y2) / 2;
+      return (
+        <g key={l.key} opacity={opacity}>
+          <path
+            d={`M ${l.x1} ${l.y1} C ${l.x1} ${midY}, ${l.x2} ${midY}, ${l.x2} ${l.y2}`}
+            fill="none"
+            stroke={l.color}
+            strokeWidth={1.5}
+            strokeDasharray={l.dash}
+            style={animate ? { animation: 'arch-flow 0.7s linear infinite' } : undefined}
+          />
+          <circle cx={l.x2} cy={l.y2} r={2} fill={l.color} opacity={0.85} />
+        </g>
+      );
+    });
 
   return (
     <div
@@ -496,36 +651,14 @@ export function ArchitectureLayers() {
         setHoveredElementId(null);
       }}
     >
+      <div className="shrink-0 py-1">
+        <ArchViewSwitch view={view} onChange={setView} />
+      </div>
+
       <ProcessStrip
         highlightedProcessIds={highlightedProcessIds}
         onHoverProcess={hoverProcess}
         registerNode={registerNode}
-        headerRight={
-          <div className="pointer-events-auto flex gap-1.5">
-            {(Object.keys(VIEW_META) as ArchView[]).map((v) => {
-              const selected = view === v;
-              const meta = VIEW_META[v];
-              return (
-                <button
-                  key={v}
-                  type="button"
-                  onClick={() => setView(v)}
-                  className="rounded-full border px-3.5 py-1 text-xs font-medium uppercase tracking-[0.08em] transition"
-                  style={{
-                    borderColor: selected ? `${meta.accent}cc` : 'rgba(255,255,255,0.12)',
-                    background: selected ? `${meta.accent}14` : 'transparent',
-                    color: selected ? meta.accent : '#9DB4CC',
-                    boxShadow: selected
-                      ? `0 0 0 1px ${meta.accent}40, 0 0 16px -4px ${meta.accent}80`
-                      : undefined,
-                  }}
-                >
-                  {meta.label}
-                </button>
-              );
-            })}
-          </div>
-        }
       />
 
       <div className="flex min-h-0 flex-1 flex-col gap-2">
@@ -560,55 +693,59 @@ export function ArchitectureLayers() {
         />
       </div>
 
-      {/* flow connectors around the hovered node */}
-      {flowLines.length > 0 && (
-        <svg className="pointer-events-none absolute inset-0 z-20 h-full w-full overflow-visible">
-          {flowLines.map((l) => {
-            const midY = (l.y1 + l.y2) / 2;
-            return (
-              <g key={l.key}>
-                <path
-                  d={`M ${l.x1} ${l.y1} C ${l.x1} ${midY}, ${l.x2} ${midY}, ${l.x2} ${l.y2}`}
-                  fill="none"
-                  stroke={l.color}
-                  strokeWidth={1.5}
-                  strokeDasharray="6 6"
-                  opacity={0.75}
-                  style={{ animation: 'arch-flow 0.7s linear infinite' }}
-                />
-                <circle cx={l.x2} cy={l.y2} r={2.5} fill={l.color} opacity={0.9} />
-              </g>
-            );
-          })}
+      {!isHovering && persistentLines.length > 0 && (
+        <svg className="pointer-events-none absolute inset-0 z-10 h-full w-full overflow-visible">
+          <AnimatePresence>
+            {renderLines(persistentLines, 0.42, false)}
+          </AnimatePresence>
         </svg>
       )}
 
-      <p className="shrink-0 text-center text-xs text-mist/80">
-        {isHovering ? (
-          'Dashed lines show the connections — operational data travels up, decision support flows down.'
-        ) : view === 'tobe' ? (
-          <>
-            {(['live', 'in_dev', 'todo'] as const).map((s, i) => (
-              <span key={s} className="whitespace-nowrap">
-                {i > 0 && <span className="mx-2 text-mist/40">·</span>}
-                <span
-                  className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full align-middle"
-                  style={
-                    s === 'todo'
-                      ? { border: `1px solid ${ELEMENT_STATUS_META[s].color}` }
-                      : { background: ELEMENT_STATUS_META[s].color }
-                  }
-                />
-                {ELEMENT_STATUS_META[s].label}
-              </span>
-            ))}
-            <span className="mx-2 text-mist/40">—</span>
-            the target architecture, ticked off as the strategy delivers.
-          </>
-        ) : (
-          'As is — what runs today. Switch to “To be” for the 2030 target architecture.'
-        )}
-      </p>
+      {flowLines.length > 0 && (
+        <svg className="pointer-events-none absolute inset-0 z-20 h-full w-full overflow-visible">
+          {renderLines(flowLines, 0.85, true)}
+        </svg>
+      )}
+
+      <div className="shrink-0 space-y-1.5 pt-1">
+        <ConnectionLegend kinds={legendKinds} />
+        <p className="text-center text-xs text-mist/80">
+          {isHovering ? (
+            'Dashed lines show the connections — operational data travels up, decision support flows down.'
+          ) : view === 'tobe' ? (
+            <>
+              {(['live', 'in_dev', 'todo'] as const).map((s, i) => (
+                <span key={s} className="whitespace-nowrap">
+                  {i > 0 && <span className="mx-2 text-mist/40">·</span>}
+                  <span
+                    className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full align-middle"
+                    style={
+                      s === 'todo'
+                        ? { border: `1px solid ${ELEMENT_STATUS_META[s].color}` }
+                        : { background: ELEMENT_STATUS_META[s].color }
+                    }
+                  />
+                  {ELEMENT_STATUS_META[s].label}
+                </span>
+              ))}
+              {diffKinds.upgraded.length > 0 && (
+                <span className="mt-1 block text-mist/70">
+                  {diffKinds.upgraded.length} new or standardized links vs as-is
+                </span>
+              )}
+            </>
+          ) : (
+            <>
+              Only running systems are shown.{' '}
+              {diffKinds.downgraded.length > 0 && (
+                <span className="text-mist/70">
+                  {diffKinds.downgraded.length} links upgrade when you switch to To be.
+                </span>
+              )}
+            </>
+          )}
+        </p>
+      </div>
     </div>
   );
 }

@@ -24,7 +24,7 @@ const DECISIONS: Decision[] = [
     scope:
       'Authorization of an RFP for the financial core (candidates: Workday / IFS), with scope limited to finance — without moving operations into the ERP.',
     consequence:
-      'RFP in Q3 2026, selection decision in Q1 2027, implementation in 2027. Scope protected against "creep" by governance.',
+      'RFP in Q3 2026, selection decision in Q1 2027, implementation 2027–2028, go-live end-2028. Scope protected against scope creep.',
     deadline: 'RFP start: Q3 2026',
   },
   {

@@ -6,7 +6,7 @@ export const scenarios: Scenario[] = [
     name: 'ERP implementation (financial core)',
     summary:
       'Replacing the financial core. Stabilizing the ledger, closings, and inventory valuation — without moving operations into the ERP.',
-    horizon: '2026–2027',
+    horizon: '2026–2028',
     capexK: 1800,
     opexAnnualK: 350,
     ebitdaAnnualK: 400,
@@ -139,7 +139,7 @@ export const ROADMAP_TRACKS: RoadmapTrack[] = [
   {
     theme: 'Foundations',
     items: ['Data foundations', 'Integrations', 'ERP scope & selection'],
-    standard: { start: 2026.0, end: 2027.0 },
+    standard: { start: 2026.0, end: 2028.0 },
     accelerated: { start: 2026.0, end: 2026.7 },
   },
   {

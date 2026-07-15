@@ -5,8 +5,10 @@ import { systems } from '../data/systems';
 import {
   ARCH_LAYER_LABELS,
   BUSINESS_PROCESSES,
+  CONNECTION_KIND_META,
   ELEMENT_STATUS_META,
   connectedElementIds,
+  connectionsForView,
   elementStatus,
   type ArchLayerId,
   type ArchitectureElement,
@@ -21,13 +23,15 @@ const LAYER_ORDER: ArchLayerId[] = ['ai', 'data', 'apps'];
 function ConnectionsEditor({
   element,
   allElements,
+  configView,
   onToggleConnection,
 }: {
   element: ArchitectureElement;
   allElements: ArchitectureElement[];
+  configView: 'asis' | 'tobe';
   onToggleConnection: (otherId: string) => void;
 }) {
-  const connected = connectedElementIds(element, allElements);
+  const connected = connectedElementIds(element, allElements, configView);
 
   return (
     <div className="mt-2 space-y-1.5 border-t border-white/5 pt-2">
@@ -60,10 +64,12 @@ function ConnectionsEditor({
             })}
         </div>
       ))}
-      {element.linkedElementIds === undefined && (
+      {(element.linkedElementIds === undefined &&
+        element.linkedElementIdsAsIs === undefined &&
+        element.linkedElementIdsToBe === undefined) && (
         <p className="text-[10px] text-mist/50">
-          Currently derived from shared processes — toggling any connection pins
-          the list for this element.
+          Currently derived from shared processes for {configView} — toggling pins
+          the list for this element in that view.
         </p>
       )}
     </div>
@@ -73,6 +79,7 @@ function ConnectionsEditor({
 function ElementRow({
   element,
   allElements,
+  configView,
   onLabelChange,
   onToggleProcess,
   onSystemChange,
@@ -82,6 +89,7 @@ function ElementRow({
 }: {
   element: ArchitectureElement;
   allElements: ArchitectureElement[];
+  configView: 'asis' | 'tobe';
   onLabelChange: (label: string) => void;
   onToggleProcess: (processId: string) => void;
   onSystemChange: (systemId: string | undefined) => void;
@@ -90,7 +98,7 @@ function ElementRow({
   onDelete: () => void;
 }) {
   const [showConnections, setShowConnections] = useState(false);
-  const connectionCount = connectedElementIds(element, allElements).size;
+  const connectionCount = connectedElementIds(element, allElements, configView).size;
   const status = elementStatus(element);
 
   return (
@@ -181,6 +189,7 @@ function ElementRow({
         <ConnectionsEditor
           element={element}
           allElements={allElements}
+          configView={configView}
           onToggleConnection={onToggleConnection}
         />
       )}
@@ -192,6 +201,7 @@ function LayerSection({
   layerId,
   elements,
   allElements,
+  configView,
   onAdd,
   onUpdate,
   onDelete,
@@ -201,6 +211,7 @@ function LayerSection({
   layerId: ArchLayerId;
   elements: ArchitectureElement[];
   allElements: ArchitectureElement[];
+  configView: 'asis' | 'tobe';
   onAdd: () => void;
   onUpdate: (id: string, patch: Partial<ArchitectureElement>) => void;
   onDelete: (id: string) => void;
@@ -227,6 +238,7 @@ function LayerSection({
             key={el.id}
             element={el}
             allElements={allElements}
+            configView={configView}
             onLabelChange={(label) => onUpdate(el.id, { label })}
             onSystemChange={(systemId) => onUpdate(el.id, { systemId })}
             onStatusChange={(status) => onUpdate(el.id, { status })}
@@ -251,9 +263,11 @@ export function ArchitectureConfigModal() {
   const updateArchitectureElement = useStore((s) => s.updateArchitectureElement);
   const removeArchitectureElement = useStore((s) => s.removeArchitectureElement);
   const setElementProcessLinks = useStore((s) => s.setElementProcessLinks);
+  const toggleArchitectureConnection = useStore((s) => s.toggleArchitectureConnection);
   const resetArchitectureConfig = useStore((s) => s.resetArchitectureConfig);
   const architectureSaveStatus = useStore((s) => s.architectureSaveStatus);
   const architectureSaveError = useStore((s) => s.architectureSaveError);
+  const [configView, setConfigView] = useState<'asis' | 'tobe'>('tobe');
 
   const toggleProcess = (elementId: string, processId: string) => {
     const el = config.elements.find((e) => e.id === elementId);
@@ -265,29 +279,10 @@ export function ArchitectureConfigModal() {
   };
 
   const toggleConnection = (elementId: string, otherId: string) => {
-    const el = config.elements.find((e) => e.id === elementId);
-    const other = config.elements.find((e) => e.id === otherId);
-    if (!el || !other) return;
-    const effective = connectedElementIds(el, config.elements);
-    if (effective.has(otherId)) {
-      updateArchitectureElement(elementId, {
-        linkedElementIds: [...effective].filter((id) => id !== otherId),
-      });
-      // also strip a reciprocal explicit link so the connection really goes away
-      if (
-        Array.isArray(other.linkedElementIds) &&
-        other.linkedElementIds.includes(elementId)
-      ) {
-        updateArchitectureElement(otherId, {
-          linkedElementIds: other.linkedElementIds.filter((id) => id !== elementId),
-        });
-      }
-    } else {
-      updateArchitectureElement(elementId, {
-        linkedElementIds: [...effective, otherId],
-      });
-    }
+    toggleArchitectureConnection(configView, elementId, otherId);
   };
+
+  const viewConnections = connectionsForView(config, configView);
 
   return (
     <AnimatePresence>
@@ -343,6 +338,37 @@ export function ArchitectureConfigModal() {
             </header>
 
             <div className="flex-1 overflow-y-auto px-6 py-4">
+              <div className="mb-5 flex items-center justify-between gap-4">
+                <span className="text-sm font-medium text-mist">
+                  Edit connections for
+                </span>
+                <div className="flex gap-2">
+                  {(['asis', 'tobe'] as const).map((v) => (
+                    <button
+                      key={v}
+                      type="button"
+                      onClick={() => setConfigView(v)}
+                      className="rounded-full border px-3 py-1 text-xs font-medium uppercase tracking-[0.08em] transition"
+                      style={{
+                        borderColor:
+                          configView === v ? '#2EC5C5aa' : 'rgba(255,255,255,0.12)',
+                        background:
+                          configView === v ? 'rgba(46,197,197,0.12)' : 'transparent',
+                        color: configView === v ? '#2EC5C5' : '#9DB4CC',
+                      }}
+                    >
+                      {v === 'asis' ? 'As is' : 'To be'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <p className="mb-4 text-xs text-mist/70">
+                {viewConnections.length} cross-layer links in{' '}
+                {configView === 'asis' ? 'as-is' : 'to-be'} view. Use Links on each
+                element or toggle pairs below.
+              </p>
+
               <section className="mb-6">
                 <h3 className="mb-2 text-sm font-semibold text-mist">
                   Business processes (fixed)
@@ -369,6 +395,7 @@ export function ArchitectureConfigModal() {
                   <LayerSection
                     key={layerId}
                     layerId={layerId}
+                    configView={configView}
                     elements={config.elements.filter((el) => el.layer === layerId)}
                     allElements={config.elements}
                     onAdd={() => addArchitectureElement(layerId, 'New item')}

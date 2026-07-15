@@ -5,6 +5,12 @@ import { Html, Line, Edges } from '@react-three/drei';
 import { BRAND, ACCENT_HEX } from '../../data/brand';
 import { ZONE_COORDS } from '../../data/factoryLayout';
 import { FACTORY_DEMO_STEPS } from '../../data/factoryDemo';
+import {
+  FACTORY_ACTIVE_SYSTEMS,
+  FACTORY_FLOW_PROGRESS,
+  FACTORY_LINK_COLORS,
+  FACTORY_SYSTEM_LINKS,
+} from '../../data/factoryTopology';
 import { systemById } from '../../data/systems';
 import { useStore } from '../../store/useStore';
 import { PulsingDataDot } from '../objects/PulsingDataDot';
@@ -215,7 +221,34 @@ function BuildingMesh({
   );
 }
 
-/* ── bezier link + animated data dot ─────────────────────────────── */
+function InterSystemLink({
+  from,
+  to,
+  kind,
+  opacity,
+}: {
+  from: Vector3;
+  to: Vector3;
+  kind: 'manual' | 'standard' | 'broken';
+  opacity: number;
+}) {
+  const color = FACTORY_LINK_COLORS[kind];
+  const curve = useMemo(() => createConnectionCurve(from, to), [from, to]);
+  const points = useMemo(() => curve.getPoints(32), [curve]);
+  return (
+    <Line
+      points={points}
+      color={color}
+      lineWidth={kind === 'standard' ? 1.3 : 1}
+      transparent
+      opacity={opacity * (kind === 'broken' ? 0.35 : 0.65)}
+      dashed={kind !== 'standard'}
+      dashSize={kind === 'manual' ? 0.06 : 0.04}
+      gapSize={0.05}
+    />
+  );
+}
+
 
 function SystemConnection({
   from,
@@ -352,6 +385,8 @@ function SystemChip({
 
 export function FactoryScene({ opacity = 1, reveal = true }: SceneProps) {
   const chapter = useStore((s) => s.current());
+  const factoryOrderView = useStore((s) => s.factoryOrderView);
+  const isOrderSlide = chapter.id === 'factory-order';
   const factoryMapping = useStore((s) => s.factoryMapping);
   const tourSystem = useStore((s) => s.factoryTourSystem);
   const demoStepIndex = useStore((s) => s.factoryDemoStep);
@@ -382,12 +417,16 @@ export function FactoryScene({ opacity = 1, reveal = true }: SceneProps) {
     }
   }, [reveal, chapter.id]);
 
-  const activeSystems = useMemo(
-    () =>
-      chapter.activeSystems.filter(
-        (id) => (factoryMapping[id]?.length ?? 0) > 0,
-      ),
-    [chapter.activeSystems, factoryMapping],
+  const activeSystems = useMemo(() => {
+    const base = isOrderSlide
+      ? FACTORY_ACTIVE_SYSTEMS[factoryOrderView]
+      : chapter.activeSystems;
+    return base.filter((id) => (factoryMapping[id]?.length ?? 0) > 0);
+  }, [chapter.activeSystems, factoryMapping, factoryOrderView, isOrderSlide]);
+
+  const interSystemLinks = useMemo(
+    () => (isOrderSlide ? FACTORY_SYSTEM_LINKS[factoryOrderView] : []),
+    [factoryOrderView, isOrderSlide],
   );
 
   const highlightZones = useMemo(() => {
@@ -441,6 +480,10 @@ export function FactoryScene({ opacity = 1, reveal = true }: SceneProps) {
   );
   const allSlicingPoints = useMemo(() => slicingCurve.getPoints(50), [slicingCurve]);
 
+  const flowTargetProgress = isOrderSlide
+    ? FACTORY_FLOW_PROGRESS[factoryOrderView]
+    : 1;
+
   useFrame((state, delta) => {
     if (!reveal) return;
 
@@ -462,7 +505,7 @@ export function FactoryScene({ opacity = 1, reveal = true }: SceneProps) {
       );
     });
 
-    const flowTarget = allLanded ? 1 : 0;
+    const flowTarget = allLanded ? flowTargetProgress : 0;
     setFlowDraw((prev) => damp(prev, flowTarget, 4, delta));
     setChipOpacity((prev) => damp(prev, allLanded ? 1 : 0, 5, delta));
 
@@ -532,6 +575,21 @@ export function FactoryScene({ opacity = 1, reveal = true }: SceneProps) {
           )}
         </>
       )}
+
+      {interSystemLinks.map((link) => {
+        const fromPos = chipPositions[link.from];
+        const toPos = chipPositions[link.to];
+        if (!fromPos || !toPos) return null;
+        return (
+          <InterSystemLink
+            key={`${link.from}-${link.to}`}
+            from={fromPos}
+            to={toPos}
+            kind={link.kind}
+            opacity={chipOpacity * opacity}
+          />
+        );
+      })}
 
       {activeSystems.map((id) => {
         const position = chipPositions[id];
