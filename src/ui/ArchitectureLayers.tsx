@@ -459,7 +459,6 @@ export function ArchitectureLayers() {
   const [hoveredProcessId, setHoveredProcessId] = useState<string | null>(null);
   const [hoveredElementId, setHoveredElementId] = useState<string | null>(null);
   const [flowLines, setFlowLines] = useState<FlowLine[]>([]);
-  const [persistentLines, setPersistentLines] = useState<FlowLine[]>([]);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const nodeMap = useRef(new Map<string, HTMLElement>());
@@ -587,22 +586,6 @@ export function ArchitectureLayers() {
       };
     };
   }, [elementById]);
-
-  useLayoutEffect(() => {
-    const mk = makeMeasurer();
-    if (!mk) {
-      setPersistentLines([]);
-      return;
-    }
-
-    const lines: FlowLine[] = [];
-    viewConnections.forEach((conn) => {
-      const meta = CONNECTION_KIND_META[conn.kind];
-      const line = mk(conn.fromId, conn.toId, meta.color, meta.dash ?? '4 4', conn.kind);
-      if (line) lines.push(line);
-    });
-    setPersistentLines(distributeLinePorts(lines));
-  }, [viewConnections, view, elements, makeMeasurer]);
 
   useLayoutEffect(() => {
     const mk = makeMeasurer();
@@ -738,14 +721,6 @@ export function ArchitectureLayers() {
           registerNode={registerNode}
         />
       </div>
-
-      {!isHovering && persistentLines.length > 0 && (
-        <svg className="pointer-events-none absolute inset-0 z-10 h-full w-full overflow-visible">
-          <AnimatePresence>
-            {renderLines(persistentLines, 0.42, false)}
-          </AnimatePresence>
-        </svg>
-      )}
 
       {flowLines.length > 0 && (
         <svg className="pointer-events-none absolute inset-0 z-20 h-full w-full overflow-visible">
