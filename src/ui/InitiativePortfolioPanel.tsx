@@ -1,4 +1,5 @@
-import { motion } from 'framer-motion';
+import { useState } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
 import {
   INITIATIVE_CLUSTERS,
   INITIATIVE_ROWS,
@@ -12,14 +13,16 @@ const PRIORITY_STYLE: Record<InitiativeRow['priority'], string> = {
 };
 
 export function InitiativePortfolioPanel() {
+  const [hoveredClusterId, setHoveredClusterId] = useState<string | null>(null);
+  const reduceMotion = useReducedMotion();
   const rowsById = new Map(INITIATIVE_ROWS.map((row) => [row.id, row]));
   const tableColumns = 'clamp(10rem, 14vw, 14rem) minmax(0, 1fr)';
 
   return (
     <div className="pointer-events-auto h-full max-h-[34rem] w-full max-w-[100rem]">
-      <div className="flex h-full min-h-0 flex-col overflow-hidden rounded-xl border border-white/10 bg-navy-900/65 shadow-panel backdrop-blur-sm">
+      <div className="relative flex h-full min-h-0 flex-col overflow-visible rounded-xl border border-white/10 bg-navy-900/65 shadow-panel backdrop-blur-sm">
         <div
-          className="grid shrink-0 border-b border-white/10 bg-white/[0.035]"
+          className="grid shrink-0 rounded-t-xl border-b border-white/10 bg-white/[0.035]"
           style={{ gridTemplateColumns: tableColumns }}
         >
           <span className="px-[clamp(0.65rem,1vw,1rem)] py-[clamp(0.35rem,0.7vh,0.55rem)] text-[clamp(9px,0.55vw,11px)] font-semibold uppercase tracking-[0.14em] text-mist/65">
@@ -41,12 +44,28 @@ export function InitiativePortfolioPanel() {
             <motion.section
               key={cluster.id}
               initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: clusterIndex * 0.08, duration: 0.35 }}
-              className="grid min-h-0 border-b border-white/10 last:border-b-0"
+              animate={{
+                opacity: 1,
+                y: 0,
+                scale: hoveredClusterId === cluster.id && !reduceMotion ? 1.05 : 1,
+              }}
+              transition={{
+                delay: hoveredClusterId ? 0 : clusterIndex * 0.08,
+                duration: 0.3,
+                ease: [0.22, 1, 0.36, 1],
+              }}
+              className={`relative grid min-h-0 origin-left border-b border-white/10 last:border-b-0 ${
+                hoveredClusterId === cluster.id
+                  ? 'z-40 rounded-xl bg-navy-800/95 shadow-[0_22px_65px_rgba(0,10,24,0.68)] ring-1 ring-gold/45'
+                  : 'z-10'
+              }`}
               style={{ flex: rows.length, gridTemplateColumns: tableColumns }}
             >
-              <div className="flex min-h-0 flex-col justify-center border-r border-white/10 bg-white/[0.02] px-[clamp(0.65rem,1vw,1rem)] py-[clamp(0.35rem,0.7vh,0.65rem)]">
+              <div
+                onMouseEnter={() => setHoveredClusterId(cluster.id)}
+                onMouseLeave={() => setHoveredClusterId(null)}
+                className="relative z-10 flex min-h-0 cursor-zoom-in flex-col justify-center border-r border-white/10 bg-navy-900/45 px-[clamp(0.65rem,1vw,1rem)] py-[clamp(0.35rem,0.7vh,0.65rem)] transition-colors duration-300 hover:bg-gold/10 motion-reduce:transition-none"
+              >
                 <div className="text-[clamp(13px,calc(0.5vw+0.7vh),17px)] font-semibold leading-tight text-paper">
                   {cluster.label}
                 </div>
@@ -62,7 +81,7 @@ export function InitiativePortfolioPanel() {
                 {rows.map((row) => (
                   <div
                     key={row.id}
-                    className="grid min-h-0 grid-cols-[1fr_2.2fr_1.25fr] items-center gap-[clamp(0.5rem,1vw,1rem)] border-b border-white/[0.06] px-[clamp(0.65rem,1vw,1rem)] py-[clamp(0.3rem,0.65vh,0.55rem)] last:border-b-0"
+                    className="relative grid min-h-0 grid-cols-[1fr_2.2fr_1.25fr] items-center gap-[clamp(0.5rem,1vw,1rem)] border-b border-white/[0.06] px-[clamp(0.65rem,1vw,1rem)] py-[clamp(0.3rem,0.65vh,0.55rem)] transition duration-300 ease-out last:border-b-0 hover:z-30 hover:scale-[1.022] hover:rounded-xl hover:bg-navy-800/95 hover:shadow-[0_18px_55px_rgba(0,10,24,0.62)] hover:ring-1 hover:ring-gold/40 motion-reduce:transform-none motion-reduce:transition-none"
                   >
                     <div className="min-w-0">
                       <div className="text-[clamp(13px,calc(0.45vw+0.65vh),17px)] font-semibold leading-tight text-paper">
