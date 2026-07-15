@@ -22,7 +22,6 @@ import {
   getProcessColor,
   primaryProcessColor,
   type ArchLayerId,
-  type ArchitectureConnection,
   type ArchitectureElement,
   type ConnectionKind,
 } from '../data/architectureLayout';
