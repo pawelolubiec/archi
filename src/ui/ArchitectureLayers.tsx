@@ -42,13 +42,53 @@ const LAYER_FLOW_HINTS: Record<ArchLayerId, string> = {
 
 interface FlowLine {
   key: string;
+  fromKey: string;
+  toKey: string;
   x1: number;
   y1: number;
   x2: number;
   y2: number;
+  fromLeft: number;
+  fromRight: number;
+  toLeft: number;
+  toRight: number;
   color: string;
   dash: string;
   kind: ConnectionKind;
+}
+
+function distributeLinePorts(lines: FlowLine[]): FlowLine[] {
+  const distributed = lines.map((line) => ({ ...line }));
+
+  const spread = (endpoint: 'from' | 'to') => {
+    const groups = new Map<string, FlowLine[]>();
+    distributed.forEach((line) => {
+      const nodeKey = endpoint === 'from' ? line.fromKey : line.toKey;
+      const y = endpoint === 'from' ? line.y1 : line.y2;
+      const key = `${nodeKey}:${Math.round(y)}`;
+      groups.set(key, [...(groups.get(key) ?? []), line]);
+    });
+
+    groups.forEach((group) => {
+      group.sort((a, b) =>
+        endpoint === 'from' ? a.x2 - b.x2 : a.x1 - b.x1,
+      );
+      group.forEach((line, index) => {
+        const left = endpoint === 'from' ? line.fromLeft : line.toLeft;
+        const right = endpoint === 'from' ? line.fromRight : line.toRight;
+        const padding = Math.min(10, (right - left) * 0.15);
+        const min = left + padding;
+        const max = right - padding;
+        const x = min + ((index + 1) / (group.length + 1)) * (max - min);
+        if (endpoint === 'from') line.x1 = x;
+        else line.x2 = x;
+      });
+    });
+  };
+
+  spread('from');
+  spread('to');
+  return distributed;
 }
 
 function ArchViewSwitch({
@@ -513,6 +553,8 @@ export function ArchitectureLayers() {
       return {
         top: r.top - cRect.top,
         bottom: r.bottom - cRect.top,
+        left: r.left - cRect.left,
+        right: r.right - cRect.left,
         cx: r.left - cRect.left + r.width / 2,
       };
     };
@@ -526,15 +568,19 @@ export function ArchitectureLayers() {
       const a = rectOf(fromKey);
       const b = rectOf(toKey);
       if (!a || !b) return null;
-      const fromLower = LAYER_RANK[elementById[fromKey]?.layer ?? 'apps'];
-      const toLower = LAYER_RANK[elementById[toKey]?.layer ?? 'apps'];
-      const upward = fromLower > toLower;
+      const upward = a.top > b.top;
       return {
         key: `${fromKey}->${toKey}`,
+        fromKey,
+        toKey,
         x1: a.cx,
         y1: upward ? a.top : a.bottom,
         x2: b.cx,
         y2: upward ? b.bottom : b.top,
+        fromLeft: a.left,
+        fromRight: a.right,
+        toLeft: b.left,
+        toRight: b.right,
         color,
         dash,
         kind,
@@ -555,7 +601,7 @@ export function ArchitectureLayers() {
       const line = mk(conn.fromId, conn.toId, meta.color, meta.dash ?? '4 4', conn.kind);
       if (line) lines.push(line);
     });
-    setPersistentLines(lines);
+    setPersistentLines(distributeLinePorts(lines));
   }, [viewConnections, view, elements, makeMeasurer]);
 
   useLayoutEffect(() => {
@@ -599,7 +645,7 @@ export function ArchitectureLayers() {
         .forEach((o) => add(mk(o.id, `proc:${hoveredProcessId}`, color, '6 6', 'standard')));
     }
 
-    setFlowLines([...lines.values()]);
+    setFlowLines(distributeLinePorts([...lines.values()]));
   }, [
     hoveredElementId,
     hoveredProcessId,

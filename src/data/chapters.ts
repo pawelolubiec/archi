@@ -89,9 +89,9 @@ export const chapters: Chapter[] = [
     eyebrow: 'Portfolio',
     title: 'Investment portfolio',
     description:
-      'Each initiative has a business owner, a KPI link, and a board decision point. Foundations and ERP selection unlock everything else.',
+      'Seven initiatives mapped from their current state to the target capability and the business outcome they enable.',
     businessMessage:
-      'One portfolio, sequenced for margin — not a single ERP big bang.',
+      'Build the core first, improve decisions next, and protect adoption throughout.',
     cameraPosition: [0, 1, 9.5],
     cameraTarget: [0, 0, 0],
     visibleLocations: [],

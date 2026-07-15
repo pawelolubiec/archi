@@ -1,82 +1,94 @@
 import { motion } from 'framer-motion';
 import {
   INITIATIVE_CLUSTERS,
-  INITIATIVE_HEADLINE,
   INITIATIVE_ROWS,
-  INITIATIVE_SUBLINE,
+  type InitiativeRow,
 } from '../data/initiativePortfolio';
 
+const PRIORITY_STYLE: Record<InitiativeRow['priority'], string> = {
+  High: 'border-rose-300/35 bg-rose-300/10 text-rose-200',
+  'Medium-high': 'border-gold/35 bg-gold/10 text-gold',
+  Medium: 'border-sea/30 bg-sea/10 text-sea',
+};
+
 export function InitiativePortfolioPanel() {
-  const totalCapex = INITIATIVE_ROWS.reduce((sum, r) => sum + r.capexK, 0);
-  const totalEbitda = INITIATIVE_ROWS.reduce((sum, r) => sum + r.ebitdaK, 0);
+  const rowsById = new Map(INITIATIVE_ROWS.map((row) => [row.id, row]));
 
   return (
-    <div className="pointer-events-auto w-full max-w-6xl">
-      <div className="mb-4 max-w-3xl">
-        <p className="text-slide-body font-medium text-paper">{INITIATIVE_HEADLINE}</p>
-        <p className="mt-1.5 text-sm leading-relaxed text-mist">{INITIATIVE_SUBLINE}</p>
-      </div>
+    <div className="pointer-events-auto w-full max-w-7xl">
+      <div className="overflow-hidden rounded-xl border border-white/10 bg-navy-900/65 shadow-panel backdrop-blur-sm">
+        <div className="grid grid-cols-[11rem_1fr] border-b border-white/10 bg-white/[0.035] lg:grid-cols-[13rem_1fr]">
+          <span className="px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-mist/65">
+            Priority
+          </span>
+          <div className="grid grid-cols-[1fr_2.2fr_1.25fr] gap-4 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-mist/65">
+            <span>Initiative</span>
+            <span>Transformation move</span>
+            <span>Business value</span>
+          </div>
+        </div>
 
-      <div className="mb-4 grid grid-cols-2 gap-2 lg:grid-cols-4">
-        {INITIATIVE_CLUSTERS.map((cluster, i) => (
-          <motion.div
+        {INITIATIVE_CLUSTERS.map((cluster, clusterIndex) => {
+          const rows = cluster.initiativeIds
+            .map((id) => rowsById.get(id))
+            .filter((row): row is InitiativeRow => Boolean(row));
+
+          return (
+            <motion.section
             key={cluster.id}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.06, duration: 0.35 }}
-            className={`rounded-xl border px-3 py-2.5 ${
-              cluster.highlight
-                ? 'border-gold/40 bg-gold/10'
-                : 'border-white/10 bg-navy-900/50'
-            }`}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: clusterIndex * 0.08, duration: 0.35 }}
+              className="grid grid-cols-[11rem_1fr] border-b border-white/10 last:border-b-0 lg:grid-cols-[13rem_1fr]"
           >
-            <div className="text-sm font-semibold text-paper">{cluster.label}</div>
-            <div className="mt-0.5 text-xs leading-snug text-mist">{cluster.summary}</div>
-          </motion.div>
-        ))}
-      </div>
+              <div className="border-r border-white/10 bg-white/[0.02] px-4 py-2.5">
+                <div className="text-sm font-semibold text-paper lg:text-base">{cluster.label}</div>
+                <p className="mt-1 text-[11px] leading-snug text-mist/75 lg:text-xs">
+                  {cluster.summary}
+                </p>
+              </div>
 
-      <div className="overflow-hidden rounded-xl border border-white/10 bg-navy-900/60 backdrop-blur-sm">
-        <div className="grid grid-cols-[1.4fr_0.9fr_0.7fr_0.6fr_0.6fr_1fr] gap-2 border-b border-white/10 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-mist/70">
-          <span>Initiative</span>
-          <span>Cluster</span>
-          <span>Horizon</span>
-          <span className="text-right">CAPEX</span>
-          <span className="text-right">EBITDA/yr</span>
-          <span>Decision point</span>
-        </div>
-        <div className="max-h-[min(42vh,22rem)] overflow-y-auto">
-          {INITIATIVE_ROWS.map((row, i) => (
-            <motion.div
-              key={row.id}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.08 + i * 0.04 }}
-              className="grid grid-cols-[1.4fr_0.9fr_0.7fr_0.6fr_0.6fr_1fr] gap-2 border-b border-white/5 px-4 py-2.5 text-sm last:border-b-0"
-            >
-              <span className="font-medium text-paper">{row.initiative}</span>
-              <span className="text-mist">{row.cluster}</span>
-              <span className="font-mono text-xs text-mist/90">{row.horizon}</span>
-              <span className="text-right font-mono text-xs text-sea">
-                €{(row.capexK / 1000).toFixed(1)}M
-              </span>
-              <span className="text-right font-mono text-xs text-green">
-                +€{(row.ebitdaK / 1000).toFixed(1)}M
-              </span>
-              <span className="text-xs text-gold/90">{row.decision ?? '—'}</span>
-            </motion.div>
-          ))}
-        </div>
-        <div className="grid grid-cols-[1.4fr_0.9fr_0.7fr_0.6fr_0.6fr_1fr] gap-2 border-t border-white/10 bg-white/[0.03] px-4 py-2 text-xs font-semibold">
-          <span className="col-span-3 text-mist">Portfolio subtotal (shown initiatives)</span>
-          <span className="text-right font-mono text-sea">
-            €{(totalCapex / 1000).toFixed(1)}M
-          </span>
-          <span className="text-right font-mono text-green">
-            +€{(totalEbitda / 1000).toFixed(1)}M
-          </span>
-          <span className="text-mist/60">Estimates · validate with Controlling</span>
-        </div>
+              <div>
+                {rows.map((row, rowIndex) => (
+                  <div
+                    key={row.id}
+                    className="grid grid-cols-[1fr_2.2fr_1.25fr] gap-4 border-b border-white/[0.06] px-4 py-2 last:border-b-0"
+                  >
+                    <div className="min-w-0">
+                      <div className="text-sm font-semibold leading-tight text-paper lg:text-[15px]">
+                        {row.initiative}
+                      </div>
+                      <div className="mt-1 flex items-center gap-1.5">
+                        <span
+                          className={`shrink-0 rounded border px-1.5 py-0.5 text-[9px] font-semibold ${PRIORITY_STYLE[row.priority]}`}
+                        >
+                          {row.priority}
+                        </span>
+                        <span className="truncate text-[10px] text-mist/65 lg:text-[11px]">
+                          {row.status}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="grid min-w-0 grid-cols-[1fr_auto_1.15fr] items-center gap-2">
+                      <p className="line-clamp-2 text-[11px] leading-snug text-mist lg:text-xs">
+                        {row.current}
+                      </p>
+                      <span className="text-sm text-gold/70">→</span>
+                      <p className="line-clamp-2 text-[11px] font-medium leading-snug text-paper/90 lg:text-xs">
+                        {row.target}
+                      </p>
+                    </div>
+
+                    <p className="line-clamp-2 self-center text-[11px] leading-snug text-sea/90 lg:text-xs">
+                      {row.businessValue}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </motion.section>
+          );
+        })}
       </div>
     </div>
   );

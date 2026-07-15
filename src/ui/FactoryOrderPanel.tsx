@@ -7,11 +7,14 @@ import {
   FACTORY_SYSTEM_LINKS,
   type FactoryOrderView,
 } from '../data/factoryTopology';
+import { systemById } from '../data/systems';
 
 const VIEW_META: Record<FactoryOrderView, { label: string; accent: string }> = {
   asis: { label: 'As is', accent: '#2EC5C5' },
   tobe: { label: 'To be', accent: '#D6BF91' },
 };
+
+const displaySystemName = (id: string) => systemById[id]?.short ?? id.replace(/_/g, ' ');
 
 export function FactoryOrderPanel() {
   const view = useStore((s) => s.factoryOrderView);
@@ -76,11 +79,11 @@ export function FactoryOrderPanel() {
                   style={{ background: FACTORY_LINK_COLORS[link.kind] }}
                 />
                 <span className="font-medium uppercase text-paper/90">
-                  {link.from.replace(/_/g, ' ')}
+                  {displaySystemName(link.from)}
                 </span>
                 <span className="text-mist/50">→</span>
                 <span className="font-medium uppercase text-paper/90">
-                  {link.to.replace(/_/g, ' ')}
+                  {displaySystemName(link.to)}
                 </span>
                 <span className="ml-auto text-[10px] uppercase tracking-wider text-mist/60">
                   {link.kind}
@@ -91,7 +94,7 @@ export function FactoryOrderPanel() {
         </div>
 
         <p className="mt-3 text-[11px] leading-relaxed text-mist/70">
-          Active: {FACTORY_ACTIVE_SYSTEMS[view].join(', ').replace(/_/g, ' ')}
+          Active: {FACTORY_ACTIVE_SYSTEMS[view].map(displaySystemName).join(', ')}
         </p>
       </div>
     </div>
