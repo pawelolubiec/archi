@@ -15,7 +15,6 @@ import {
   CONNECTION_KIND_META,
   ELEMENT_STATUS_META,
   LAYER_RANK,
-  connectedElementIds,
   connectionsForView,
   elementStatus,
   formatProcessBadges,
@@ -483,6 +482,23 @@ export function ArchitectureLayers() {
     () => connectionsForView(architectureConfig, view),
     [architectureConfig, view],
   );
+  const connectedIdsByElement = useMemo(() => {
+    const result = new Map<string, Set<string>>();
+    const add = (fromId: string, toId: string) => {
+      const ids = result.get(fromId) ?? new Set<string>();
+      ids.add(toId);
+      result.set(fromId, ids);
+    };
+    viewConnections.forEach((connection) => {
+      add(connection.fromId, connection.toId);
+      add(connection.toId, connection.fromId);
+    });
+    return result;
+  }, [viewConnections]);
+  const visibleElementIds = useMemo(
+    () => new Set(visibleElements.map((element) => element.id)),
+    [visibleElements],
+  );
 
   const otherViewConnections = useMemo(
     () => connectionsForView(architectureConfig, view === 'asis' ? 'tobe' : 'asis'),
@@ -524,9 +540,12 @@ export function ArchitectureLayers() {
           highlightedElementIds: new Set<string>(),
         };
       }
+      const connectedIds = [...(connectedIdsByElement.get(el.id) ?? [])].filter(
+        (id) => visibleElementIds.has(id),
+      );
       const ids = new Set([
         el.id,
-        ...connectedElementIds(el, visibleElements, view),
+        ...connectedIds,
       ]);
       return {
         highlightedProcessIds: new Set(el.linkedProcessIds),
@@ -538,7 +557,14 @@ export function ArchitectureLayers() {
       highlightedProcessIds: new Set<string>(),
       highlightedElementIds: new Set<string>(),
     };
-  }, [hoveredProcessId, hoveredElementId, visibleElements, elementById, view]);
+  }, [
+    hoveredProcessId,
+    hoveredElementId,
+    visibleElements,
+    visibleElementIds,
+    elementById,
+    connectedIdsByElement,
+  ]);
 
   const makeMeasurer = useCallback(() => {
     const container = containerRef.current;
@@ -601,13 +627,15 @@ export function ArchitectureLayers() {
     const el = hoveredElementId ? elementById[hoveredElementId] : null;
     if (el) {
       const color = primaryProcessColor(el.linkedProcessIds);
-      connectedElementIds(el, visibleElements, view).forEach((id) => {
+      [...(connectedIdsByElement.get(el.id) ?? [])]
+        .filter((id) => visibleElementIds.has(id))
+        .forEach((id) => {
         const other = elementById[id];
         if (!other) return;
         const diff = LAYER_RANK[other.layer] - LAYER_RANK[el.layer];
         if (diff > 0) add(mk(el.id, other.id, color, '6 6', 'standard'));
         else if (diff < 0) add(mk(other.id, el.id, color, '6 6', 'standard'));
-      });
+        });
       el.linkedProcessIds.forEach((pid) =>
         add(mk(el.id, `proc:${pid}`, getProcessColor(pid), '6 6', 'standard')),
       );
@@ -623,7 +651,9 @@ export function ArchitectureLayers() {
     hoveredElementId,
     hoveredProcessId,
     visibleElements,
+    visibleElementIds,
     elementById,
+    connectedIdsByElement,
     makeMeasurer,
     view,
   ]);

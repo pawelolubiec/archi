@@ -327,6 +327,7 @@ export const useStore = create<AppState>((set, get) => ({
         linkedProcessIds: [],
       };
       const architectureConfig = {
+        ...s.architectureConfig,
         elements: [...s.architectureConfig.elements, element],
       };
       scheduleArchitectureSave(architectureConfig, set);
@@ -336,6 +337,7 @@ export const useStore = create<AppState>((set, get) => ({
   updateArchitectureElement: (id, patch) =>
     set((s) => {
       const architectureConfig = {
+        ...s.architectureConfig,
         elements: s.architectureConfig.elements.map((el) =>
           el.id === id ? { ...el, ...patch } : el,
         ),
@@ -347,7 +349,14 @@ export const useStore = create<AppState>((set, get) => ({
   removeArchitectureElement: (id) =>
     set((s) => {
       const architectureConfig = {
+        ...s.architectureConfig,
         elements: s.architectureConfig.elements.filter((el) => el.id !== id),
+        connectionsAsIs: s.architectureConfig.connectionsAsIs?.filter(
+          (connection) => connection.fromId !== id && connection.toId !== id,
+        ),
+        connectionsToBe: s.architectureConfig.connectionsToBe?.filter(
+          (connection) => connection.fromId !== id && connection.toId !== id,
+        ),
       };
       scheduleArchitectureSave(architectureConfig, set);
       return { architectureConfig };
@@ -356,6 +365,7 @@ export const useStore = create<AppState>((set, get) => ({
   setElementProcessLinks: (id, processIds) =>
     set((s) => {
       const architectureConfig = {
+        ...s.architectureConfig,
         elements: s.architectureConfig.elements.map((el) =>
           el.id === id ? { ...el, linkedProcessIds: [...processIds] } : el,
         ),

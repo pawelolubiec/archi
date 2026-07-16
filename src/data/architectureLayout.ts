@@ -176,7 +176,7 @@ export function connectionsForView(
 ): ArchitectureConnection[] {
   const stored =
     view === 'asis' ? config.connectionsAsIs : config.connectionsToBe;
-  if (stored?.length) return stored;
+  if (stored !== undefined) return stored;
   return view === 'asis'
     ? deriveAsIsConnections(config.elements)
     : deriveStandardConnections(config.elements);

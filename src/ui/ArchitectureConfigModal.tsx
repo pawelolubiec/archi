@@ -7,10 +7,10 @@ import {
   BUSINESS_PROCESSES,
   CONNECTION_KIND_META,
   ELEMENT_STATUS_META,
-  connectedElementIds,
   connectionsForView,
   elementStatus,
   type ArchLayerId,
+  type ArchitectureConnection,
   type ArchitectureElement,
   type ElementStatus,
 } from '../data/architectureLayout';
@@ -23,15 +23,23 @@ const LAYER_ORDER: ArchLayerId[] = ['ai', 'data', 'apps'];
 function ConnectionsEditor({
   element,
   allElements,
+  connections,
   configView,
   onToggleConnection,
 }: {
   element: ArchitectureElement;
   allElements: ArchitectureElement[];
+  connections: ArchitectureConnection[];
   configView: 'asis' | 'tobe';
   onToggleConnection: (otherId: string) => void;
 }) {
-  const connected = connectedElementIds(element, allElements, configView);
+  const connected = new Set(
+    connections.flatMap((connection) => {
+      if (connection.fromId === element.id) return [connection.toId];
+      if (connection.toId === element.id) return [connection.fromId];
+      return [];
+    }),
+  );
 
   return (
     <div className="mt-2 space-y-1.5 border-t border-white/5 pt-2">
@@ -79,6 +87,7 @@ function ConnectionsEditor({
 function ElementRow({
   element,
   allElements,
+  connections,
   configView,
   onLabelChange,
   onToggleProcess,
@@ -89,6 +98,7 @@ function ElementRow({
 }: {
   element: ArchitectureElement;
   allElements: ArchitectureElement[];
+  connections: ArchitectureConnection[];
   configView: 'asis' | 'tobe';
   onLabelChange: (label: string) => void;
   onToggleProcess: (processId: string) => void;
@@ -98,7 +108,10 @@ function ElementRow({
   onDelete: () => void;
 }) {
   const [showConnections, setShowConnections] = useState(false);
-  const connectionCount = connectedElementIds(element, allElements, configView).size;
+  const connectionCount = connections.filter(
+    (connection) =>
+      connection.fromId === element.id || connection.toId === element.id,
+  ).length;
   const status = elementStatus(element);
 
   return (
@@ -189,6 +202,7 @@ function ElementRow({
         <ConnectionsEditor
           element={element}
           allElements={allElements}
+          connections={connections}
           configView={configView}
           onToggleConnection={onToggleConnection}
         />
@@ -201,6 +215,7 @@ function LayerSection({
   layerId,
   elements,
   allElements,
+  connections,
   configView,
   onAdd,
   onUpdate,
@@ -211,6 +226,7 @@ function LayerSection({
   layerId: ArchLayerId;
   elements: ArchitectureElement[];
   allElements: ArchitectureElement[];
+  connections: ArchitectureConnection[];
   configView: 'asis' | 'tobe';
   onAdd: () => void;
   onUpdate: (id: string, patch: Partial<ArchitectureElement>) => void;
@@ -238,6 +254,7 @@ function LayerSection({
             key={el.id}
             element={el}
             allElements={allElements}
+            connections={connections}
             configView={configView}
             onLabelChange={(label) => onUpdate(el.id, { label })}
             onSystemChange={(systemId) => onUpdate(el.id, { systemId })}
@@ -283,6 +300,10 @@ export function ArchitectureConfigModal() {
   };
 
   const viewConnections = connectionsForView(config, configView);
+  const connectionCounts = {
+    asis: connectionsForView(config, 'asis').length,
+    tobe: connectionsForView(config, 'tobe').length,
+  };
 
   return (
     <AnimatePresence>
@@ -340,7 +361,7 @@ export function ArchitectureConfigModal() {
             <div className="flex-1 overflow-y-auto px-6 py-4">
               <div className="mb-5 flex items-center justify-between gap-4">
                 <span className="text-sm font-medium text-mist">
-                  Edit connections for
+                  Connection map
                 </span>
                 <div className="flex gap-2">
                   {(['asis', 'tobe'] as const).map((v) => (
@@ -351,22 +372,35 @@ export function ArchitectureConfigModal() {
                       className="rounded-full border px-3 py-1 text-xs font-medium uppercase tracking-[0.08em] transition"
                       style={{
                         borderColor:
-                          configView === v ? '#2EC5C5aa' : 'rgba(255,255,255,0.12)',
+                          configView === v
+                            ? v === 'asis'
+                              ? '#2EC5C5aa'
+                              : '#D6BF91aa'
+                            : 'rgba(255,255,255,0.12)',
                         background:
-                          configView === v ? 'rgba(46,197,197,0.12)' : 'transparent',
-                        color: configView === v ? '#2EC5C5' : '#9DB4CC',
+                          configView === v
+                            ? v === 'asis'
+                              ? 'rgba(46,197,197,0.12)'
+                              : 'rgba(214,191,145,0.12)'
+                            : 'transparent',
+                        color:
+                          configView === v
+                            ? v === 'asis'
+                              ? '#2EC5C5'
+                              : '#D6BF91'
+                            : '#9DB4CC',
                       }}
                     >
-                      {v === 'asis' ? 'As is' : 'To be'}
+                      {v === 'asis' ? 'As is connections' : 'To be connections'}{' '}
+                      <span className="opacity-65">({connectionCounts[v]})</span>
                     </button>
                   ))}
                 </div>
               </div>
 
               <p className="mb-4 text-xs text-mist/70">
-                {viewConnections.length} cross-layer links in{' '}
-                {configView === 'asis' ? 'as-is' : 'to-be'} view. Use Links on each
-                element or toggle pairs below.
+                Editing {configView === 'asis' ? 'today’s architecture' : 'the target architecture'}.
+                This connection map is saved independently and does not change the other view.
               </p>
 
               <section className="mb-6">
@@ -398,6 +432,7 @@ export function ArchitectureConfigModal() {
                     configView={configView}
                     elements={config.elements.filter((el) => el.layer === layerId)}
                     allElements={config.elements}
+                    connections={viewConnections}
                     onAdd={() => addArchitectureElement(layerId, 'New item')}
                     onUpdate={(id, patch) => updateArchitectureElement(id, patch)}
                     onDelete={removeArchitectureElement}
