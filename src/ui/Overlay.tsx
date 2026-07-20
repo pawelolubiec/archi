@@ -35,6 +35,13 @@ export function Overlay() {
   const isFactory = chapter.scene === 'factory';
   const isIntegration = chapter.id === 'germany-factory';
   const compactTitle = isFactory || isIntegration;
+  const titleSizeClass = compactTitle
+    ? 'text-slide-title'
+    : chapter.title.length > 42
+      ? 'text-[clamp(2rem,3.5vw,3rem)]'
+      : chapter.title.length > 28
+        ? 'text-[clamp(2.25rem,4vw,3.25rem)]'
+        : 'text-slide-display';
 
   return (
     <div
@@ -60,15 +67,13 @@ export function Overlay() {
           </div>
 
           <h1
-            className={`font-display leading-tight text-paper ${
-              compactTitle ? 'text-slide-title' : 'text-slide-display'
-            }`}
+            className={`max-w-[22ch] font-display leading-tight text-paper [text-wrap:balance] ${titleSizeClass}`}
           >
             {chapter.title}
           </h1>
 
           <p
-            className={`mt-4 text-slide-body leading-relaxed text-mist ${
+            className={`mt-4 max-w-[58ch] text-slide-body leading-relaxed text-mist [text-wrap:pretty] ${
               isFactory ? 'line-clamp-2' : isIntegration ? 'line-clamp-3' : ''
             }`}
           >
@@ -83,11 +88,11 @@ export function Overlay() {
             }`}
           >
             <p
-              className={
+              className={`max-w-[52ch] [text-wrap:balance] ${
                 chapter.prominentTakeaway
                   ? 'text-slide-takeaway font-medium leading-relaxed text-paper'
                   : 'text-slide-takeaway font-medium leading-relaxed text-paper/90'
-              }
+              }`}
             >
               {chapter.businessMessage}
             </p>

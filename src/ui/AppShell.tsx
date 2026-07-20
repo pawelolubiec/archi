@@ -291,7 +291,7 @@ export function AppShell() {
       )}
 
       {/* bottom bar */}
-      <footer className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-6 p-8">
+      <footer className="absolute inset-x-0 bottom-0 z-50 flex items-center justify-between gap-6 p-8">
         <ChapterProgress />
         <NavigationControls />
       </footer>
