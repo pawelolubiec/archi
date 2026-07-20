@@ -17,6 +17,8 @@ export function InitiativePortfolioPanel() {
   const reduceMotion = useReducedMotion();
   const rowsById = new Map(INITIATIVE_ROWS.map((row) => [row.id, row]));
   const tableColumns = 'clamp(10rem, 14vw, 14rem) minmax(0, 1fr)';
+  const rowColumns =
+    'minmax(7.5rem, 1.05fr) minmax(14rem, 1.9fr) repeat(3, minmax(8rem, 1fr))';
 
   return (
     <div className="pointer-events-auto h-full max-h-[34rem] w-full max-w-[100rem]">
@@ -28,10 +30,15 @@ export function InitiativePortfolioPanel() {
           <span className="px-[clamp(0.65rem,1vw,1rem)] py-[clamp(0.35rem,0.7vh,0.55rem)] text-[clamp(9px,0.55vw,11px)] font-semibold uppercase tracking-[0.14em] text-mist/65">
             Priority
           </span>
-          <div className="grid grid-cols-[1fr_2.2fr_1.25fr] gap-[clamp(0.5rem,1vw,1rem)] px-[clamp(0.65rem,1vw,1rem)] py-[clamp(0.35rem,0.7vh,0.55rem)] text-[clamp(9px,0.55vw,11px)] font-semibold uppercase tracking-[0.14em] text-mist/65">
+          <div
+            className="grid gap-[clamp(0.45rem,0.75vw,0.8rem)] px-[clamp(0.65rem,1vw,1rem)] py-[clamp(0.35rem,0.7vh,0.55rem)] text-[clamp(8px,0.48vw,10px)] font-semibold uppercase tracking-[0.12em] text-mist/65"
+            style={{ gridTemplateColumns: rowColumns }}
+          >
             <span>Initiative</span>
             <span>Transformation move</span>
-            <span>Business value</span>
+            <span>Profitability</span>
+            <span>Margin</span>
+            <span>Product portfolio</span>
           </div>
         </div>
 
@@ -81,7 +88,8 @@ export function InitiativePortfolioPanel() {
                 {rows.map((row) => (
                   <div
                     key={row.id}
-                    className="relative grid min-h-0 grid-cols-[1fr_2.2fr_1.25fr] items-center gap-[clamp(0.5rem,1vw,1rem)] border-b border-white/[0.06] px-[clamp(0.65rem,1vw,1rem)] py-[clamp(0.3rem,0.65vh,0.55rem)] transition duration-300 ease-out last:border-b-0 hover:z-30 hover:scale-[1.022] hover:rounded-xl hover:bg-navy-800/95 hover:shadow-[0_18px_55px_rgba(0,10,24,0.62)] hover:ring-1 hover:ring-gold/40 motion-reduce:transform-none motion-reduce:transition-none"
+                    className="relative grid min-h-0 items-center gap-[clamp(0.45rem,0.75vw,0.8rem)] border-b border-white/[0.06] px-[clamp(0.65rem,1vw,1rem)] py-[clamp(0.3rem,0.65vh,0.55rem)] transition duration-300 ease-out last:border-b-0 hover:z-30 hover:scale-[1.022] hover:rounded-xl hover:bg-navy-800/95 hover:shadow-[0_18px_55px_rgba(0,10,24,0.62)] hover:ring-1 hover:ring-gold/40 motion-reduce:transform-none motion-reduce:transition-none"
+                    style={{ gridTemplateColumns: rowColumns }}
                   >
                     <div className="min-w-0">
                       <div className="text-[clamp(13px,calc(0.45vw+0.65vh),17px)] font-semibold leading-tight text-paper">
@@ -109,8 +117,23 @@ export function InitiativePortfolioPanel() {
                       </p>
                     </div>
 
-                    <p className="line-clamp-2 self-center text-[clamp(11px,calc(0.35vw+0.65vh),14px)] leading-snug text-sea/90">
-                      {row.businessValue}
+                    <p
+                      className="line-clamp-3 self-center text-[clamp(9px,calc(0.25vw+0.5vh),12px)] leading-snug text-paper/80"
+                      title={row.profitability}
+                    >
+                      {row.profitability}
+                    </p>
+                    <p
+                      className="line-clamp-3 self-center text-[clamp(9px,calc(0.25vw+0.5vh),12px)] leading-snug text-sea/90"
+                      title={row.margin}
+                    >
+                      {row.margin}
+                    </p>
+                    <p
+                      className="line-clamp-3 self-center text-[clamp(9px,calc(0.25vw+0.5vh),12px)] leading-snug text-gold/85"
+                      title={row.productPortfolio}
+                    >
+                      {row.productPortfolio}
                     </p>
                   </div>
                 ))}

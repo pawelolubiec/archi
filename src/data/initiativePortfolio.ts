@@ -8,6 +8,9 @@ export interface InitiativeRow {
   current: string;
   target: string;
   businessValue: string;
+  profitability: string;
+  margin: string;
+  productPortfolio: string;
 }
 
 export interface InitiativeCluster {
@@ -48,6 +51,9 @@ export const INITIATIVE_ROWS: InitiativeRow[] = [
     current: 'Tracks production orders, recipes and raw-material intake.',
     target: 'Add mobile capture, technical KPIs and live performance analytics.',
     businessValue: 'Less manual work, lower loss and faster product rollout.',
+    profitability: 'Yes — operational efficiency and less manual work.',
+    margin: 'Yes — mass balance, control of raw-material loss, yield, labour cost and time per order.',
+    productPortfolio: 'Yes — supports new production areas and processes.',
   },
   {
     id: 'erp',
@@ -58,6 +64,9 @@ export const INITIATIVE_ROWS: InitiativeRow[] = [
     current: 'The current company ERP is due for replacement.',
     target: 'Create the core for finance, purchasing, sales and selected supply-chain flows.',
     businessValue: 'Cost control, product margin visibility and faster launches.',
+    profitability: 'Yes — foundation for efficiency and cost control.',
+    margin: 'Yes — cost accounting and margin per product and customer.',
+    productPortfolio: 'Yes — faster product launches and multi-market support.',
   },
   {
     id: 'master-data',
@@ -68,6 +77,9 @@ export const INITIATIVE_ROWS: InitiativeRow[] = [
     current: 'Master data differs across systems and sites.',
     target: 'Set group-wide rules, owners and quality controls for core data.',
     businessValue: 'Fewer errors, comparable margins and one group catalogue.',
+    profitability: 'Yes — fewer errors, less manual work and reliable data for decisions.',
+    margin: 'Yes — consistent item codes and costs; comparable margin per product across the group.',
+    productPortfolio: 'Yes — one group product catalogue and consistent SKUs across markets.',
   },
   {
     id: 'mifo',
@@ -78,6 +90,9 @@ export const INITIATIVE_ROWS: InitiativeRow[] = [
     current: 'Forecasting feeds production, budgets and reporting.',
     target: 'Extend to demand planning, S&OP, scenarios and predictive forecasting.',
     businessValue: 'Lower tied-up capital, less overproduction and better portfolio planning.',
+    profitability: 'Yes — more accurate planning and less tied-up capital.',
+    margin: 'Yes — less overproduction and better matching.',
+    productPortfolio: 'Partly — supports planning for portfolio change.',
   },
   {
     id: 'pid',
@@ -88,6 +103,9 @@ export const INITIATIVE_ROWS: InitiativeRow[] = [
     current: 'Finished-goods specifications are managed centrally.',
     target: 'Move toward PLM and one source for product and packaging data.',
     businessValue: 'Less product-data work, accurate costing and faster SKU rollout.',
+    profitability: 'Indirectly — less manual work with product data.',
+    margin: 'Yes — product costing and pricing.',
+    productPortfolio: 'Yes — product and specification management with faster SKU rollout.',
   },
   {
     id: 'people',
@@ -98,6 +116,9 @@ export const INITIATIVE_ROWS: InitiativeRow[] = [
     current: 'There is no formal adoption programme.',
     target: 'Build training, change support and digital skills.',
     businessValue: 'Adoption, reliable data and organisational readiness for change.',
+    profitability: 'Indirectly — return on investment depends on adoption success.',
+    margin: 'Indirectly — correct system use creates reliable data.',
+    productPortfolio: 'Indirectly — organisational readiness for change.',
   },
   {
     id: 'cybersecurity',
@@ -108,6 +129,9 @@ export const INITIATIVE_ROWS: InitiativeRow[] = [
     current: 'IT security is maintained continuously.',
     target: 'Complete NIS2 and strengthen business continuity.',
     businessValue: 'Continuity, protected data and secure expansion into new markets.',
+    profitability: 'Yes — business continuity and no losses from downtime.',
+    margin: 'Indirectly — protection of data and competitive advantage.',
+    productPortfolio: 'Indirectly — secures new channels and markets.',
   },
 ];
 

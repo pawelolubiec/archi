@@ -419,6 +419,6 @@ const HIDDEN_SLIDE_INDEXES = new Set([4, 5, 6, 7, 8, 12, 14]);
 
 export const chapters = allChapters.filter(
   (chapter) => !HIDDEN_SLIDE_INDEXES.has(chapter.index),
-);
+).map((chapter, index) => ({ ...chapter, index }));
 
 export const TOTAL_CHAPTERS = chapters.length;
