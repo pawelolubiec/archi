@@ -4,7 +4,7 @@ import type { Chapter } from './types';
  * Chapters = the single source of truth for the narrative. Each one drives the
  * camera, point visibility, active flows, modals, and the KPI panel.
  */
-export const chapters: Chapter[] = [
+const allChapters: Chapter[] = [
   {
     id: 'cosmos',
     index: 0,
@@ -87,7 +87,7 @@ export const chapters: Chapter[] = [
     index: 3,
     scene: 'portfolio',
     eyebrow: 'Portfolio',
-    title: 'Investment portfolio',
+    title: 'Initiatives portfolio',
     description:
       'Seven initiatives mapped from their current state to the target capability and the business outcome they enable.',
     businessMessage:
@@ -414,5 +414,11 @@ export const chapters: Chapter[] = [
     kpiPanel: false,
   },
 ];
+
+const HIDDEN_SLIDE_INDEXES = new Set([4, 5, 6, 7, 8, 12, 14]);
+
+export const chapters = allChapters.filter(
+  (chapter) => !HIDDEN_SLIDE_INDEXES.has(chapter.index),
+);
 
 export const TOTAL_CHAPTERS = chapters.length;

@@ -149,6 +149,7 @@ function ProcessChevron({
   highlighted,
   dimmed,
   onHover,
+  onLeave,
   nodeRef,
 }: {
   proc: (typeof BUSINESS_PROCESSES)[number];
@@ -158,6 +159,7 @@ function ProcessChevron({
   highlighted: boolean;
   dimmed: boolean;
   onHover: () => void;
+  onLeave: () => void;
   nodeRef: (node: HTMLElement | null) => void;
 }) {
   return (
@@ -171,6 +173,7 @@ function ProcessChevron({
       }}
       transition={{ delay: index * 0.03, duration: 0.2 }}
       onMouseEnter={onHover}
+      onMouseLeave={onLeave}
       className="flex min-h-[2.25rem] cursor-pointer items-center justify-center px-1 py-1 text-center transition-shadow"
       style={{
         background: proc.color,
@@ -200,10 +203,12 @@ function ProcessChevron({
 function ProcessStrip({
   highlightedProcessIds,
   onHoverProcess,
+  onLeaveProcess,
   registerNode,
 }: {
   highlightedProcessIds: Set<string>;
   onHoverProcess: (id: string) => void;
+  onLeaveProcess: () => void;
   registerNode: (key: string) => (node: HTMLElement | null) => void;
 }) {
   const isFiltering = highlightedProcessIds.size > 0;
@@ -229,6 +234,7 @@ function ProcessStrip({
               highlighted={highlighted}
               dimmed={dimmed}
               onHover={() => onHoverProcess(proc.id)}
+              onLeave={onLeaveProcess}
               nodeRef={registerNode(`proc:${proc.id}`)}
             />
           );
@@ -247,6 +253,7 @@ function ElementChip({
   ghosted = false,
   showStatus = false,
   onHover,
+  onLeave,
   nodeRef,
 }: {
   element: ArchitectureElement;
@@ -257,6 +264,7 @@ function ElementChip({
   ghosted?: boolean;
   showStatus?: boolean;
   onHover: () => void;
+  onLeave: () => void;
   nodeRef: (node: HTMLElement | null) => void;
 }) {
   const color = primaryProcessColor(element.linkedProcessIds);
@@ -318,7 +326,9 @@ function ElementChip({
     transform: highlighted ? 'scale(1.04)' : undefined,
   };
 
-  const hoverHandlers = ghosted ? {} : { onMouseEnter: onHover };
+  const hoverHandlers = ghosted
+    ? {}
+    : { onMouseEnter: onHover, onMouseLeave: onLeave };
 
   if (element.systemId && !ghosted) {
     return (
@@ -361,6 +371,7 @@ function LayerSection({
   view,
   highlightedElementIds,
   onHoverElement,
+  onLeaveElement,
   registerNode,
 }: {
   layerId: ArchLayerId;
@@ -370,6 +381,7 @@ function LayerSection({
   view: ArchView;
   highlightedElementIds: Set<string>;
   onHoverElement: (id: string) => void;
+  onLeaveElement: () => void;
   registerNode: (key: string) => (node: HTMLElement | null) => void;
 }) {
   if (!elements.length) return null;
@@ -413,6 +425,7 @@ function LayerSection({
               ghosted={ghosted}
               showStatus={view === 'tobe'}
               onHover={() => onHoverElement(el.id)}
+              onLeave={onLeaveElement}
               nodeRef={registerNode(el.id)}
             />
           );
@@ -707,6 +720,7 @@ export function ArchitectureLayers() {
       <ProcessStrip
         highlightedProcessIds={highlightedProcessIds}
         onHoverProcess={hoverProcess}
+        onLeaveProcess={() => setHoveredProcessId(null)}
         registerNode={registerNode}
       />
 
@@ -719,6 +733,7 @@ export function ArchitectureLayers() {
           view={view}
           highlightedElementIds={highlightedElementIds}
           onHoverElement={hoverElement}
+          onLeaveElement={() => setHoveredElementId(null)}
           registerNode={registerNode}
         />
         <LayerSection
@@ -728,6 +743,7 @@ export function ArchitectureLayers() {
           view={view}
           highlightedElementIds={highlightedElementIds}
           onHoverElement={hoverElement}
+          onLeaveElement={() => setHoveredElementId(null)}
           registerNode={registerNode}
         />
         <LayerSection
@@ -738,6 +754,7 @@ export function ArchitectureLayers() {
           view={view}
           highlightedElementIds={highlightedElementIds}
           onHoverElement={hoverElement}
+          onLeaveElement={() => setHoveredElementId(null)}
           registerNode={registerNode}
         />
       </div>

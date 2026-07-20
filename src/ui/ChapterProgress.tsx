@@ -1,4 +1,5 @@
 import { chapters } from '../data/chapters';
+import { formatSlideNumber } from '../lib/slideNumber';
 import { useStore } from '../store/useStore';
 
 export function ChapterProgress() {
@@ -26,7 +27,7 @@ export function ChapterProgress() {
             }}
           >
             <span className="pointer-events-none absolute -top-7 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-ink/90 px-2 py-1 text-[10px] text-mist opacity-0 transition group-hover:opacity-100">
-              {String(i + 1).padStart(2, '0')} · {c.title}
+              {formatSlideNumber(c.index)} · {c.title}
             </span>
           </button>
         );
