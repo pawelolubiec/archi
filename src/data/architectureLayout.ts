@@ -333,7 +333,7 @@ export const ARCH_VIEW_COPY: Record<
   },
 };
 export const ARCH_LAYER_LABELS: Record<ArchLayerId, string> = {
-  ai: 'Decision, Automation & AI Orchestration',
+  ai: 'Control Tower: Decision, Automation & AI Orchestration',
   data: 'Data Platform',
   apps: 'Applications',
 };
