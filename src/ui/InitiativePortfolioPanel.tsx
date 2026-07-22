@@ -22,7 +22,7 @@ export function InitiativePortfolioPanel() {
     'minmax(7.5rem, 1.05fr) minmax(14rem, 1.9fr) repeat(3, minmax(8rem, 1fr))';
 
   return (
-    <div className="pointer-events-auto h-full max-h-[34rem] w-full max-w-[100rem]">
+    <div className="pointer-events-auto h-full max-h-[min(42rem,100%)] w-full max-w-[100rem]">
       <div className="relative flex h-full min-h-0 flex-col overflow-visible rounded-xl border border-white/10 bg-navy-900/65 shadow-panel backdrop-blur-sm">
         <div
           className="grid shrink-0 rounded-t-xl border-b border-white/10 bg-white/[0.035]"
@@ -93,9 +93,9 @@ export function InitiativePortfolioPanel() {
                       key={row.id}
                       onMouseEnter={() => setHoveredRowId(row.id)}
                       onMouseLeave={() => setHoveredRowId(null)}
-                      className={`relative grid min-h-0 gap-[clamp(0.45rem,0.75vw,0.8rem)] border-b border-white/[0.06] px-[clamp(0.65rem,1vw,1rem)] transition duration-300 ease-out last:border-b-0 motion-reduce:transform-none motion-reduce:transition-none ${
+                      className={`relative grid min-h-[4.75rem] gap-[clamp(0.45rem,0.75vw,0.8rem)] border-b border-white/[0.06] px-[clamp(0.65rem,1vw,1rem)] transition duration-300 ease-out last:border-b-0 motion-reduce:transform-none motion-reduce:transition-none ${
                         expanded
-                          ? 'z-50 -my-8 min-h-[9rem] scale-[1.025] items-start rounded-xl bg-navy-800/95 py-4 shadow-[0_22px_65px_rgba(0,10,24,0.72)] ring-1 ring-gold/45'
+                          ? 'z-50 -my-8 min-h-[10rem] scale-[1.025] items-start rounded-xl bg-navy-800/95 py-4 shadow-[0_22px_65px_rgba(0,10,24,0.72)] ring-1 ring-gold/45'
                           : 'items-center py-[clamp(0.3rem,0.65vh,0.55rem)]'
                       }`}
                       style={{ gridTemplateColumns: rowColumns }}
@@ -117,33 +117,29 @@ export function InitiativePortfolioPanel() {
                     </div>
 
                     <div className="grid min-w-0 grid-cols-[1fr_auto_1.15fr] items-center gap-2">
-                      <p
-                        className={`${expanded ? '' : 'line-clamp-2'} text-[clamp(11px,calc(0.35vw+0.65vh),14px)] leading-snug text-mist`}
-                      >
+                      <p className="text-[clamp(10px,calc(0.3vw+0.55vh),13px)] leading-snug text-mist">
                         {row.current}
                       </p>
                       <span className="text-[clamp(12px,0.8vw,16px)] text-gold/70">→</span>
-                      <p
-                        className={`${expanded ? '' : 'line-clamp-2'} text-[clamp(11px,calc(0.35vw+0.65vh),14px)] font-medium leading-snug text-paper/90`}
-                      >
+                      <p className="text-[clamp(10px,calc(0.3vw+0.55vh),13px)] font-medium leading-snug text-paper/90">
                         {row.target}
                       </p>
                     </div>
 
                     <p
-                      className={`${expanded ? '' : 'line-clamp-3'} self-center text-[clamp(9px,calc(0.25vw+0.5vh),12px)] leading-snug text-paper/80`}
+                      className="self-center text-[clamp(9px,calc(0.22vw+0.45vh),11px)] leading-snug text-paper/80"
                       title={row.profitability}
                     >
                       {row.profitability}
                     </p>
                     <p
-                      className={`${expanded ? '' : 'line-clamp-3'} self-center text-[clamp(9px,calc(0.25vw+0.5vh),12px)] leading-snug text-sea/90`}
+                      className="self-center text-[clamp(9px,calc(0.22vw+0.45vh),11px)] leading-snug text-sea/90"
                       title={row.margin}
                     >
                       {row.margin}
                     </p>
                     <p
-                      className={`${expanded ? '' : 'line-clamp-3'} self-center text-[clamp(9px,calc(0.25vw+0.5vh),12px)] leading-snug text-gold/85`}
+                      className="self-center text-[clamp(9px,calc(0.22vw+0.45vh),11px)] leading-snug text-gold/85"
                       title={row.productPortfolio}
                     >
                       {row.productPortfolio}
