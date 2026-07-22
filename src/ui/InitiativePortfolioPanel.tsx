@@ -14,6 +14,7 @@ const PRIORITY_STYLE: Record<InitiativeRow['priority'], string> = {
 
 export function InitiativePortfolioPanel() {
   const [hoveredClusterId, setHoveredClusterId] = useState<string | null>(null);
+  const [hoveredRowId, setHoveredRowId] = useState<string | null>(null);
   const reduceMotion = useReducedMotion();
   const rowsById = new Map(INITIATIVE_ROWS.map((row) => [row.id, row]));
   const tableColumns = 'clamp(10rem, 14vw, 14rem) minmax(0, 1fr)';
@@ -85,12 +86,20 @@ export function InitiativePortfolioPanel() {
                 className="grid min-h-0"
                 style={{ gridTemplateRows: `repeat(${rows.length}, minmax(0, 1fr))` }}
               >
-                {rows.map((row) => (
-                  <div
-                    key={row.id}
-                    className="relative grid min-h-0 items-center gap-[clamp(0.45rem,0.75vw,0.8rem)] border-b border-white/[0.06] px-[clamp(0.65rem,1vw,1rem)] py-[clamp(0.3rem,0.65vh,0.55rem)] transition duration-300 ease-out last:border-b-0 hover:z-30 hover:scale-[1.022] hover:rounded-xl hover:bg-navy-800/95 hover:shadow-[0_18px_55px_rgba(0,10,24,0.62)] hover:ring-1 hover:ring-gold/40 motion-reduce:transform-none motion-reduce:transition-none"
-                    style={{ gridTemplateColumns: rowColumns }}
-                  >
+                {rows.map((row) => {
+                  const expanded = hoveredRowId === row.id;
+                  return (
+                    <div
+                      key={row.id}
+                      onMouseEnter={() => setHoveredRowId(row.id)}
+                      onMouseLeave={() => setHoveredRowId(null)}
+                      className={`relative grid min-h-0 gap-[clamp(0.45rem,0.75vw,0.8rem)] border-b border-white/[0.06] px-[clamp(0.65rem,1vw,1rem)] transition duration-300 ease-out last:border-b-0 motion-reduce:transform-none motion-reduce:transition-none ${
+                        expanded
+                          ? 'z-50 -my-8 min-h-[9rem] scale-[1.025] items-start rounded-xl bg-navy-800/95 py-4 shadow-[0_22px_65px_rgba(0,10,24,0.72)] ring-1 ring-gold/45'
+                          : 'items-center py-[clamp(0.3rem,0.65vh,0.55rem)]'
+                      }`}
+                      style={{ gridTemplateColumns: rowColumns }}
+                    >
                     <div className="min-w-0">
                       <div className="text-[clamp(13px,calc(0.45vw+0.65vh),17px)] font-semibold leading-tight text-paper">
                         {row.initiative}
@@ -108,35 +117,40 @@ export function InitiativePortfolioPanel() {
                     </div>
 
                     <div className="grid min-w-0 grid-cols-[1fr_auto_1.15fr] items-center gap-2">
-                      <p className="line-clamp-2 text-[clamp(11px,calc(0.35vw+0.65vh),14px)] leading-snug text-mist">
+                      <p
+                        className={`${expanded ? '' : 'line-clamp-2'} text-[clamp(11px,calc(0.35vw+0.65vh),14px)] leading-snug text-mist`}
+                      >
                         {row.current}
                       </p>
                       <span className="text-[clamp(12px,0.8vw,16px)] text-gold/70">→</span>
-                      <p className="line-clamp-2 text-[clamp(11px,calc(0.35vw+0.65vh),14px)] font-medium leading-snug text-paper/90">
+                      <p
+                        className={`${expanded ? '' : 'line-clamp-2'} text-[clamp(11px,calc(0.35vw+0.65vh),14px)] font-medium leading-snug text-paper/90`}
+                      >
                         {row.target}
                       </p>
                     </div>
 
                     <p
-                      className="line-clamp-3 self-center text-[clamp(9px,calc(0.25vw+0.5vh),12px)] leading-snug text-paper/80"
+                      className={`${expanded ? '' : 'line-clamp-3'} self-center text-[clamp(9px,calc(0.25vw+0.5vh),12px)] leading-snug text-paper/80`}
                       title={row.profitability}
                     >
                       {row.profitability}
                     </p>
                     <p
-                      className="line-clamp-3 self-center text-[clamp(9px,calc(0.25vw+0.5vh),12px)] leading-snug text-sea/90"
+                      className={`${expanded ? '' : 'line-clamp-3'} self-center text-[clamp(9px,calc(0.25vw+0.5vh),12px)] leading-snug text-sea/90`}
                       title={row.margin}
                     >
                       {row.margin}
                     </p>
                     <p
-                      className="line-clamp-3 self-center text-[clamp(9px,calc(0.25vw+0.5vh),12px)] leading-snug text-gold/85"
+                      className={`${expanded ? '' : 'line-clamp-3'} self-center text-[clamp(9px,calc(0.25vw+0.5vh),12px)] leading-snug text-gold/85`}
                       title={row.productPortfolio}
                     >
                       {row.productPortfolio}
                     </p>
-                  </div>
-                ))}
+                    </div>
+                  );
+                })}
               </div>
             </motion.section>
           );
