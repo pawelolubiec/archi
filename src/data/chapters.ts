@@ -283,9 +283,9 @@ const allChapters: Chapter[] = [
     eyebrow: 'Operations',
     title: "The factory's internal systems",
     description:
-      'Descending from orbit into the operational core. A guided run-through of ERP, PTS, PID, MiFo, WMS, and QMS/LIMS — how each system supports the organisation — then the hall is yours to explore.',
+      'Descending into the operational core — MiFo, PTS, PID, WMS, QMS/LIMS and ERP. Specialized systems that create value, and feed the signals the Control Tower decides on.',
     businessMessage:
-      'Every area has a specialized system — not one monolith for everything. This is where value is created.',
+      'Specialized systems below — not one monolith. Their live signals are what make the Control Tower useful.',
     cameraPosition: [7.0, 10.5, 8.5],
     cameraTarget: [0, 0.5, 0],
     visibleLocations: ['factory_poland'],
@@ -300,9 +300,9 @@ const allChapters: Chapter[] = [
     eyebrow: 'Operations',
     title: 'Building order in the organisation',
     description:
-      'The same hall, two states: fragmented handoffs today versus a continuous chain from order to output when the hybrid architecture is in place.',
+      'The same hall, two states: fragmented handoffs today versus a continuous chain from order to output — with signals rising to the Control Tower and approved decisions flowing back down.',
     businessMessage:
-      'Order in operations means linked systems — not one monolith for everything.',
+      'Order means linked systems below and a governed decision layer above — not one operational monolith.',
     cameraPosition: [7.0, 10.5, 8.5],
     cameraTarget: [0, 0.5, 0],
     visibleLocations: ['factory_poland'],

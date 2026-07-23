@@ -121,7 +121,7 @@ Notice the band at the top of the architecture. Just like our digital strategy t
 
 <break time="0.7s" />
 
-Every signal lands here. Demand variances. Capacity squeeze. Ordering deadlines. Quality and farm flags. Alerts from every system meet in one place — each with a deep link into the application where the answer lives.
+Every signal lands here. Demand variances. Capacity squeeze. Ordering deadlines. Quality and farm flags. Thin shelf-life buffers. Alerts from every system meet in one place — each with a deep link into the application where the answer lives. This is the decision layer from the strategy architecture… made real.
 
 <break time="0.7s" />
 
@@ -129,7 +129,11 @@ The generative A I agent turns those signals into a concrete, quantified proposa
 
 <break time="0.7s" />
 
-A human clicks Approve. Then every plan updates itself: the forecast, the budget, production, purchasing, staffing — no e-mails, no re-typing. Every gate in this flow is a human decision, with a name, a timestamp, and a system.
+A human clicks Approve. Then every plan updates itself: the forecast publishes… the budget re-projects… production, purchasing and staffing stay consistent. No e-mails. No re-typing. Every gate is a human decision — with a name, a timestamp, and a system.
+
+<break time="0.7s" />
+
+And before you commit, the margin simulator runs the same calculation chain as the budget — so management sees the impact first… not in next quarter's results.
 
 <break time="1.4s" />
 
@@ -139,7 +143,7 @@ Automation does the work. Accountability stays with people. That is the target a
 
 ## Slide 06 — The factory’s internal systems
 
-The factory is where the architecture becomes operational value.
+The factory is where the architecture becomes operational value — and where the Control Tower gets its signals.
 
 <break time="0.7s" />
 
@@ -147,19 +151,15 @@ The chain begins with MiFo, bringing demand, customer orders, and margin intelli
 
 <break time="0.7s" />
 
-P I D provides one controlled source for recipes, specifications, allergens, and product versions. W M S connects warehouse locations and stock rotation directly to production, reducing inventory and improving material availability. Q M S and LIMS capture quality checks and laboratory results at the source — making compliance part of the process, rather than an exercise in paperwork.
+P I D provides one controlled source for recipes, specifications, allergens, and product versions. W M S connects warehouse locations and stock rotation directly to production. Q M S and LIMS capture quality checks and laboratory results at the source. The E R P closes the financial loop through the ledger, valuation, and group reporting.
 
 <break time="0.7s" />
 
-Finally, the E R P closes the financial loop through the ledger, valuation, and group reporting.
-
-<break time="0.7s" />
-
-Each system has a clear responsibility. Together, they connect demand... material... production... quality... inventory... and money.
+Each system has a clear responsibility. Together they connect demand, material, production, quality, inventory, and money — and they feed the shared data layer that powers the Control Tower above.
 
 <break time="1.4s" />
 
-The objective is not one system for the whole factory. It is one coherent operating model for the whole factory.
+The objective is not one system for the whole factory. It is one coherent operating model — specialized systems below, and one decision layer on top.
 
 ---
 
@@ -169,19 +169,19 @@ The same factory can operate in two very different ways.
 
 <break time="0.7s" />
 
-In the current state, the systems exist, but information often stops between them. Spreadsheets, email, and manual re-entry bridge the gaps. Material continues to move... while the information needed to manage it arrives late, or in conflicting versions. That creates delay, rework, and decisions based on partial facts.
+In the current state, the systems exist, but information often stops between them. Spreadsheets, email, and manual re-entry bridge the gaps. Exceptions surface late — in meetings, not in a Control Tower. Material continues to move… while the information needed to manage it arrives late, or in conflicting versions.
 
 <break time="0.7s" />
 
-In the target state, one connected chain runs from order to output. Demand from MiFo informs production. P I D supplies the correct recipe and specification. P T S records execution and traceability. Quality results are captured in Q M S and LIMS. W M S controls inventory and material movement. The E R P receives the financial result — without taking over operational work.
+In the target state, one connected chain runs from order to output. Demand from MiFo informs production. P I D supplies the correct recipe and specification. P T S records execution and traceability. Quality, warehouse and finance stay in the loop. Signals rise into the Control Tower — and approved decisions flow back down, without re-typing.
 
 <break time="0.7s" />
 
-This is what building order in the organisation means: clear system responsibilities... standard data connections... and one continuous flow of information.
+This is what building order in the organisation means: clear system responsibilities… standard data connections… and a governed decision layer above the hall.
 
 <break time="1.4s" />
 
-The result is faster coordination, stronger control, and fewer manual handoffs — achieved through linked specialist systems... not through one operational monolith.
+The result is faster coordination, stronger control, and fewer manual handoffs — linked specialist systems below… Control Tower on top. Not one operational monolith.
 
 ---
 

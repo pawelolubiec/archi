@@ -22,7 +22,7 @@ export const TOUR_NARRATIVE: Record<string, string> = {
   pid: 'One source of truth for recipes, specs and allergens — production never runs on an outdated specification.',
   wms: 'FEFO-managed locations connect the warehouse to production — this is where inventory days come down.',
   qms_lims: 'Quality checks and lab results are captured at the source — compliance becomes a by-product of the process, not paperwork.',
-  workday_erp: 'The lean financial core closes the loop — ledger, valuation, closing. Deliberately not an operational monolith.',
+  workday_erp: 'The lean financial core closes the loop — ledger, valuation, closing. Deliberately not an operational monolith. Together with the other systems, it feeds the Control Tower above.',
 };
 
 export interface CameraFocus {

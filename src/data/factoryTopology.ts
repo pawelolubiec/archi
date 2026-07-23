@@ -13,12 +13,12 @@ export const FACTORY_ORDER_COPY: Record<
   asis: {
     headline: 'As is — local handoffs and gaps',
     detail:
-      'Systems exist but data stops at spreadsheets and e-mail between shifts. Material flow runs; information flow does not keep up.',
+      'Systems exist but data stops at spreadsheets and e-mail between shifts. Exceptions surface late — in meetings, not in a Control Tower.',
   },
   tobe: {
     headline: 'To be — order across the hall',
     detail:
-      'One continuous chain from order to output: demand, recipe, execution, quality, and finance linked through the shared platform.',
+      'One continuous chain from order to output. Signals rise to the Control Tower; approved decisions flow back — no re-typing.',
   },
 };
 
