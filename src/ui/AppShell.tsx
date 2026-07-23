@@ -29,6 +29,7 @@ import { InitiativePortfolioPanel } from './InitiativePortfolioPanel';
 import { FactoryOrderPanel } from './FactoryOrderPanel';
 import { FACTORY_DEMO_STEPS } from '../data/factoryDemo';
 import { NarrationControl } from './NarrationControl';
+import { ControlTowerPanel } from './ControlTowerPanel';
 
 function CentralPanel() {
   const chapter = useStore((s) => s.current());
@@ -69,6 +70,7 @@ export function AppShell() {
   const isGermanyFactory = chapter.id === 'germany-factory';
   const isFactoryOrder = chapter.id === 'factory-order';
   const isGrowth = chapter.id === 'growth';
+  const isControlTower = chapter.id === 'ai-automation';
   const isSalesSlide =
     chapter.id === 'germany' ||
     chapter.id === 'pts-yield' ||
@@ -159,6 +161,11 @@ export function AppShell() {
         </>
       )}
 
+      {/* Control Tower — globe as atmospheric backdrop only */}
+      {is3D && isControlTower && (
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-ink/80 via-ink/70 to-ink/88" />
+      )}
+
       {/* top bar */}
       <header className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-8">
         <div className="pointer-events-auto">
@@ -175,7 +182,7 @@ export function AppShell() {
       {/* center content */}
       {is3D ? (
         <>
-          {factoryDemoStep === null && (
+          {factoryDemoStep === null && !isControlTower && (
             <div
               className={`absolute z-10 ${
                 chapter.scene === 'factory'
@@ -188,7 +195,30 @@ export function AppShell() {
               <Overlay />
             </div>
           )}
-          {isGermanyFactory ? (
+          {isControlTower ? (
+            <div className="absolute inset-x-6 top-[8.75rem] bottom-[4.75rem] z-10 flex flex-col sm:inset-x-8 lg:inset-x-10">
+              <div className="pointer-events-none mb-3 flex shrink-0 flex-wrap items-baseline gap-x-3 gap-y-1">
+                <span className="font-display text-3xl leading-none text-gold/80">
+                  {formatSlideNumber(chapter.index)}
+                </span>
+                <h1 className="font-display text-slide-title leading-none text-paper">
+                  {chapter.title}
+                </h1>
+                <span className="text-slide-kicker uppercase tracking-eyebrow text-sea">
+                  {chapter.eyebrow}
+                </span>
+              </div>
+              <p className="pointer-events-none mb-3 max-w-4xl shrink-0 text-sm leading-relaxed text-mist lg:text-base">
+                {chapter.description}
+              </p>
+              <div className="flex min-h-0 flex-1 items-center justify-center">
+                <ControlTowerPanel />
+              </div>
+              <p className="pointer-events-none mt-3 shrink-0 border-l-[3px] border-gold pl-4 text-slide-takeaway font-medium leading-snug text-paper">
+                {chapter.businessMessage}
+              </p>
+            </div>
+          ) : isGermanyFactory ? (
             <>
               <div className="absolute inset-y-0 right-8 z-10 flex w-[min(58%,52rem)] items-center justify-center pt-20 pb-28">
                 <OrderFlow />

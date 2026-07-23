@@ -115,25 +115,25 @@ The portfolio therefore connects every initiative to a business outcome: stronge
 
 ---
 
-## Slide 05 — AI on top of everything
+## Slide 05 — A decision layer on top
 
-Artificial intelligence is not a separate experiment in this strategy. It is a decision layer that works across the entire business.
-
-<break time="0.7s" />
-
-The foundation must come first: connected applications, governed master data, and a trusted data platform. Once that foundation is in place, artificial intelligence can read the same canonical data across sales, production, quality, logistics, and finance.
+Notice the band at the top of the architecture. Just like our digital strategy target landscape, there are three layers: operational applications at the bottom… one shared data layer… and on top, a decision layer — the Control Tower — where alerts, A I recommendations, simulations and human approvals live.
 
 <break time="0.7s" />
 
-That creates practical business use cases. Demand signals can be monitored continuously. Forecast variance can be identified earlier. Margin can be simulated before a commercial commitment is made. Yield and quality anomalies can be detected while there is still time to act. Repetitive analysis and routine decisions can be automated — with clear human oversight.
+Every signal lands here. Demand variances. Capacity squeeze. Ordering deadlines. Quality and farm flags. Alerts from every system meet in one place — each with a deep link into the application where the answer lives.
 
 <break time="0.7s" />
 
-The ambition is not artificial intelligence for its own sake. It is faster... more consistent... and better-informed decision-making.
+The generative A I agent turns those signals into a concrete, quantified proposal — with the profit impact computed by the same engine as the budget. It can even warn about side effects. And one thing it cannot do… is publish anything on its own.
+
+<break time="0.7s" />
+
+A human clicks Approve. Then every plan updates itself: the forecast, the budget, production, purchasing, staffing — no e-mails, no re-typing. Every gate in this flow is a human decision, with a name, a timestamp, and a system.
 
 <break time="1.4s" />
 
-One shared intelligence layer also avoids building a separate solution for every application. As the data foundation improves, every connected system gains stronger prediction and decision support... at the same time.
+Automation does the work. Accountability stays with people. That is the target architecture: applications… one data layer… and a decision layer on top.
 
 ---
 

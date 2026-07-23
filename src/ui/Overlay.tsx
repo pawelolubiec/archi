@@ -21,10 +21,6 @@ function chapterDescription(chapterId: string, fallback: string): string {
     const inventory = kpiById.inventory_days;
     return `One lean group ERP for ledger, closing and valuation — deliberately not an operational monolith. Operations stay in the specialized systems; the ledger carries one truth for money and the ${inventory.baseline} → ${inventory.target} days working-capital target.`;
   }
-  if (chapterId === 'ai-automation') {
-    const forecast = kpiById.forecast_accuracy;
-    return `Our demand forecast is right ${forecast.baseline}% of the time today. Agents on the canonical data layer take it to ${forecast.target}% — and bring prediction, simulation and automation to every application at once.`;
-  }
   return fallback;
 }
 

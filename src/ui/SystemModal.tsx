@@ -186,42 +186,12 @@ function erpOutcomeCards(): OutcomeCard[] {
   ];
 }
 
-function aiOutcomeCards(): OutcomeCard[] {
-  const forecast = kpiById.forecast_accuracy;
-  const costPerKg = kpiById.cost_per_kg;
-  const co2 = kpiById.co2_per_kg;
-  return [
-    {
-      claim: `Forecast accuracy ${forecast.baseline}% → ${forecast.target}%`,
-      support:
-        'Demand prediction over the canonical data layer — every office and product, one model.',
-      tag: forecast.name,
-      kpis: [forecast],
-    },
-    {
-      claim: 'Optimization at shift level',
-      support:
-        'Yield, throughput and staffing tuned by agents while the shift runs — not analyzed after it.',
-      tag: costPerKg.name,
-      kpis: [costPerKg],
-    },
-    {
-      claim: 'Footprint down from the same data',
-      support:
-        'Energy and CO₂ per kilogram optimized from the same event stream — no separate sustainability stack.',
-      tag: co2.name,
-      kpis: [co2],
-    },
-  ];
-}
-
 /** Strategic-view outcome cards per chapter: which system gets the board story. */
 const OUTCOME_VIEWS: Record<string, { systemId: string; cards: () => OutcomeCard[] }> = {
   germany: { systemId: 'mifo', cards: mifoOutcomeCards },
   'pts-yield': { systemId: 'pts', cards: ptsOutcomeCards },
   'pid-spec': { systemId: 'pid', cards: pidOutcomeCards },
   'erp-core': { systemId: 'workday_erp', cards: erpOutcomeCards },
-  'ai-automation': { systemId: 'gone_ai', cards: aiOutcomeCards },
 };
 
 function OutcomeCards({ cards }: { cards: OutcomeCard[] }) {

@@ -246,12 +246,12 @@ const allChapters: Chapter[] = [
     id: 'ai-automation',
     index: 9,
     scene: 'globe',
-    eyebrow: 'AI & automation',
-    title: 'AI on top of everything',
+    eyebrow: 'Control Tower',
+    title: 'A decision layer on top',
     description:
-      'Agents read the canonical data layer — demand prediction, margin simulation, anomaly detection and automation reach every application without per-system integration.',
+      'Just like the target architecture: applications below, one shared data layer, and on top the Control Tower — where alerts, AI recommendations, simulations and human approvals live.',
     businessMessage:
-      'Every system in this journey just gained decision support — the AI layer covers them all at once.',
+      'Automation does the work. Accountability stays with people — every gate is a human decision, with a name, a timestamp, and a system.',
     prominentTakeaway: true,
     cameraPosition: [6.4, 7.7, -0.9],
     cameraTarget: [0, 0, 0],
@@ -274,7 +274,6 @@ const allChapters: Chapter[] = [
     ],
     hideLocationLabels: true,
     activeSystems: ['gone_ai', 'data_platform'],
-    modal: 'gone_ai',
     kpiPanel: false,
   },
   {
