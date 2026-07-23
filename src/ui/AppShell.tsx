@@ -28,6 +28,7 @@ import { GrowthPanel } from './GrowthPanel';
 import { InitiativePortfolioPanel } from './InitiativePortfolioPanel';
 import { FactoryOrderPanel } from './FactoryOrderPanel';
 import { FACTORY_DEMO_STEPS } from '../data/factoryDemo';
+import { NarrationControl } from './NarrationControl';
 
 function CentralPanel() {
   const chapter = useStore((s) => s.current());
@@ -164,6 +165,7 @@ export function AppShell() {
           <SlideMenu />
         </div>
         <div className="pointer-events-auto flex items-center gap-3">
+          <NarrationControl />
           <FactoryConfigButton />
           <ArchitectureConfigButton />
           {chapter.scene === 'factory' && <ModeToggle />}
