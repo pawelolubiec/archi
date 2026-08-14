@@ -10,6 +10,7 @@
   "scripts": {
     "dev": "vite",
     "dev:worker": "wrangler dev",
+    "dev:full": "npm run dev:worker & npm run dev",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "deploy": "npm run build && npm run db:migrate:remote && wrangler deploy",

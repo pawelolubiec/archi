@@ -23,7 +23,11 @@ export interface ArchitectureElement {
   id: string;
   label: string;
   layer: ArchLayerId;
+  /** Default business-process links (fallback when a view override is unset). */
   linkedProcessIds: string[];
+  /** Per-view business-process links — override linkedProcessIds when set. */
+  linkedProcessIdsAsIs?: string[];
+  linkedProcessIdsToBe?: string[];
   /**
    * Explicit connections to other elements. `undefined` means "derive from
    * shared business processes"; an array (even empty) pins the exact set.
@@ -35,6 +39,12 @@ export interface ArchitectureElement {
   systemId?: string;
   /** to be done / in development / running — absent = derived from the system */
   status?: ElementStatus;
+  /**
+   * Per-view visibility. `false` hides the element in that architecture state
+   * (e.g. Excel live in As is, retired in To be). Undefined = enabled.
+   */
+  enabledAsIs?: boolean;
+  enabledToBe?: boolean;
 }
 
 /** How a cross-layer link behaves in each architecture state. */
@@ -55,6 +65,25 @@ export interface ArchitectureConfig {
 /** Vertical position of each layer — used to decide flow direction. */
 export const LAYER_RANK: Record<ArchLayerId, number> = { apps: 0, data: 1, ai: 2 };
 
+/** Effective business-process links for a given architecture view. */
+export function processIdsForView(
+  el: ArchitectureElement,
+  view: 'asis' | 'tobe',
+): string[] {
+  const override =
+    view === 'asis' ? el.linkedProcessIdsAsIs : el.linkedProcessIdsToBe;
+  return override ?? el.linkedProcessIds;
+}
+
+/** Whether an element is included in As is / To be (default: yes). */
+export function isElementEnabledInView(
+  el: ArchitectureElement,
+  view: 'asis' | 'tobe',
+): boolean {
+  const flag = view === 'asis' ? el.enabledAsIs : el.enabledToBe;
+  return flag !== false;
+}
+
 /**
  * Effective element-to-element connections. Explicit links (from either side)
  * always count; when neither side pins its links, cross-layer elements sharing
@@ -66,8 +95,11 @@ export function connectedElementIds(
   view: 'asis' | 'tobe' = 'tobe',
 ): Set<string> {
   const out = new Set<string>();
-  const shares = (a: ArchitectureElement, b: ArchitectureElement) =>
-    a.linkedProcessIds.some((p) => b.linkedProcessIds.includes(p));
+  const shares = (a: ArchitectureElement, b: ArchitectureElement) => {
+    const aProcs = processIdsForView(a, view);
+    const bProcs = processIdsForView(b, view);
+    return aProcs.some((p) => bProcs.includes(p));
+  };
 
   const viewLinks =
     view === 'asis' ? el.linkedElementIdsAsIs : el.linkedElementIdsToBe;
@@ -191,6 +223,12 @@ export function mergeArchitectureConfig(
     elements: remote.elements.map((el) => ({
       ...el,
       linkedProcessIds: [...el.linkedProcessIds],
+      linkedProcessIdsAsIs: el.linkedProcessIdsAsIs
+        ? [...el.linkedProcessIdsAsIs]
+        : undefined,
+      linkedProcessIdsToBe: el.linkedProcessIdsToBe
+        ? [...el.linkedProcessIdsToBe]
+        : undefined,
     })),
     connectionsAsIs: remote.connectionsAsIs ?? base.connectionsAsIs,
     connectionsToBe: remote.connectionsToBe ?? base.connectionsToBe,

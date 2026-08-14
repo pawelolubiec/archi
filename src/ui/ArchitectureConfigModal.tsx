@@ -9,6 +9,7 @@ import {
   ELEMENT_STATUS_META,
   connectionsForView,
   elementStatus,
+  processIdsForView,
   type ArchLayerId,
   type ArchitectureConnection,
   type ArchitectureElement,
@@ -25,13 +26,17 @@ function ConnectionsEditor({
   allElements,
   connections,
   configView,
+  processIds,
   onToggleConnection,
+  onToggleProcess,
 }: {
   element: ArchitectureElement;
   allElements: ArchitectureElement[];
   connections: ArchitectureConnection[];
   configView: 'asis' | 'tobe';
+  processIds: string[];
   onToggleConnection: (otherId: string) => void;
+  onToggleProcess: (processId: string) => void;
 }) {
   const connected = new Set(
     connections.flatMap((connection) => {
@@ -40,9 +45,38 @@ function ConnectionsEditor({
       return [];
     }),
   );
+  const viewLabel = configView === 'asis' ? 'As is' : 'To be';
 
   return (
-    <div className="mt-2 space-y-1.5 border-t border-white/5 pt-2">
+    <div className="mt-2 space-y-2 border-t border-white/5 pt-2">
+      <p className="text-[10px] text-mist/55">
+        Connections for <span className="text-mist/80">{viewLabel}</span> only —
+        the other view keeps its own map.
+      </p>
+      <div className="flex flex-wrap items-baseline gap-1.5">
+        <span className="w-24 shrink-0 text-[10px] uppercase tracking-[0.14em] text-mist/60">
+          Business
+        </span>
+        {BUSINESS_PROCESSES.map((proc) => {
+          const active = processIds.includes(proc.id);
+          return (
+            <button
+              key={proc.id}
+              type="button"
+              onClick={() => onToggleProcess(proc.id)}
+              className="rounded-full border px-2 py-0.5 text-[10px] font-medium transition"
+              style={{
+                borderColor: active ? proc.color : 'rgba(255,255,255,0.12)',
+                background: active ? `${proc.color}33` : 'transparent',
+                color: active ? proc.color : '#9DB4CC',
+              }}
+              title={proc.label}
+            >
+              {proc.order}. {proc.label}
+            </button>
+          );
+        })}
+      </div>
       {LAYER_ORDER.filter((layer) =>
         allElements.some((o) => o.layer === layer && o.id !== element.id),
       ).map((layer) => (
@@ -61,9 +95,21 @@ function ConnectionsEditor({
                   onClick={() => onToggleConnection(o.id)}
                   className="rounded-full border px-2 py-0.5 text-[10px] font-medium transition"
                   style={{
-                    borderColor: active ? '#2EC5C5' : 'rgba(255,255,255,0.12)',
-                    background: active ? 'rgba(46,197,197,0.15)' : 'transparent',
-                    color: active ? '#2EC5C5' : '#9DB4CC',
+                    borderColor: active
+                      ? configView === 'asis'
+                        ? '#F07167'
+                        : '#34D399'
+                      : 'rgba(255,255,255,0.12)',
+                    background: active
+                      ? configView === 'asis'
+                        ? 'rgba(240,113,103,0.15)'
+                        : 'rgba(52,211,153,0.15)'
+                      : 'transparent',
+                    color: active
+                      ? configView === 'asis'
+                        ? '#F07167'
+                        : '#34D399'
+                      : '#9DB4CC',
                   }}
                 >
                   {o.label}
@@ -72,14 +118,6 @@ function ConnectionsEditor({
             })}
         </div>
       ))}
-      {(element.linkedElementIds === undefined &&
-        element.linkedElementIdsAsIs === undefined &&
-        element.linkedElementIdsToBe === undefined) && (
-        <p className="text-[10px] text-mist/50">
-          Currently derived from shared processes for {configView} — toggling pins
-          the list for this element in that view.
-        </p>
-      )}
     </div>
   );
 }
@@ -94,6 +132,7 @@ function ElementRow({
   onSystemChange,
   onToggleConnection,
   onStatusChange,
+  onEnabledChange,
   onDelete,
 }: {
   element: ArchitectureElement;
@@ -105,17 +144,27 @@ function ElementRow({
   onSystemChange: (systemId: string | undefined) => void;
   onToggleConnection: (otherId: string) => void;
   onStatusChange: (status: ElementStatus) => void;
+  onEnabledChange: (view: 'asis' | 'tobe', enabled: boolean) => void;
   onDelete: () => void;
 }) {
-  const [showConnections, setShowConnections] = useState(false);
+  const [showConnections, setShowConnections] = useState(true);
+  const processIds = processIdsForView(element, configView);
   const connectionCount = connections.filter(
     (connection) =>
       connection.fromId === element.id || connection.toId === element.id,
   ).length;
   const status = elementStatus(element);
+  const viewLabel = configView === 'asis' ? 'As is' : 'To be';
+  const enabledAsIs = element.enabledAsIs !== false;
+  const enabledToBe = element.enabledToBe !== false;
+  const enabledInCurrentView = configView === 'asis' ? enabledAsIs : enabledToBe;
 
   return (
-    <div className="rounded-lg border border-white/8 bg-ink/40 p-3">
+    <div
+      className={`rounded-lg border border-white/8 bg-ink/40 p-3 ${
+        enabledInCurrentView ? '' : 'opacity-55'
+      }`}
+    >
       <div className="mb-2 flex items-center gap-2">
         <input
           type="text"
@@ -165,9 +214,10 @@ function ElementRow({
           type="button"
           onClick={() => setShowConnections((v) => !v)}
           className="rounded-md border border-white/10 px-2 py-1 text-xs text-mist transition hover:border-sea/40 hover:text-sea"
-          title="Configure connections to other elements"
+          title="Configure connections to business processes and other elements"
         >
-          Links ({connectionCount}) {showConnections ? '▴' : '▾'}
+          Links ({processIds.length + connectionCount}){' '}
+          {showConnections ? '▴' : '▾'}
         </button>
         <button
           type="button"
@@ -177,9 +227,48 @@ function ElementRow({
           Delete
         </button>
       </div>
-      <div className="flex flex-wrap gap-1.5">
+      <div className="mb-2 flex flex-wrap items-center gap-2">
+        <span className="text-[10px] uppercase tracking-[0.12em] text-mist/55">
+          Show in
+        </span>
+        <button
+          type="button"
+          onClick={() => onEnabledChange('asis', !enabledAsIs)}
+          className="rounded-full border px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] transition"
+          style={{
+            borderColor: enabledAsIs ? '#F07167' : 'rgba(255,255,255,0.12)',
+            background: enabledAsIs ? 'rgba(240,113,103,0.15)' : 'transparent',
+            color: enabledAsIs ? '#F07167' : '#9DB4CC',
+          }}
+          title="Include this element in the As is architecture"
+        >
+          As is {enabledAsIs ? 'on' : 'off'}
+        </button>
+        <button
+          type="button"
+          onClick={() => onEnabledChange('tobe', !enabledToBe)}
+          className="rounded-full border px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] transition"
+          style={{
+            borderColor: enabledToBe ? '#34D399' : 'rgba(255,255,255,0.12)',
+            background: enabledToBe ? 'rgba(52,211,153,0.15)' : 'transparent',
+            color: enabledToBe ? '#34D399' : '#9DB4CC',
+          }}
+          title="Include this element in the To be architecture"
+        >
+          To be {enabledToBe ? 'on' : 'off'}
+        </button>
+        {!enabledInCurrentView && (
+          <span className="text-[10px] text-mist/60">
+            Hidden in {viewLabel} — turn it on to show on the slide
+          </span>
+        )}
+      </div>
+      <div className="mb-1 flex flex-wrap items-center gap-1.5">
+        <span className="text-[10px] uppercase tracking-[0.12em] text-mist/55">
+          Business · {viewLabel}
+        </span>
         {BUSINESS_PROCESSES.map((proc) => {
-          const active = element.linkedProcessIds.includes(proc.id);
+          const active = processIds.includes(proc.id);
           return (
             <button
               key={proc.id}
@@ -191,7 +280,7 @@ function ElementRow({
                 background: active ? `${proc.color}33` : 'transparent',
                 color: active ? proc.color : '#9DB4CC',
               }}
-              title={proc.label}
+              title={`${proc.label} (${viewLabel})`}
             >
               {proc.order}
             </button>
@@ -204,7 +293,9 @@ function ElementRow({
           allElements={allElements}
           connections={connections}
           configView={configView}
+          processIds={processIds}
           onToggleConnection={onToggleConnection}
+          onToggleProcess={onToggleProcess}
         />
       )}
     </div>
@@ -259,6 +350,14 @@ function LayerSection({
             onLabelChange={(label) => onUpdate(el.id, { label })}
             onSystemChange={(systemId) => onUpdate(el.id, { systemId })}
             onStatusChange={(status) => onUpdate(el.id, { status })}
+            onEnabledChange={(view, enabled) =>
+              onUpdate(
+                el.id,
+                view === 'asis'
+                  ? { enabledAsIs: enabled }
+                  : { enabledToBe: enabled },
+              )
+            }
             onDelete={() => onDelete(el.id)}
             onToggleProcess={(processId) => onToggleProcess(el.id, processId)}
             onToggleConnection={(otherId) => onToggleConnection(el.id, otherId)}
@@ -279,7 +378,7 @@ export function ArchitectureConfigModal() {
   const addArchitectureElement = useStore((s) => s.addArchitectureElement);
   const updateArchitectureElement = useStore((s) => s.updateArchitectureElement);
   const removeArchitectureElement = useStore((s) => s.removeArchitectureElement);
-  const setElementProcessLinks = useStore((s) => s.setElementProcessLinks);
+  const toggleElementProcessLink = useStore((s) => s.toggleElementProcessLink);
   const toggleArchitectureConnection = useStore((s) => s.toggleArchitectureConnection);
   const resetArchitectureConfig = useStore((s) => s.resetArchitectureConfig);
   const architectureSaveStatus = useStore((s) => s.architectureSaveStatus);
@@ -287,12 +386,7 @@ export function ArchitectureConfigModal() {
   const [configView, setConfigView] = useState<'asis' | 'tobe'>('tobe');
 
   const toggleProcess = (elementId: string, processId: string) => {
-    const el = config.elements.find((e) => e.id === elementId);
-    if (!el) return;
-    const next = el.linkedProcessIds.includes(processId)
-      ? el.linkedProcessIds.filter((id) => id !== processId)
-      : [...el.linkedProcessIds, processId];
-    setElementProcessLinks(elementId, next);
+    toggleElementProcessLink(configView, elementId, processId);
   };
 
   const toggleConnection = (elementId: string, otherId: string) => {
@@ -331,9 +425,9 @@ export function ArchitectureConfigModal() {
                   Architecture layer mapping
                 </h2>
                 <p className="mt-1 text-sm text-mist">
-                  Add elements to each layer, link them to business processes,
-                  and configure connections between elements via “Links”.
-                  Changes save to the shared database automatically.
+                  Add elements, choose where they appear with As is / To be
+                  toggles, and configure connections per view. Example: keep
+                  Excel on in As is and turn To be off to retire it.
                 </p>
                 <SaveStatus
                   status={architectureSaveStatus}

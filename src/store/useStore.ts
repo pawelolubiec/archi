@@ -197,15 +197,24 @@ interface AppState {
         | 'layer'
         | 'systemId'
         | 'linkedProcessIds'
+        | 'linkedProcessIdsAsIs'
+        | 'linkedProcessIdsToBe'
         | 'linkedElementIds'
         | 'linkedElementIdsAsIs'
         | 'linkedElementIdsToBe'
         | 'status'
+        | 'enabledAsIs'
+        | 'enabledToBe'
       >
     >,
   ) => void;
   removeArchitectureElement: (id: string) => void;
-  setElementProcessLinks: (id: string, processIds: string[]) => void;
+  /** Toggle a business-process link for one architecture view only. */
+  toggleElementProcessLink: (
+    view: 'asis' | 'tobe',
+    id: string,
+    processId: string,
+  ) => void;
   toggleArchitectureConnection: (
     view: 'asis' | 'tobe',
     fromId: string,
@@ -374,13 +383,20 @@ export const useStore = create<AppState>((set, get) => ({
       return { architectureConfig };
     }),
 
-  setElementProcessLinks: (id, processIds) =>
+  toggleElementProcessLink: (view, id, processId) =>
     set((s) => {
+      const field =
+        view === 'asis' ? 'linkedProcessIdsAsIs' : 'linkedProcessIdsToBe';
       const architectureConfig = {
         ...s.architectureConfig,
-        elements: s.architectureConfig.elements.map((el) =>
-          el.id === id ? { ...el, linkedProcessIds: [...processIds] } : el,
-        ),
+        elements: s.architectureConfig.elements.map((el) => {
+          if (el.id !== id) return el;
+          const current = el[field] ?? [...el.linkedProcessIds];
+          const next = current.includes(processId)
+            ? current.filter((pid) => pid !== processId)
+            : [...current, processId];
+          return { ...el, [field]: next };
+        }),
       };
       scheduleArchitectureSave(architectureConfig, set);
       return { architectureConfig };

@@ -19,7 +19,9 @@ import {
   elementStatus,
   formatProcessBadges,
   getProcessColor,
+  isElementEnabledInView,
   primaryProcessColor,
+  processIdsForView,
   type ArchLayerId,
   type ArchitectureElement,
   type ConnectionKind,
@@ -297,6 +299,7 @@ function ElementChip({
   element,
   index,
   compact,
+  view,
   highlighted,
   dimmed,
   ghosted = false,
@@ -308,6 +311,7 @@ function ElementChip({
   element: ArchitectureElement;
   index: number;
   compact?: boolean;
+  view: ArchView;
   highlighted: boolean;
   dimmed: boolean;
   ghosted?: boolean;
@@ -316,8 +320,9 @@ function ElementChip({
   onLeave: () => void;
   nodeRef: (node: HTMLElement | null) => void;
 }) {
-  const color = primaryProcessColor(element.linkedProcessIds);
-  const badges = formatProcessBadges(element.linkedProcessIds);
+  const processIds = processIdsForView(element, view);
+  const color = primaryProcessColor(processIds);
+  const badges = formatProcessBadges(processIds);
   const status = elementStatus(element);
   const statusMeta = ELEMENT_STATUS_META[status];
   const openApp = useStore((s) => s.openApp);
@@ -469,6 +474,7 @@ function LayerSection({
               element={el}
               index={i}
               compact={layerId === 'data'}
+              view={view}
               highlighted={highlighted}
               dimmed={dimmed}
               ghosted={ghosted}
@@ -534,9 +540,11 @@ export function ArchitectureLayers() {
 
   const visibleElements = useMemo(
     () =>
-      view === 'asis'
-        ? elements.filter((el) => elementStatus(el) === 'live')
-        : elements,
+      elements.filter((el) => {
+        if (!isElementEnabledInView(el, view)) return false;
+        if (view === 'asis') return elementStatus(el) === 'live';
+        return true;
+      }),
     [elements, view],
   );
 
@@ -586,7 +594,7 @@ export function ArchitectureLayers() {
   const { highlightedProcessIds, highlightedElementIds } = useMemo(() => {
     if (hoveredProcessId) {
       const connected = visibleElements
-        .filter((el) => el.linkedProcessIds.includes(hoveredProcessId))
+        .filter((el) => processIdsForView(el, view).includes(hoveredProcessId))
         .map((el) => el.id);
       return {
         highlightedProcessIds: new Set([hoveredProcessId]),
@@ -610,7 +618,7 @@ export function ArchitectureLayers() {
         ...connectedIds,
       ]);
       return {
-        highlightedProcessIds: new Set(el.linkedProcessIds),
+        highlightedProcessIds: new Set(processIdsForView(el, view)),
         highlightedElementIds: ids,
       };
     }
@@ -626,6 +634,7 @@ export function ArchitectureLayers() {
     visibleElementIds,
     elementById,
     connectedIdsByElement,
+    view,
   ]);
 
   const makeMeasurer = useCallback(() => {
@@ -688,7 +697,8 @@ export function ArchitectureLayers() {
 
     const el = hoveredElementId ? elementById[hoveredElementId] : null;
     if (el) {
-      const color = primaryProcessColor(el.linkedProcessIds);
+      const processIds = processIdsForView(el, view);
+      const color = primaryProcessColor(processIds);
       [...(connectedIdsByElement.get(el.id) ?? [])]
         .filter((id) => visibleElementIds.has(id))
         .forEach((id) => {
@@ -698,13 +708,13 @@ export function ArchitectureLayers() {
         if (diff > 0) add(mk(el.id, other.id, color, '6 6', 'standard'));
         else if (diff < 0) add(mk(other.id, el.id, color, '6 6', 'standard'));
         });
-      el.linkedProcessIds.forEach((pid) =>
+      processIds.forEach((pid) =>
         add(mk(el.id, `proc:${pid}`, getProcessColor(pid), '6 6', 'standard')),
       );
     } else if (hoveredProcessId) {
       const color = getProcessColor(hoveredProcessId);
       visibleElements
-        .filter((o) => o.linkedProcessIds.includes(hoveredProcessId))
+        .filter((o) => processIdsForView(o, view).includes(hoveredProcessId))
         .forEach((o) => add(mk(o.id, `proc:${hoveredProcessId}`, color, '6 6', 'standard')));
     }
 
@@ -730,7 +740,8 @@ export function ArchitectureLayers() {
     setHoveredProcessId(null);
   };
 
-  const byLayer = (layer: ArchLayerId) => elements.filter((el) => el.layer === layer);
+  const byLayer = (layer: ArchLayerId) =>
+    visibleElements.filter((el) => el.layer === layer);
 
   const isHovering = hoveredProcessId !== null || hoveredElementId !== null;
   const legendKinds = viewConnections.map((c) => c.kind);
