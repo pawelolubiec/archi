@@ -324,12 +324,14 @@ export function AppShell() {
           </div>
 
           {/* business message */}
-          <div className="pointer-events-none flex shrink-0 justify-center px-8">
-            <p className="max-w-5xl text-center text-slide-takeaway font-medium leading-snug text-paper/85">
-              <span className="mr-2 text-gold">▸</span>
-              {chapter.businessMessage}
-            </p>
-          </div>
+          {chapter.businessMessage && (
+            <div className="pointer-events-none flex shrink-0 justify-center px-8">
+              <p className="max-w-5xl text-center text-slide-takeaway font-medium leading-snug text-paper/85">
+                <span className="mr-2 text-gold">▸</span>
+                {chapter.businessMessage}
+              </p>
+            </div>
+          )}
         </div>
       )}
 

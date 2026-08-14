@@ -386,8 +386,7 @@ const allChapters: Chapter[] = [
     title: 'Initiative costs and roadmap',
     description:
       'Q4 2026 – Q4 2030. All figures in EUR thousands. Current = annual run-rate today · Transformation = one-off project cost · Future = annual maintenance after go-live.',
-    businessMessage:
-      'Indicative 5-year cost of EUR 2,904k — transformation plus four years of future maintenance — sequenced as controlled investments, not a big bang.',
+    businessMessage: '',
     cameraPosition: [0, 1, 9.5],
     cameraTarget: [0, 0, 0],
     visibleLocations: [],
