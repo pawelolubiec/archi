@@ -478,7 +478,7 @@ function LayerSection({
               highlighted={highlighted}
               dimmed={dimmed}
               ghosted={ghosted}
-              showStatus={view === 'tobe'}
+              showStatus={view === 'tobe' || ghosted}
               onHover={() => onHoverElement(el.id)}
               onLeave={onLeaveElement}
               nodeRef={registerNode(el.id)}
@@ -542,7 +542,11 @@ export function ArchitectureLayers() {
     () =>
       elements.filter((el) => {
         if (!isElementEnabledInView(el, view)) return false;
-        if (view === 'asis') return elementStatus(el) === 'live';
+        if (view === 'asis') {
+          const status = elementStatus(el);
+          // Running = solid; In development = shown faded (preview of what’s coming)
+          return status === 'live' || status === 'in_dev';
+        }
         return true;
       }),
     [elements, view],
@@ -854,7 +858,7 @@ export function ArchitectureLayers() {
             </>
           ) : (
             <>
-              Only running systems are shown.{' '}
+              Running systems are solid; in-development systems are faded.{' '}
               {diffKinds.downgraded.length > 0 && (
                 <span className="text-mist/70">
                   {diffKinds.downgraded.length} links upgrade when you switch to To be.
