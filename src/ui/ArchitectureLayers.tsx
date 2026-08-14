@@ -27,9 +27,22 @@ import {
 
 type ArchView = 'asis' | 'tobe';
 
-const VIEW_META: Record<ArchView, { label: string; accent: string }> = {
-  asis: { label: 'As is', accent: '#2EC5C5' },
-  tobe: { label: 'To be', accent: '#D6BF91' },
+const VIEW_META: Record<
+  ArchView,
+  { label: string; accent: string; soft: string; hint: string }
+> = {
+  asis: {
+    label: 'As is',
+    accent: '#F07167',
+    soft: 'rgba(240,113,103,0.16)',
+    hint: 'Today — fragmented',
+  },
+  tobe: {
+    label: 'To be',
+    accent: '#34D399',
+    soft: 'rgba(52,211,153,0.16)',
+    hint: 'Target — connected',
+  },
 };
 
 const LAYER_FLOW_HINTS: Record<ArchLayerId, string> = {
@@ -96,25 +109,58 @@ function ArchViewSwitch({
   view: ArchView;
   onChange: (v: ArchView) => void;
 }) {
+  const asIs = view === 'asis';
+  const active = VIEW_META[view];
+
   return (
-    <div className="flex flex-col items-center gap-2">
-      <div className="pointer-events-auto flex gap-2 rounded-full border border-white/10 bg-navy-900/80 p-1.5 shadow-panel backdrop-blur-md">
+    <div className="flex flex-col items-center gap-2.5">
+      <div
+        className="pointer-events-auto relative flex overflow-hidden rounded-full border bg-navy-900/85 p-1.5 shadow-panel backdrop-blur-md"
+        style={{
+          borderColor: asIs ? 'rgba(240,113,103,0.55)' : `${active.accent}55`,
+          boxShadow: asIs
+            ? '0 0 0 1px rgba(240,113,103,0.2), 0 0 28px -8px rgba(240,113,103,0.55)'
+            : `0 0 0 1px ${active.accent}22, 0 0 28px -8px ${active.accent}66`,
+        }}
+        role="group"
+        aria-label="Architecture state"
+      >
+        {asIs && (
+          <span
+            aria-hidden="true"
+            className="arch-asis-sweep pointer-events-none absolute inset-y-0 left-0 z-0 w-1/2 rounded-full motion-reduce:hidden"
+            style={{
+              background:
+                'linear-gradient(90deg, transparent 0%, rgba(240,113,103,0.08) 25%, rgba(240,113,103,0.45) 50%, rgba(52,211,153,0.35) 72%, transparent 100%)',
+              filter: 'blur(2px)',
+            }}
+          />
+        )}
+
         {(Object.keys(VIEW_META) as ArchView[]).map((v) => {
           const selected = view === v;
           const meta = VIEW_META[v];
+          const asIsSelected = selected && v === 'asis';
           return (
             <button
               key={v}
               type="button"
               onClick={() => onChange(v)}
-              className="rounded-full px-6 py-2.5 text-sm font-semibold uppercase tracking-[0.12em] transition"
+              aria-pressed={selected}
+              className={`relative z-10 min-w-[7.5rem] rounded-full px-5 py-2.5 text-sm font-semibold uppercase tracking-[0.12em] transition ${
+                asIsSelected ? 'arch-asis-pulse' : ''
+              }`}
               style={{
-                borderColor: selected ? `${meta.accent}cc` : 'transparent',
-                background: selected ? `${meta.accent}18` : 'transparent',
-                color: selected ? meta.accent : '#9DB4CC',
-                boxShadow: selected
-                  ? `0 0 0 1px ${meta.accent}44, 0 0 24px -6px ${meta.accent}88`
-                  : undefined,
+                background: selected ? meta.soft : 'transparent',
+                color: selected
+                  ? meta.accent
+                  : asIs && v === 'tobe'
+                    ? 'rgba(52,211,153,0.75)'
+                    : '#9DB4CC',
+                boxShadow:
+                  selected && !asIsSelected
+                    ? `inset 0 0 0 1px ${meta.accent}99`
+                    : undefined,
               }}
             >
               {meta.label}
@@ -122,6 +168,7 @@ function ArchViewSwitch({
           );
         })}
       </div>
+
       <AnimatePresence mode="wait">
         <motion.div
           key={view}
@@ -131,7 +178,9 @@ function ArchViewSwitch({
           transition={{ duration: 0.25 }}
           className="max-w-2xl text-center"
         >
-          <p className="text-sm font-medium text-paper">{ARCH_VIEW_COPY[view].headline}</p>
+          <p className="text-sm font-medium" style={{ color: active.accent }}>
+            {ARCH_VIEW_COPY[view].headline}
+          </p>
           <p className="mt-1 text-xs leading-relaxed text-mist/85">
             {ARCH_VIEW_COPY[view].detail}
           </p>
@@ -713,7 +762,7 @@ export function ArchitectureLayers() {
         setHoveredElementId(null);
       }}
     >
-      <div className="fixed left-1/2 top-4 z-30 -translate-x-1/2">
+      <div className="relative z-30 shrink-0 pb-1">
         <ArchViewSwitch view={view} onChange={setView} />
       </div>
 

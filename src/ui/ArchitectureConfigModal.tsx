@@ -374,20 +374,20 @@ export function ArchitectureConfigModal() {
                         borderColor:
                           configView === v
                             ? v === 'asis'
-                              ? '#2EC5C5aa'
-                              : '#D6BF91aa'
+                              ? '#F07167aa'
+                              : '#34D399aa'
                             : 'rgba(255,255,255,0.12)',
                         background:
                           configView === v
                             ? v === 'asis'
-                              ? 'rgba(46,197,197,0.12)'
-                              : 'rgba(214,191,145,0.12)'
+                              ? 'rgba(240,113,103,0.12)'
+                              : 'rgba(52,211,153,0.12)'
                             : 'transparent',
                         color:
                           configView === v
                             ? v === 'asis'
-                              ? '#2EC5C5'
-                              : '#D6BF91'
+                              ? '#F07167'
+                              : '#34D399'
                             : '#9DB4CC',
                       }}
                     >

@@ -153,6 +153,12 @@ interface AppState {
   factorySaveError: string | null;
   architectureSaveStatus: ConfigSaveStatus;
   architectureSaveError: string | null;
+  /** slide voiceover on/off — shared with the start modal and header control */
+  narrationEnabled: boolean;
+  /** opening choice on the first slide */
+  narrationStartOpen: boolean;
+  /** play hook registered by NarrationControl so the start modal keeps the user-gesture */
+  narrationPlayHandler: (() => void) | null;
 
   current: () => Chapter;
   next: () => void;
@@ -207,6 +213,9 @@ interface AppState {
   ) => void;
   resetArchitectureConfig: () => void;
   hydrateConfig: () => Promise<void>;
+  setNarrationEnabled: (enabled: boolean) => void;
+  registerNarrationPlayHandler: (handler: (() => void) | null) => void;
+  chooseNarrationStart: (withNarration: boolean) => void;
 }
 
 export const useStore = create<AppState>((set, get) => ({
@@ -232,6 +241,9 @@ export const useStore = create<AppState>((set, get) => ({
   factorySaveError: null,
   architectureSaveStatus: 'idle',
   architectureSaveError: null,
+  narrationEnabled: false,
+  narrationStartOpen: true,
+  narrationPlayHandler: null,
 
   current: () => chapters[get().index],
 
@@ -434,6 +446,19 @@ export const useStore = create<AppState>((set, get) => ({
         factorySaveStatus: 'error',
         factorySaveError: message,
       });
+    }
+  },
+
+  setNarrationEnabled: (enabled) => set({ narrationEnabled: enabled }),
+  registerNarrationPlayHandler: (handler) =>
+    set({ narrationPlayHandler: handler }),
+  chooseNarrationStart: (withNarration) => {
+    set({
+      narrationEnabled: withNarration,
+      narrationStartOpen: false,
+    });
+    if (withNarration) {
+      get().narrationPlayHandler?.();
     }
   },
 }));

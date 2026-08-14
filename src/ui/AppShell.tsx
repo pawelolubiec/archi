@@ -29,6 +29,7 @@ import { InitiativePortfolioPanel } from './InitiativePortfolioPanel';
 import { FactoryOrderPanel } from './FactoryOrderPanel';
 import { FACTORY_DEMO_STEPS } from '../data/factoryDemo';
 import { NarrationControl } from './NarrationControl';
+import { NarrationStartModal } from './NarrationStartModal';
 import { ControlTowerPanel } from './ControlTowerPanel';
 
 function CentralPanel() {
@@ -100,16 +101,26 @@ export function AppShell() {
         architectureConfigOpen,
         factoryDemoStep: demoStep,
         setFactoryDemoStep,
+        narrationStartOpen,
+        chooseNarrationStart,
       } = useStore.getState();
       if (e.key === 'Escape') {
-        if (factoryConfigOpen) closeFactoryConfig();
+        if (narrationStartOpen) chooseNarrationStart(false);
+        else if (factoryConfigOpen) closeFactoryConfig();
         else if (architectureConfigOpen) closeArchitectureConfig();
         else if (appModal) closeApp();
         else if (demoStep !== null) setFactoryDemoStep(null);
         else closeModal();
         return;
       }
-      if (appModal || factoryConfigOpen || architectureConfigOpen) return;
+      if (
+        narrationStartOpen ||
+        appModal ||
+        factoryConfigOpen ||
+        architectureConfigOpen
+      ) {
+        return;
+      }
       // while the factory demo runs, arrows step the demo instead of slides
       if (demoStep !== null) {
         if (e.key === 'ArrowRight' || e.key === ' ') {
@@ -332,6 +343,7 @@ export function AppShell() {
       <AppModal />
       <FactoryConfigModal />
       <ArchitectureConfigModal />
+      <NarrationStartModal />
     </div>
   );
 }

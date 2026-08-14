@@ -40,9 +40,13 @@ function SpeakerIcon({ active }: { active: boolean }) {
 
 export function NarrationControl() {
   const index = useStore((s) => s.index);
+  const enabled = useStore((s) => s.narrationEnabled);
+  const setNarrationEnabled = useStore((s) => s.setNarrationEnabled);
+  const registerNarrationPlayHandler = useStore(
+    (s) => s.registerNarrationPlayHandler,
+  );
   const audioRef = useRef<HTMLAudioElement>(null);
   const lastStartedIndex = useRef<number | null>(null);
-  const [enabled, setEnabled] = useState(false);
   const [playback, setPlayback] = useState<PlaybackState>('off');
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -69,7 +73,24 @@ export function NarrationControl() {
   }, []);
 
   useEffect(() => {
-    if (!enabled || lastStartedIndex.current === index) return;
+    const playFromGesture = () => {
+      lastStartedIndex.current = useStore.getState().index;
+      void playCurrentSlide();
+    };
+    registerNarrationPlayHandler(playFromGesture);
+    return () => registerNarrationPlayHandler(null);
+  }, [playCurrentSlide, registerNarrationPlayHandler]);
+
+  useEffect(() => {
+    if (!enabled) {
+      audioRef.current?.pause();
+      lastStartedIndex.current = null;
+      setPlayback('off');
+      setCurrentTime(0);
+      setDuration(0);
+      return;
+    }
+    if (lastStartedIndex.current === index) return;
     lastStartedIndex.current = index;
     void playCurrentSlide();
   }, [enabled, index, playCurrentSlide]);
@@ -87,14 +108,14 @@ export function NarrationControl() {
     if (enabled) {
       audio?.pause();
       lastStartedIndex.current = null;
-      setEnabled(false);
+      setNarrationEnabled(false);
       setPlayback('off');
       setCurrentTime(0);
       setDuration(0);
       return;
     }
 
-    setEnabled(true);
+    setNarrationEnabled(true);
     lastStartedIndex.current = index;
     void playCurrentSlide();
   };

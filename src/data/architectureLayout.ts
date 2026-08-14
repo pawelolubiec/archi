@@ -324,7 +324,7 @@ export const ARCH_VIEW_COPY: Record<
   asis: {
     headline: 'As is — fragmented today',
     detail:
-      'Live systems connect through manual exports and custom wiring. BI sits beside operations — not underneath them.',
+      'Live systems connect through manual exports and custom wiring. BI sits beside operations — not underneath them. Switch to To be to see the target state.',
   },
   tobe: {
     headline: 'To be — one data layer',

@@ -207,25 +207,25 @@ Every key performance indicator has an owner... a baseline... a target... and na
 
 ---
 
-## Slide 09 — Roadmap 2026 to 2030
+## Slide 09 — Initiative costs and roadmap, Q4 2026 to Q4 2030
 
-The roadmap is designed as a sequence of controlled investments... not a big-bang transformation.
-
-<break time="0.7s" />
-
-We begin with data foundations, integrations, and a tightly defined E R P scope. In parallel, we strengthen the operational core through MiFo, W M S, P T S, and P I D. Once trusted data and core processes are in place, we expand planning, quality, analytics, automation, and ultimately digital-twin capabilities.
+The roadmap is a costed sequence of controlled investments... not a big-bang transformation.
 
 <break time="0.7s" />
 
-The tracks can overlap because several core systems are already live or in development. A data-platform-first approach reduces rework in later phases. A focused financial E R P limits scope. Parallel delivery, supported by clear stage gates, allows Milarex to move faster — without losing control.
+Seven initiatives carry the program. Master data and P T S start in late twenty twenty-six. P I D, MiFo, and the new E R P build through twenty twenty-seven and twenty twenty-eight, then move into run. The Control Tower and Digital Twin develop continuously from twenty twenty-seven.
 
 <break time="0.7s" />
 
-The standard path runs through twenty thirty, with the E R P planned to be live by the end of twenty twenty-eight. An accelerated path can bring much of the twenty-thirty scope forward... provided the organization has the capacity to execute.
+Where cash is external, the numbers are explicit. Current annual run-rate is three hundred twenty-six thousand euro. Transformation is one million four hundred twenty-eight thousand. Future maintenance is three hundred sixty-nine thousand a year. Several workstreams are delivered with internal labour.
+
+<break time="0.7s" />
+
+The indicative five-year cost — transformation plus four years of future maintenance — is two million nine hundred four thousand euro. The E R P transformation figure is the average of four submitted offers.
 
 <break time="1.4s" />
 
-The message is discipline with momentum: deliver value in stages... protect dependencies... and make every phase earn the next.
+The message is discipline with momentum: fund what is sequenced... protect dependencies... and make every phase earn the next.
 
 ---
 

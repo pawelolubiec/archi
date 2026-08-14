@@ -353,7 +353,7 @@ const allChapters: Chapter[] = [
     description:
       'Every KPI has an owner and is driven by specific systems. Technology meets the financial result.',
     businessMessage:
-      'Yield = PTS + MiFo + PID + Data. Forecast = MiFo + APS + Data + AI. Working capital = WMS + ERP + APS.',
+      'Every KPI has an owner — and is driven by specific systems that move the financial result.',
     cameraPosition: [0, 1, 9.5],
     cameraTarget: [0, 0, 0],
     visibleLocations: [],
@@ -383,11 +383,11 @@ const allChapters: Chapter[] = [
     index: 15,
     scene: 'roadmap',
     eyebrow: 'Roadmap',
-    title: 'Roadmap 2026–2030',
+    title: 'Initiative costs and roadmap',
     description:
-      'From data foundations to autonomous decision support — five tracks that can run in parallel, not in sequence. Toggle the pace to see how the 2030 scope can land by end-2028.',
+      'Q4 2026 – Q4 2030. All figures in EUR thousands. Current = annual run-rate today · Transformation = one-off project cost · Future = annual maintenance after go-live.',
     businessMessage:
-      'A sequence, not a big bang — and with parallel tracks and AI-assisted delivery, the 2030 scope can land by 2028.',
+      'Indicative 5-year cost of EUR 2,904k — transformation plus four years of future maintenance — sequenced as controlled investments, not a big bang.',
     cameraPosition: [0, 1, 9.5],
     cameraTarget: [0, 0, 0],
     visibleLocations: [],

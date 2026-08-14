@@ -125,17 +125,3 @@ export interface Chapter {
   prominentTakeaway?: boolean;
 }
 
-/** Time span of a roadmap track, in fractional years (e.g. 2026.5 = mid-2026). */
-export interface RoadmapSpan {
-  start: number;
-  end: number;
-}
-
-export interface RoadmapTrack {
-  theme: string;
-  items: string[];
-  /** sequential 2026–2030 pace */
-  standard: RoadmapSpan;
-  /** parallel-tracks pace — 2030 scope by end-2028 */
-  accelerated: RoadmapSpan;
-}

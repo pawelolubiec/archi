@@ -1,4 +1,4 @@
-import type { Scenario, RoadmapTrack } from './types';
+import type { Scenario } from './types';
 
 export const scenarios: Scenario[] = [
   {
@@ -129,50 +129,3 @@ export const scenarios: Scenario[] = [
 export const scenarioById = Object.fromEntries(
   scenarios.map((s) => [s.id, s]),
 ) as Record<string, Scenario>;
-
-/**
- * Roadmap as parallel tracks. Spans are fractional years on a 2026–2031 axis.
- * `standard` is the sequential 2026–2030 pace; `accelerated` overlaps tracks
- * and lands the 2030 scope by end-2028.
- */
-export const ROADMAP_TRACKS: RoadmapTrack[] = [
-  {
-    theme: 'Foundations',
-    items: ['Data foundations', 'Integrations', 'ERP scope & selection'],
-    standard: { start: 2026.0, end: 2028.0 },
-    accelerated: { start: 2026.0, end: 2026.7 },
-  },
-  {
-    theme: 'Operational core',
-    items: ['MiFo', 'WMS', 'PTS', 'PID'],
-    standard: { start: 2026.8, end: 2028.0 },
-    accelerated: { start: 2026.3, end: 2027.5 },
-  },
-  {
-    theme: 'Intelligence',
-    items: ['MiFo', 'APS', 'QMS / LIMS'],
-    standard: { start: 2028.0, end: 2029.0 },
-    accelerated: { start: 2027.0, end: 2028.1 },
-  },
-  {
-    theme: 'Automation',
-    items: ['AI Agents', 'Automation', 'Predictive analytics'],
-    standard: { start: 2029.0, end: 2030.0 },
-    accelerated: { start: 2027.6, end: 2028.7 },
-  },
-  {
-    theme: 'Autonomy',
-    items: ['Digital Twin', 'Autonomous decision support'],
-    standard: { start: 2030.0, end: 2030.9 },
-    accelerated: { start: 2028.2, end: 2029.0 },
-  },
-];
-
-/** Why the accelerated pace is credible — shown under the track chart. */
-export const ROADMAP_ENABLERS = [
-  'PTS · PID · MiFo already live — half the operational core exists',
-  'Data platform first — later phases start on clean data',
-  'AI-assisted delivery & integration',
-  'Fixed-scope ERP (finance only)',
-  'Parallel tracks with stage-gate governance',
-];
