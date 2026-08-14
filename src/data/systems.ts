@@ -163,7 +163,7 @@ export const systems: SystemDef[] = [
   },
   {
     id: 'gone_ai',
-    name: 'AI Agents · Gone-AI',
+    name: 'AI Agents · Gen AI',
     short: 'AI',
     category: 'ai',
     owner: 'IT / Innovation',

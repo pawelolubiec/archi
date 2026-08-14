@@ -237,7 +237,7 @@ const DEFAULT_ELEMENTS: ArchitectureElement[] = [
   { id: 'ai_ops', label: 'Operational intelligence', layer: 'ai', linkedProcessIds: ['performance'] },
     {
     id: 'ai_gone',
-    label: 'Gone-AI agents',
+    label: 'Gen AI agents',
     layer: 'ai',
     linkedProcessIds: ['forecasting', 'performance'],
     systemId: 'gone_ai',
