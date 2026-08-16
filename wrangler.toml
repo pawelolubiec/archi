@@ -13,3 +13,11 @@ binding = "DB"
 database_name = "archi"
 database_id = "453d475c-06df-4ab6-936d-df812f3a76da"
 migrations_dir = "migrations"
+
+[observability]
+enabled = true
+
+[observability.logs]
+enabled = true
+invocation_logs = true
+
