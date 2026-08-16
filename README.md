@@ -25,9 +25,18 @@ npm run db:migrate:local   # first time / local D1 schema
 npm run dev                # Vite on :5173 (proxies /api → worker)
 npm run dev:worker         # in another terminal — Worker + D1 on :8787
 npm run build
-npm run deploy             # build + wrangler deploy
+npm run deploy             # build + migrate remote + wrangler deploy
 npm run db:migrate:remote  # apply migrations to production D1
 ```
+
+### Visitor logs
+
+HTML page views are logged to D1 (`visitor_logs`). Browse them at **`/visitors`**
+(password-protected).
+
+- **Local:** `.dev.vars` sets `VISITORS_PASSWORD` (default `changeme`; file is gitignored).
+- **Production:** `wrangler secret put VISITORS_PASSWORD` before or after deploy.
+- Open the Worker URL + `/visitors` (or `http://127.0.0.1:8787/visitors` in local Worker dev).
 
 ## Controls
 
